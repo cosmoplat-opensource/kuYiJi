@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.ng.domain.mapper.MicroRepairRecordMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.ng.domain.entity.MicroRepairRecord" id="MicroRepairRecordResult">
+        <result property="id" column="id"/>
+        <result property="repairNo" column="repair_no"/>
+        <result property="submitId" column="submit_id"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="preProcessSeq" column="pre_process_seq"/>
+        <result property="submitUser" column="submit_user"/>
+        <result property="repairNum" column="repair_num"/>
+        <result property="repairUser" column="repair_user"/>
+        <result property="concessionNum" column="concession_num"/>
+        <result property="abandonedNum" column="abandoned_num"/>
+        <result property="abandonedType" column="abandoned_type"/>
+        <result property="remark" column="remark"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="activeFlag" column="active_flag"/>
+    </resultMap>
+
+    <sql id="selectMicroRepairRecordVo">
+        select id, repair_no, submit_id, product_seq, process_seq, pre_process_seq, submit_user, repair_user, repair_num, concession_num, abandoned_num, abandoned_type, remark, created_by, created_date, last_upd_by, last_upd_date, active_flag from micro_repair_record
+    </sql>
+
+    <select id="selectMicroRepairRecordList" parameterType="com.cosmo.hhim.micro.ng.domain.entity.MicroRepairRecord" resultMap="MicroRepairRecordResult">
+        <include refid="selectMicroRepairRecordVo"/>
+        <where>
+            <if test="repairNo != null  and repairNo != ''">and repair_no = #{repairNo}</if>
+            <if test="submitId != null ">and submit_id = #{submitId}</if>
+            <if test="productSeq != null  and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="processSeq != null  and processSeq != ''">and process_seq = #{processSeq}</if>
+            <if test="preProcessSeq != null  and preProcessSeq != ''">and pre_process_seq = #{preProcessSeq}</if>
+            <if test="submitUser != null">and submit_user = #{submitUser}</if>
+            <if test="repairUser != null ">and repair_user = #{repairUser}</if>
+            <if test="repairNum != null ">and repair_num = #{repairNum}</if>
+            <if test="concessionNum != null ">and concession_num = #{concessionNum}</if>
+            <if test="abandonedNum != null ">and abandoned_num = #{abandonedNum}</if>
+            <if test="abandonedType != null  and abandonedType != ''">and abandoned_type = #{abandonedType}</if>
+            <if test="createdBy != null ">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null ">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and active_flag = #{activeFlag}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroRepairRecordById" parameterType="Long" resultMap="MicroRepairRecordResult">
+        <include refid="selectMicroRepairRecordVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMicroRepairRecord" parameterType="com.cosmo.hhim.micro.ng.domain.entity.MicroRepairRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_repair_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="repairNo != null and repairNo != ''">repair_no,</if>
+            <if test="submitId != null">submit_id,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="processSeq != null and processSeq != ''">process_seq,</if>
+            <if test="preProcessSeq != null">pre_process_seq,</if>
+            <if test="submitUser != null">submit_user,</if>
+            <if test="repairUser != null">repair_user,</if>
+            <if test="repairNum != null">repair_num,</if>
+            <if test="concessionNum != null">concession_num,</if>
+            <if test="abandonedNum != null">abandoned_num,</if>
+            <if test="abandonedType != null">abandoned_type,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="activeFlag != null">active_flag,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="repairNo != null and repairNo != ''">#{repairNo},</if>
+            <if test="submitId != null">#{submitId},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="processSeq != null and processSeq != ''">#{processSeq},</if>
+            <if test="preProcessSeq != null">#{preProcessSeq},</if>
+            <if test="submitUser != null">#{submitUser},</if>
+            <if test="repairUser != null">#{repairUser},</if>
+            <if test="repairNum != null">#{repairNum},</if>
+            <if test="concessionNum != null">#{concessionNum},</if>
+            <if test="abandonedNum != null">#{abandonedNum},</if>
+            <if test="abandonedType != null">#{abandonedType},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertMicroRepairRecordBatch">
+        insert into micro_repair_record
+        (repair_no,
+        submit_id,
+        product_seq,
+        process_seq,
+        pre_process_seq,
+        submit_user,
+        repair_user,
+        repair_num,
+        concession_num,
+        abandoned_num,
+        abandoned_type,
+        remark,
+        created_by,
+        created_date,
+        last_upd_by,
+        last_upd_date,
+        active_flag
+        ) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.repairNo},
+             #{item.submitId},
+             #{item.productSeq},
+             #{item.processSeq},
+             #{item.preProcessSeq},
+             #{item.submitUser},
+             #{item.repairUser},
+             #{item.repairNum},
+             #{item.concessionNum},
+             #{item.abandonedNum},
+             #{item.abandonedType},
+             #{item.remark},
+             #{item.createdBy},
+             #{item.createdDate},
+             #{item.lastUpdBy},
+             #{item.lastUpdDate},
+             #{item.activeFlag})
+        </foreach>
+    </insert>
+
+    <update id="updateMicroRepairRecord" parameterType="com.cosmo.hhim.micro.ng.domain.entity.MicroRepairRecord">
+        update micro_repair_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="repairNo != null and repairNo != ''">repair_no = #{repairNo},</if>
+            <if test="submitId != null">submit_id = #{submitId},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="processSeq != null and processSeq != ''">process_seq = #{processSeq},</if>
+            <if test="preProcessSeq != null">pre_process_seq = #{preProcessSeq},</if>
+            <if test="submitUser != null">submit_user = #{submitUser},</if>
+            <if test="repairUser != null">repair_user = #{repairUser},</if>
+            <if test="repairNum != null">repair_num = #{repairNum},</if>
+            <if test="concessionNum != null">concession_num = #{concessionNum},</if>
+            <if test="abandonedNum != null">abandoned_num = #{abandonedNum},</if>
+            <if test="abandonedType != null">abandoned_type = #{abandonedType},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroRepairRecordById" parameterType="Long">
+        delete from micro_repair_record where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroRepairRecordByIds" parameterType="String">
+        delete from micro_repair_record where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectMicroRepairRecordListByQueryKey" resultType="com.cosmo.hhim.micro.ng.domain.entity.RepairRecordInfo">
+        SELECT
+            mrr.repair_no as repairNo,
+            mrr.product_seq as productSeq,
+            mp.product_code as productCode,
+            mp.product_name as productName,
+            mrr.process_seq as processSeq,
+            mpc.process_name as processName,
+            sum(repair_num) as repairNum,
+            sum(concession_num) as concessionNum,
+            sum(abandoned_num) as abandonedNum,
+            mu.nick_name as repairNickName,
+            mu2.nick_name as reviewNickName,
+            mrr.created_date as reviewDate
+        FROM micro_repair_record mrr
+        LEFT JOIN micro_process_common mpc on mrr.process_seq = mpc.process_seq
+        LEFT JOIN micro_product mp on mrr.product_seq = mp.product_seq
+        LEFT JOIN micro_user mu on mu.id = mrr.repair_user
+        LEFT JOIN micro_user mu2 on mu2.id = mrr.created_by
+        <where>
+            <if test="queryKey != null and queryKey != ''">
+                mp.product_code like concat('%', #{queryKey}, '%')
+                or mp.product_name like concat('%', #{queryKey}, '%')
+                or mpc.process_code like concat('%', #{queryKey}, '%')
+                or mpc.process_name like concat('%', #{queryKey}, '%')
+            </if>
+        </where>
+        GROUP BY mrr.repair_no
+        ORDER BY mrr.created_date DESC
+    </select>
+
+    <select id="selectNumInfoByProductAndProcessAndUser" resultType="com.cosmo.hhim.micro.ng.domain.entity.RepairNumInfoByProductAndProcessAndUser">
+        SELECT
+            product_seq as productSeq,
+            process_seq as processSeq,
+            submit_user as submitUser,
+            sum(repair_num) as repairNum,
+            sum(concession_num) as concessionNum,
+            sum(abandoned_num) as abandonedNum
+        FROM micro_repair_record
+        GROUP BY product_seq, process_seq, submit_user
+    </select>
+</mapper>

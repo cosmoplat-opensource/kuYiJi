@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.planning.domain.mapper.manufacture.MicroPickMaterialsMapper">
+    
+    <resultMap type="MicroPickMaterials" id="MicroPickMaterialsResult">
+        <result property="id"    column="id"    />
+        <result property="pickingNo"    column="picking_no"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="workOrderNo"    column="work_order_no"    />
+        <result property="productSeq"    column="product_seq"    />
+        <result property="materialsType"    column="materials_type"    />
+        <result property="pickingNumber"    column="picking_number"    />
+        <result property="activityFlag"    column="activity_flag"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpDate"    column="last_up_date"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="productType"    column="product_type"    />
+        <result property="productionMode"    column="production_mode"    />
+        <result property="returnNumber"    column="return_number"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="productName"    column="product_name"    />
+    </resultMap>
+
+    <sql id="selectMicroPickMaterialsVo">
+        select id, picking_no, order_no, work_order_no, product_seq, materials_type, picking_number, activity_flag, created_by, created_date, last_upd_by, last_up_date, tenant_code from micro_pick_materials
+    </sql>
+    <sql id="selectMicroPickMaterialsVoFirst">
+        select mpm.order_no,
+               mpm.work_order_no,
+               mpm.product_seq,
+               sum(case  when mpm.materials_type = '0' THEN mpm.picking_number else 0 end) as picking_number,
+               sum(case  when mpm.materials_type = '1' THEN mpm.picking_number else 0 end) as return_number,
+               mpm.activity_flag,
+               mpm.created_by,
+               mpm.created_date,
+               mpm.last_upd_by,
+               mpm.last_up_date,
+               mpm.tenant_code,
+               mp.product_type,
+               mp.production_mode,
+               mp.product_name,
+               mp.product_code
+        from micro_pick_materials mpm
+        left join micro_product mp on mpm.product_seq = mp.product_seq
+    </sql>
+
+    <select id="selectMicroPickMaterialsList" parameterType="MicroPickMaterials" resultMap="MicroPickMaterialsResult">
+        <include refid="selectMicroPickMaterialsVo"/>
+        <where>  
+            <if test="pickingNo != null  and pickingNo != ''"> and picking_no = #{pickingNo}</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no = #{orderNo}</if>
+            <if test="workOrderNo != null  and workOrderNo != ''"> and work_order_no = #{workOrderNo}</if>
+            <if test="productSeq != null  and productSeq != ''"> and product_seq = #{productSeq}</if>
+            <if test="materialsType != null "> and materials_type = #{materialsType}</if>
+            <if test="pickingNumber != null "> and picking_number = #{pickingNumber}</if>
+            <if test="activityFlag != null  and activityFlag != ''"> and activity_flag = #{activityFlag}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpDate != null "> and last_up_date = #{lastUpDate}</if>
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+        </where>
+    </select>
+    
+    <select id="selectMicroPickMaterialsById" parameterType="Long" resultMap="MicroPickMaterialsResult">
+        <include refid="selectMicroPickMaterialsVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMicroPickMaterials" parameterType="MicroPickMaterials" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_pick_materials
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pickingNo != null">picking_no,</if>
+            <if test="orderNo != null">order_no,</if>
+            <if test="workOrderNo != null and workOrderNo != ''">work_order_no,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="materialsType != null">materials_type,</if>
+            <if test="pickingNumber != null">picking_number,</if>
+            <if test="activityFlag != null and activityFlag != ''">activity_flag,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpDate != null">last_up_date,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pickingNo != null">#{pickingNo},</if>
+            <if test="orderNo != null">#{orderNo},</if>
+            <if test="workOrderNo != null and workOrderNo != ''">#{workOrderNo},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="materialsType != null">#{materialsType},</if>
+            <if test="pickingNumber != null">#{pickingNumber},</if>
+            <if test="activityFlag != null and activityFlag != ''">#{activityFlag},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpDate != null">#{lastUpDate},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroPickMaterials" parameterType="MicroPickMaterials">
+        update micro_pick_materials
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="pickingNo != null">picking_no = #{pickingNo},</if>
+            <if test="orderNo != null">order_no = #{orderNo},</if>
+            <if test="workOrderNo != null and workOrderNo != ''">work_order_no = #{workOrderNo},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="materialsType != null">materials_type = #{materialsType},</if>
+            <if test="pickingNumber != null">picking_number = #{pickingNumber},</if>
+            <if test="activityFlag != null and activityFlag != ''">activity_flag = #{activityFlag},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpDate != null">last_up_date = #{lastUpDate},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroPickMaterialsById" parameterType="Long">
+        delete from micro_pick_materials where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroPickMaterialsByIds" parameterType="String">
+        delete from micro_pick_materials where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id ="insertList" parameterType="java.util.List" >
+        insert into micro_pick_materials (
+        tenant_code,
+        picking_no,
+        order_no,
+        work_order_no,
+        product_seq,
+        materials_type,
+        picking_number,
+        created_by,
+        created_date
+        )
+        values
+        <foreach collection ="list" item="item" index= "index" separator =",">
+            (
+            #{item.tenantCode},
+            #{item.pickingNo},
+            #{item.orderNo},
+            #{item.workOrderNo},
+            #{item.productSeq},
+            #{item.materialsType},
+            #{item.pickingNumber},
+            #{item.createdBy},
+            sysdate()
+            )
+        </foreach >
+    </insert >
+
+    <select id="getMicroPickMaterialsList" parameterType="MicroPickMaterials" resultMap="MicroPickMaterialsResult">
+        <include refid="selectMicroPickMaterialsVoFirst"/>
+        <where>
+            <if test="workOrderNo != null and workOrderNo != ''">
+                and mpm.work_order_no = #{workOrderNo}
+            </if>
+            <if test="productSeqList != null">
+                and mpm.product_seq in
+                <foreach item="productSeq" collection="productSeqList" open="(" separator="," close=")">
+                    #{productSeq}
+                </foreach>
+            </if>
+        </where>
+        group by mpm.product_seq
+    </select>
+    <select id="selectMaterialShortageInfo" resultMap="MicroPickMaterialsResult">
+        SELECT
+        mpm.work_order_no,
+        mpm.product_seq,
+        ANY_VALUE(mpm.order_no) as order_no ,
+        ANY_VALUE(mp.product_type) as product_type ,
+        ANY_VALUE(mp.production_mode) as production_mode ,
+        ANY_VALUE(mp.product_name) as product_name ,
+        ANY_VALUE(mp.product_code) as product_code ,
+        ANY_VALUE(mpm.tenant_code) as tenant_code ,
+        SUM(IF(mpm.materials_type = '1',-1, 1) * mpm.picking_number) AS picking_number
+        FROM
+        micro_pick_materials mpm
+        left join micro_product mp on mpm.tenant_code = mp.tenant_code and mpm.product_seq=mp.product_seq
+        <where>
+            <if test="list != null  and list.size() > 0">
+                AND (mpm.work_order_no,mpm.product_seq) in
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    (#{item.workOrderNo},#{item.productSeq})
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        mpm.work_order_no,
+        mpm.product_seq
+    </select>
+
+</mapper>

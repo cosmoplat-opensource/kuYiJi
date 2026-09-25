@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.factory.MicroFactoryMapper">
+    
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.factory.MicroFactory" id="MicroFactoryResult">
+        <result property="id"    column="id"    />
+        <result property="remark"    column="remark"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+        <result property="tenantCode"    column="tenant_code"    />
+    </resultMap>
+
+    <sql id="selectMicroFactoryVo">
+        select id, factory_code, factory_name, remark, active_flag, created_by, created_date, last_upd_by, last_upd_date, tenant_code from micro_factory
+    </sql>
+
+    <select id="selectMicroFactoryList" parameterType="MicroFactory" resultMap="MicroFactoryResult">
+        <include refid="selectMicroFactoryVo"/>
+        <where>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and last_upd_date = #{lastUpdDate}</if>
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+        </where>
+    </select>
+    
+    <select id="selectMicroFactoryById" parameterType="Long" resultMap="MicroFactoryResult">
+        <include refid="selectMicroFactoryVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMicroFactory" parameterType="MicroFactory" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_factory
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="remark != null">remark,</if>
+            <if test="activeFlag != null and activeFlag != ''">active_flag,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="remark != null">#{remark},</if>
+            <if test="activeFlag != null and activeFlag != ''">#{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroFactory" parameterType="MicroFactory">
+        update micro_factory
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="activeFlag != null and activeFlag != ''">active_flag = #{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroFactoryById" parameterType="Long">
+        delete from micro_factory where id = #{id}
+    </delete>
+
+    <update id="deleteMicroFactoryByIds" parameterType="String">
+        update micro_factory set active_flag = '0' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

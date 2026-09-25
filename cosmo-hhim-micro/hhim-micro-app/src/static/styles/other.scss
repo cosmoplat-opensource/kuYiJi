@@ -1,0 +1,379 @@
+@import '@/static/styles/common.scss';
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-nowrap {
+  white-space: normal;
+}
+.z-index-0 {
+  z-index: 0;
+}
+
+.z-index-1 {
+  z-index: 1;
+}
+
+.z-index-2 {
+  z-index: 2;
+}
+
+.z-index-999 {
+  z-index: 999;
+}
+
+.rounded-4 {
+  border-radius: px2vw(4);
+}
+.rounded-8 {
+  border-radius: px2vw(8);
+}
+
+.rounded-full {
+  border-radius: 50%;
+}
+.overflow-scroll {
+  overflow: scroll;
+}
+.rounded-8 {
+  border-radius: px2vw(8);
+}
+.rounded-16 {
+  border-radius: px2vw(16);
+}
+.rounded-16-top {
+  border-radius: px2vw(16) px2vw(16) 0 0;
+}
+.rounded-16-top-left {
+  border-radius: px2vw(16) 0 0 0;
+}
+.rounded-16-bottom {
+  border-radius: 0 0 px2vw(16) px2vw(16);
+}
+.rounded-24 {
+  border-radius: px2vw(24);
+}
+.rounded-32 {
+  border-radius: px2vw(32);
+}
+.rounded-44 {
+  border-radius: px2vw(44);
+}
+.rounded-50 {
+  border-radius: 50%;
+}
+.border-0 {
+  border: 0;
+}
+.border-1 {
+  border: 1px solid;
+}
+.border-2 {
+  border: px2vw(2) solid;
+}
+.border-2-dashed {
+  border: px2vw(2) dashed #e5e5e5;
+}
+.border-d3dfeb {
+  border-color: #d3dfeb;
+}
+.border-0066ff {
+  border-color: #0066ff;
+}
+.border-b6c0c9 {
+  border-color: #b6c0c9;
+}
+.border-64b5ea {
+  border-color: #64b5ea;
+}
+.border-cad7eb {
+  border-color: #cad7eb;
+}
+.relative {
+  position: relative;
+}
+.border-bottom-f5f5f5 {
+  border-bottom: px2vw(2) solid #f5f5f5;
+}
+.border-top-f5f5f5 {
+  border-top: px2vw(2) solid #f5f5f5;
+}
+.bold {
+  font-weight: 500;
+}
+.single {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.b-t-1 {
+  border-top: px2vw(1) solid;
+}
+
+.b-b-1 {
+  border-bottom: px2vw(1) solid;
+}
+
+.b-b-2 {
+  border-bottom: px2vw(2) solid;
+}
+
+.border-dotted {
+  border-style: dotted;
+}
+
+.border-fff {
+  border-color: #fff;
+}
+.border-ff0000 {
+  border-color: #ff0000;
+}
+.border-f0f0f0 {
+  border-color: #f0f0f0;
+}
+.border-ececec {
+  border-color: #ececec;
+}
+.border-f3f3f5 {
+  border-color: #f3f3f5;
+}
+.border-f5f5f5 {
+  border-color: #f5f5f5;
+}
+.border-19aa8d {
+  border-color: #19aa8d;
+}
+.text-ellipsis {
+  overflow: hidden;
+  width: 40px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.text-ellipsis-other {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.word-break {
+  word-break: break-word;
+}
+
+.text-require {
+  position: relative;
+  &:before {
+    position: absolute;
+    left: 0;
+    top: 0;
+    content: '*';
+    font-size: px2vw(28);
+    color: #ff0000;
+  }
+}
+.green-title {
+  position: relative;
+  &:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: px2vw(8);
+    left: px2vw(-32);
+    z-index: 2;
+    background: #00bfa5;
+    width: px2vw(16);
+    height: px2vw(24);
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 0 px2vw(4) px2vw(4) 0;
+  }
+}
+.tap {
+  &:active {
+    background-color: #f3f3f5;
+  }
+}
+.health-data {
+  position: absolute;
+  right: px2vw(32);
+  top: 80%;
+}
+
+.opacity-1 {
+  opacity: 1;
+}
+
+.opacity-0 {
+  opacity: 0;
+}
+
+.opacity-05 {
+  opacity: 0.1;
+}
+
+//卡片头部的小绿方块
+.block {
+  width: px2vw(16);
+  height: px2vw(24);
+  background: #00bfa5;
+  border-radius: 0 px2vw(4) px2vw(4) 0;
+}
+
+//带搜索的输入框
+.input-class {
+  height: px2vw(64);
+  background-color: #ffffff;
+  border-radius: px2vw(16);
+}
+.main-input {
+  width: 100%;
+  height: px2vw(64);
+  line-height: px2vw(64);
+}
+.input-area {
+  height: px2vw(64);
+  background: #ebecee;
+  border-radius: px2vw(16);
+  padding: 0 px2vw(24) 0 px2vw(32);
+}
+
+//卡片底部虚线
+.border-bottom-dashed {
+  border-bottom: px2vw(2) dashed #e5e5e5;
+}
+
+.icon-rotate-y {
+  transform: rotateX(180deg);
+}
+
+//各种小标签,数量/工序/产品等
+.mark-base {
+  border-radius: px2vw(8);
+  font-size: px2vw(24);
+  line-height: px2vw(24);
+  padding: 0 px2vw(4);
+  height: px2vw(32);
+  display: flex;
+  align-items: center;
+}
+.mark-ebf0f5 {
+  @extend .mark-base;
+  color: #5a6f82;
+  background: #ebf0f5;
+}
+
+.mark-ebf0f5-rounded {
+  @extend .mark-base;
+  color: #5a6f82;
+  background: #ebf0f5;
+  border-radius: 50%;
+  width: px2vw(32);
+  height: px2vw(32);
+  box-sizing: border-box;
+}
+
+.mark-64b5ea {
+  @extend .mark-base;
+  color: #fff;
+  background: #64b5ea;
+}
+
+.mark-def2ff {
+  @extend .mark-base;
+  color: #418cbd;
+  background: #def2ff;
+}
+
+.mark-c16ff1 {
+  @extend .mark-base;
+  color: #fff;
+  background: #c16ff1;
+}
+.mark-fe9f00 {
+  @extend .mark-base;
+  color: #fff;
+  background: #fe9f00;
+}
+.mark-ffffff {
+  @extend .mark-base;
+  color: #5a6f82;
+  background: #ffffff;
+}
+.mark-24a8ff {
+  @extend .mark-base;
+  color: #fff;
+  background: #24a8ff;
+}
+
+.mark-f3f3f5 {
+  @extend .mark-base;
+  color: #5a6f82;
+  background: #f3f3f5;
+}
+
+.mark-ff4655 {
+  @extend .mark-base;
+  color: #ffffff;
+  background: #ff4655;
+}
+
+.mark-00bfa5 {
+  @extend .mark-base;
+  color: #ffffff;
+  background: #00bfa5;
+}
+
+.mark-ff0000 {
+  @extend .mark-base;
+  color: #ffffff;
+  background: #ff0000;
+}
+
+.mark-fff5e3 {
+  @extend .mark-base;
+  color: #e7a11a;
+  background: #fff5e3;
+}
+
+.mark-c2f2ec {
+  @extend .mark-base;
+  color: #19aa8d;
+  background: #c2f2ec;
+}
+
+.mark-f26a60 {
+  @extend .mark-base;
+  color: #ffffff;
+  background: #f26a60;
+}
+
+.mark-9badbc {
+  @extend .mark-base;
+  color: #ffffff;
+  background: #9badbc;
+}
+
+//选择产品/工序的弹窗中添加新产品/工序的按钮
+.btn-empty-add {
+  padding: px2vw(18) px2vw(32);
+  font-size: px2vw(28);
+  line-height: px2vw(28);
+  background: rgba(61, 130, 234, 0);
+  border-radius: px2vw(32);
+  border: px2vw(2) solid #0066ff;
+  color: #0066ff;
+  &:active {
+    background-color: #0066ff;
+    color: #fff;
+  }
+}
+
+.text-wrap {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-all;
+}

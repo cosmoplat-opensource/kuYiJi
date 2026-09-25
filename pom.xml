@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.7.RELEASE</version>
+        <relativePath/>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.cosmo.hhim.parent</groupId>
+    <artifactId>hhim-parent</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0</version>
+
+    <name>cosmo-hhim-open</name>
+    <description>三方对接平台 - 基于 Spring Cloud 的工业制造微服务系统</description>
+    <url>https://github.com/your-org/cosmo-hhim-open</url>
+
+    <organization>
+        <name>海尔卡奥斯物联科技有限公司</name>
+        <url>https://www.cosmoplat.com</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>cosmo</name>
+            <email>cosmo@example.com</email>
+            <organization>海尔卡奥斯物联科技有限公司</organization>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/your-org/cosmo-hhim-open</url>
+        <connection>scm:git:git://github.com/your-org/cosmo-hhim-open.git</connection>
+        <developerConnection>scm:git:ssh://github.com:your-org/cosmo-hhim-open.git</developerConnection>
+    </scm>
+
+
+    <modules>
+        <module>hhim-third-platform</module>
+        <module>cosmo-himm-commom</module>
+        <module>cosmo-hhim-micro/hhim-micro-be</module>
+    </modules>
+
+    <properties>
+        <hhim.version>2.5.0</hhim.version>
+        <oms.version>1.0.0</oms.version>
+        <cim.version>2.3.0</cim.version>
+        <third.version>1.0</third.version>
+        <srm.version>3.5.0</srm.version>
+        <cosmo-plugins.version>4.1</cosmo-plugins.version>
+
+
+
+        <maven.compiler.source>1.11</maven.compiler.source>
+        <maven.compiler.target>1.11</maven.compiler.target>
+        <im-portal.version>3.5.0</im-portal.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+        <druid.version>1.2.6</druid.version>
+        <spring-cloud.version>Hoxton.SR9</spring-cloud.version>
+        <spring-cloud-alibaba.version>2.2.5.RELEASE</spring-cloud-alibaba.version>
+        <pagehelper.boot.version>1.3.0</pagehelper.boot.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <oshi.version>5.7.4</oshi.version>
+        <jna.version>5.8.0</jna.version>
+        <commons.io.version>2.10.0</commons.io.version>
+        <commons.fileupload.version>1.4</commons.fileupload.version>
+        <commons.collections.version>3.2.2</commons.collections.version>
+        <poi.version>4.1.2</poi.version>
+        
+        <minio.version>8.0.3</minio.version>
+        <spring-cloud-openfeign.version>2.2.6.RELEASE</spring-cloud-openfeign.version>
+        <easypoi.version>4.1.2</easypoi.version>
+        <nacos.version>2.2.5.RELEASE</nacos.version>
+        <junit.version>4.12</junit.version>
+        <lombok.version>1.18.16</lombok.version>
+        <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
+        <spring-boot.mybatis>2.1.3</spring-boot.mybatis>
+        <swagger.core.version>1.5.24</swagger.core.version>
+        <dynamic-ds.version>3.2.1</dynamic-ds.version>
+        <common-pool.version>2.6.2</common-pool.version>
+        <tms.version>2.3.0</tms.version>
+        <google.version>3.3.0</google.version>
+        <micro.version>1.0</micro.version>
+        <jsqlparser.version>4.1</jsqlparser.version>
+        <jna.version>5.8.0</jna.version>
+        
+        <mvel2.version>2.0.19</mvel2.version>
+        <beanutils.version>1.9.3</beanutils.version>
+        <mybatis-plus.version>3.4.0</mybatis-plus.version>
+        <hutool.version>5.7.14</hutool.version>
+        <thingsboard.version>2.0.2</thingsboard.version>
+        <mysql.version>8.0.22</mysql.version>
+        <commons-lang3.version>3.10</commons-lang3.version>
+        <reflections.version>0.9.11</reflections.version>
+        <plumelog.version>3.4.2</plumelog.version>
+        <hibernate-validator.version>6.0.10.Final</hibernate-validator.version>
+        <transmittable.version>2.12.4</transmittable.version>
+        <dtflys.version>1.5.2-BETA2</dtflys.version>
+        <iam-auth.version>1.1.6</iam-auth.version>
+        <!-- sms4j 短信服务 SDK（替换 Forest + cosmosupport 自封装层）-->
+        <sms4j.version>3.3.5</sms4j.version>
+    </properties>
+    <dependencyManagement>
+        <dependencies>
+            
+            
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna-platform</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.plumelog</groupId>
+                <artifactId>plumelog-trace</artifactId>
+                <version>${plumelog.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.plumelog</groupId>
+                <artifactId>plumelog-logback</artifactId>
+                <version>${plumelog.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mvel</groupId>
+                <artifactId>mvel2</artifactId>
+                <version>${mvel2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${beanutils.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>5.2.12.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.jsqlparser</groupId>
+                <artifactId>jsqlparser</artifactId>
+                <version>${jsqlparser.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-aop</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.afterturn</groupId>
+                <artifactId>easypoi-spring-boot-starter</artifactId>
+                <version>${easypoi.version}</version>
+            </dependency>
+            <dependency>
+
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-test</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+                <version>${nacos.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+                <version>${nacos.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>8.0.33</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-openfeign</artifactId>
+                <version>${spring-cloud-openfeign.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-event</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+
+            
+
+
+
+            <!-- SpringCloud 微服务 -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- SpringCloud Alibaba 微服务 -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- SpringBoot 依赖配置 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Mybatis 依赖配置 -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${spring-boot.mybatis}</version>
+            </dependency>
+
+            <!-- Swagger 依赖配置 -->
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId>
+                <version>${transmittable.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-api-thirdclient</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.dtflys.forest</groupId>
+                <artifactId>forest-spring-boot-starter</artifactId>
+                <version>${dtflys.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-core</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate-validator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-modules-unipush</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-modules-wechatmp</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-modules-wechatminiapp</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+            <!-- thirdplat-modules-cosmosupport 已下线：短信服务改用 Sms4j -->
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-modules-thirdclient</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+            <!-- sms4j 短信服务（统一 API，aliyun/tencent/huawei 等可切换） -->
+            <dependency>
+                <groupId>org.dromara.sms4j</groupId>
+                <artifactId>sms4j-spring-boot-starter</artifactId>
+                <version>${sms4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dromara.sms4j</groupId>
+                <artifactId>sms4j-aliyun</artifactId>
+                <version>${sms4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dromara.sms4j</groupId>
+                <artifactId>sms4j-tencent</artifactId>
+                <version>${sms4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dromara.sms4j</groupId>
+                <artifactId>sms4j-huawei</artifactId>
+                <version>${sms4j.version}</version>
+            </dependency>
+
+            <!-- pagehelper 分页插件 -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.boot.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.github.jsqlparser</groupId>
+                        <artifactId>jsqlparser</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- io常用工具类 -->
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
+            </dependency>
+
+            <!-- excel工具 -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+
+            <!-- 文件上传工具类 -->
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${commons.fileupload.version}</version>
+            </dependency>
+
+            <!-- JSON 解析器和生成器 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <!-- 公共资源池 -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${common-pool.version}</version>
+            </dependency>
+
+            <!-- 核心模块 -->
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-core</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-ioss</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-easypoi</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-cache</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+
+
+            <!-- 安全模块 -->
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-security</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+
+            <!-- 权限范围 -->
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-datascope</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+
+            <!-- 多数据源 -->
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-datasource</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+
+            <!-- 日志记录 -->
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-log</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+
+            <!-- 缓存服务 -->
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-redis</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-api-wechatminiapp</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-api-cosmosupport</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>im-api-operation</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-api-wechatmp</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-common</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cosmo.hhim.thirdplat</groupId>
+                <artifactId>thirdplat-api-unipush</artifactId>
+                <version>${third.version}</version>
+            </dependency>
+
+            
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>javase</artifactId>
+                <version>${google.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>core</artifactId>
+                <version>${google.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.cosmo.plugins</groupId>
+                <artifactId>hhim-common-mail</artifactId>
+                <version>${cosmo-plugins.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.0.0</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!--
+        内部模块依赖（com.cosmo.plugins / com.cosmo.hhim.thirdplat / com.cosmo.hhim.micro）
+        的源码全部在本仓库内，由本 pom 的 <modules> 聚合，一次 reactor 构建即可全部产出，
+        无需预先安装任何离线 jar，也不走公司 nexus。
+        公网依赖走 Maven Central，由 spring-boot-dependencies 等 BOM 统一管理。
+
+        构建方式：务必在仓库根目录执行（mvn clean install / mvn clean package）。
+        单独构建某个子模块时，兄弟模块尚未安装到 ~/.m2 会导致依赖解析失败。
+    -->
+</project>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzCustomerUserMappingMapper">
+    
+    <resultMap type="HyzzCustomerUserMapping" id="HyzzCustomerUserMappingResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="customerCode"    column="customer_code"    />
+        <result property="accountType"    column="account_type"    />
+        <result property="validDate"    column="valid_date"    />
+        <result property="playUser"    column="play_user"    />
+        <result property="customerProductType"    column="customer_product_type"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectHyzzCustomerUserMappingVo">
+        select id, user_id, customer_id, customer_code, account_type, valid_date, play_user, customer_product_type, create_time, create_by, update_time, update_by, remark from hyzz_customer_user_mapping
+    </sql>
+
+    <select id="selectHyzzCustomerUserMappingList" parameterType="HyzzCustomerUserMapping" resultMap="HyzzCustomerUserMappingResult">
+        <include refid="selectHyzzCustomerUserMappingVo"/>
+        <where>  
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="customerId != null "> and customer_id = #{customerId}</if>
+            <if test="customerCode != null  and customerCode != ''"> and customer_code = #{customerCode}</if>
+            <if test="accountType != null  and accountType != ''"> and account_type = #{accountType}</if>
+            <if test="validDate != null "> and valid_date = #{validDate}</if>
+            <if test="playUser != null  and playUser != ''"> and play_user = #{playUser}</if>
+            <if test="customerProductType != null "> and customer_product_type = #{customerProductType}</if>
+        </where>
+    </select>
+    
+    <select id="selectHyzzCustomerUserMappingById" parameterType="Long" resultMap="HyzzCustomerUserMappingResult">
+        <include refid="selectHyzzCustomerUserMappingVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertHyzzCustomerUserMapping" parameterType="HyzzCustomerUserMapping" useGeneratedKeys="true" keyProperty="id">
+        insert into hyzz_customer_user_mapping
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="customerId != null">customer_id,</if>
+            <if test="customerCode != null and customerCode != ''">customer_code,</if>
+            <if test="accountType != null">account_type,</if>
+            <if test="validDate != null">valid_date,</if>
+            <if test="playUser != null">play_user,</if>
+            <if test="customerProductType != null">customer_product_type,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="customerId != null">#{customerId},</if>
+            <if test="customerCode != null and customerCode != ''">#{customerCode},</if>
+            <if test="accountType != null">#{accountType},</if>
+            <if test="validDate != null">#{validDate},</if>
+            <if test="playUser != null">#{playUser},</if>
+            <if test="customerProductType != null">#{customerProductType},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHyzzCustomerUserMapping" parameterType="HyzzCustomerUserMapping">
+        update hyzz_customer_user_mapping
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="customerId != null">customer_id = #{customerId},</if>
+            <if test="customerCode != null and customerCode != ''">customer_code = #{customerCode},</if>
+            <if test="accountType != null">account_type = #{accountType},</if>
+            <if test="validDate != null">valid_date = #{validDate},</if>
+            <if test="playUser != null">play_user = #{playUser},</if>
+            <if test="customerProductType != null">customer_product_type = #{customerProductType},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteHyzzCustomerUserMappingById" parameterType="Long">
+        delete from hyzz_customer_user_mapping where id = #{id}
+    </delete>
+
+    <delete id="deleteHyzzCustomerUserMappingByIds" parameterType="String">
+        delete from hyzz_customer_user_mapping where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="changeUserId" parameterType="Long">
+        update hyzz_customer_user_mapping
+        set user_id = #{targetUserId}
+        where user_id = #{originUserId}
+    </update>
+
+
+    <delete id="deleteCustomerUserMapping">
+        delete from
+                   hyzz_customer_user_mapping
+               where
+                   user_id = #{userId}
+                    and customer_code = #{customerCode}
+                    and customer_product_type = #{productType}
+    </delete>
+</mapper>

@@ -1,0 +1,9 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.common.datascope.aspect.DataScopeAspect,\
+  com.cosmo.hhim.common.datascope.aspect.WmsDataScopeAspect,\
+  com.cosmo.hhim.common.datascope.aspect.SrmDataScopeAspect,\
+  com.cosmo.hhim.common.datascope.aspect.DataExtendAspect,\
+  com.cosmo.hhim.common.datascope.aspect.CimDataScopeAspect,\
+  com.cosmo.hhim.common.datascope.aspect.DeviceDataScopeAspect,\
+  com.cosmo.hhim.common.datascope.aspect.OmsDataScopeAspect
+

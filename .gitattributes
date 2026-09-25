@@ -1,0 +1,2 @@
+# 脚本统一 LF 换行（Windows 下 clone 会自动转 CRLF，会导致 Linux 容器内无法执行）
+*.sh text eol=lf

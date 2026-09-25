@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.process.MicroProcessWarnMapper">
+    <resultMap id="productWarnResult" type="com.cosmo.hhim.micro.base.domain.entity.warn.ProductWarn">
+        <result property="warnProductSeq" column="product_seq"/>
+        <result property="warnProductCode" column="product_code"/>
+        <result property="warnProductName" column="product_name"/>
+        <collection property="processWarnList" ofType="com.cosmo.hhim.micro.base.domain.entity.warn.ProcessWarn">
+            <result property="id" column="id"/>
+            <result property="warnProcessCode" column="process_code"/>
+            <result property="warnProcessName" column="process_name"/>
+            <result property="warnProcessSeq" column="process_seq"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectMultiLastProcessForProduct" resultMap="productWarnResult">
+        SELECT DISTINCT mws.product_seq,
+                        mp.product_code,
+                        mp.product_name,
+                        mpc.id,
+                        mpc.process_code,
+                        mpc.process_name,
+                        mpc.process_seq
+        FROM micro_work_submit mws
+                 LEFT JOIN micro_process_common mpc ON mws.operate_process_seq = mpc.process_seq
+                 LEFT JOIN micro_product mp on mws.product_seq = mp.product_seq
+        WHERE is_last_process = '0' and submit_type = '1'
+          and submit_status = '1'
+    </select>
+
+    <select id="selectNotHaveLastProcessForProduct" resultMap="productWarnResult">
+        SELECT mp.product_seq,
+			   mp.product_code,
+			   mp.product_name,
+			   IF(mt.id IS NULL, 0, 1) AS standard
+        FROM (SELECT mws.product_seq,
+                     GROUP_CONCAT(mws.is_last_process) AS is_last_process
+                FROM micro_work_submit mws
+                WHERE mws.submit_type = '1'
+                GROUP BY mws.product_seq
+                HAVING FIND_IN_SET('0', is_last_process) = 0) AS a
+        LEFT JOIN micro_product mp ON a.product_seq = mp.product_seq
+        LEFT JOIN micro_technology mt ON mt.product_seq = mp.product_seq AND mt.active_flag = '1' AND mt.tech_type='STANDARD'
+        HAVING standard = 0
+    </select>
+
+    <select id="selectNotHaveFirstProcessForProduct" resultMap="productWarnResult">
+        SELECT mp.product_seq,
+			   mp.product_code,
+			   mp.product_name,
+			   IF(mt.id IS NULL, 0, 1) AS standard
+        FROM (SELECT mws.product_seq,
+                     GROUP_CONCAT(mws.is_first_process) AS is_first_process
+                FROM micro_work_submit mws
+                WHERE mws.submit_type = '1'
+                GROUP BY mws.product_seq
+                HAVING FIND_IN_SET('0', is_first_process) = 0) AS a
+        LEFT JOIN micro_product mp ON a.product_seq = mp.product_seq
+        LEFT JOIN micro_technology mt ON mt.product_seq = mp.product_seq AND mt.active_flag = '1' AND mt.tech_type='STANDARD'
+        HAVING standard = 0
+    </select>
+</mapper>

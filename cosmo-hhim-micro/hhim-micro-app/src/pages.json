@@ -1,0 +1,502 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+      "^h-(.*)": "@/components/h-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/ontology/index",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "业务本体"
+      }
+    },
+    {
+      "path": "pages/main",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/welcome/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/stock-list/change-history",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/stock-list/add-change",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/stock-list/change-storage",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/report-production/calendar-select",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/quality-testing/detail",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "subPackages": [
+    {
+      "root": "pages-data-governance",
+      "pages": [
+        {
+          "path": "main/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "audit/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "process/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "stock/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-analysis",
+      "pages": [
+        {
+          "path": "ask/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "quality/index",
+          "style": {
+            "navigationStyle": "custom",
+            "enablePullDownRefresh": true,
+            "backgroundTextStyle": "dark"
+          }
+        },
+        {
+          "path": "quality/detail-pass-rate",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "quality/pass-list",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "quality/ng-pass-list",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "product-analysis/product-list",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "product-analysis/report-detail",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "product-analysis/report-work-list",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "work-rank",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "finish-product",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "stock-analysis",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "wip-query/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "wip-query/detail",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "rate-analysis/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-invite",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-login",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "contractText",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "index-register",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "register-tenant/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-novice-guidance",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-audit",
+      "pages": [
+        {
+          "path": "detail-info",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "detail-list",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "exception-analysis",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "detail-exception",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "report-detail-audit",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-report-work",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "edit",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "batch-create",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "batch-create-step2",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-my-center",
+      "pages": [
+        {
+          "path": "my-reviewer",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "my-set",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "edit-userinfo",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "manage-staff/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "manage-process/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "manage-process/edit",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "product-manage/list",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "product-manage/add-edit",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "product-manage/edit-process-path",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "my-feedback/submit-feedback",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "my-feedback/feedback-list",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "my-feedback/feedback-detail",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "purchase-guide/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "message-order/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-report",
+      "pages": [
+        {
+          "path": "my-product",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-work-center",
+      "pages": [
+        {
+          "path": "completion-report/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "completion-report/detail",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "completion-report/detail-complete-product",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "finish-product-storage/index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "finish-product-storage/change-history",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "finish-product-storage/index-out-product",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-settlement",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "detail-product-item",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "detail-history-item",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-rejects",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "list-detail",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        },
+        {
+          "path": "repair",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "root": "pages-smart-service",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationStyle": "custom"
+          }
+        }
+      ]
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "ku易记",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8",
+    "usingComponents": {}
+  }
+}

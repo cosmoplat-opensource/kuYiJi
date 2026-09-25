@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.custom.MicroExtendFieldMapper">
+    
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.custom.MicroExtendField" id="MicroExtendFieldResult">
+        <result property="id"    column="id"    />
+        <result property="extField"    column="ext_field"    />
+        <result property="extFieldLabel"    column="ext_field_label"    />
+        <result property="extFieldOption"    column="ext_field_option"    />
+        <result property="fieldType"    column="field_type"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+        <result property="remark"    column="remark"    />
+        <result property="tenantCode"    column="tenant_code"    />
+    </resultMap>
+
+    <sql id="selectMicroExtendFieldVo">
+        select id, ext_field, ext_field_label, ext_field_option, field_type, active_flag, created_by, created_date, last_upd_by, last_upd_date, remark, tenant_code from micro_extend_field
+    </sql>
+
+    <select id="selectMicroExtendFieldList" parameterType="MicroExtendField" resultMap="MicroExtendFieldResult">
+        <include refid="selectMicroExtendFieldVo"/>
+        <where>
+            <if test="extField != null  and extField != ''"> and ext_field = #{extField}</if>
+            <if test="extFieldLabel != null  and extFieldLabel != ''"> and ext_field_label = #{extFieldLabel}</if>
+            <if test="fieldType != null  and fieldType != ''"> and field_type = #{fieldType}</if>
+            <if test="extFieldOption != null  and extFieldOption != ''"> and ext_field_option = #{extFieldOption}</if>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and last_upd_date = #{lastUpdDate}</if>
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+        </where>
+        order by created_date asc
+    </select>
+
+    <select id="selectMicroExtendFieldListByExtFieldList" resultMap="MicroExtendFieldResult">
+        <include refid="selectMicroExtendFieldVo"/>
+        <if test="extFieldList != null  and extFieldList.size() > 0">
+            where ext_field in
+            <foreach collection="extFieldList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    
+    <select id="selectMicroExtendFieldById" parameterType="Long" resultMap="MicroExtendFieldResult">
+        <include refid="selectMicroExtendFieldVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectMaxExtField" resultType="java.lang.Integer">
+        SELECT ifnull(CASE
+                          WHEN LENGTH(max(trim(SUBSTRING_INDEX(ext_field, 'ext', -1)) + 0)) = 0 THEN 0
+                          WHEN LENGTH(max(trim(SUBSTRING_INDEX(ext_field, 'ext', -1)) + 0)) > 0
+                              THEN max(trim(SUBSTRING_INDEX(ext_field, 'ext', -1)) + 0)
+                          END, 0
+                   )
+        FROM micro_extend_field
+    </select>
+
+    <insert id="insertMicroExtendField" parameterType="MicroExtendField" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_extend_field
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="extField != null">ext_field,</if>
+            <if test="extFieldLabel != null">ext_field_label,</if>
+            <if test="extFieldOption != null">ext_field_option,</if>
+            <if test="fieldType != null">field_type,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="remark != null">remark,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="extField != null">#{extField},</if>
+            <if test="extFieldLabel != null">#{extFieldLabel},</if>
+            <if test="extFieldOption != null">#{extFieldOption},</if>
+            <if test="fieldType != null">#{fieldType},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroExtendField" parameterType="MicroExtendField">
+        update micro_extend_field
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="extField != null">ext_field = #{extField},</if>
+            <if test="extFieldLabel != null">ext_field_label = #{extFieldLabel},</if>
+            <if test="extFieldOption != null">ext_field_option = #{extFieldOption},</if>
+            <if test="fieldType != null">field_type = #{fieldType},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroExtendFieldById" parameterType="Long">
+        delete from micro_extend_field where id = #{id}
+    </delete>
+
+    <update id="deleteMicroExtendFieldByIds" parameterType="String">
+        update micro_extend_field set active_flag = '0' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

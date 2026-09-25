@@ -1,0 +1,525 @@
+{
+  "version": "1.0",
+  "description": "Ku易记 · 问数本体（指标层 v1）——平台级定义，随 Git 版本管理；租户扩展存数据库。",
+  "metrics": [
+    {
+      "code": "SUMMARY",
+      "name": "经营概览",
+      "aliases": [
+        "产量",
+        "概览",
+        "今天怎么样",
+        "今天情况",
+        "这个月怎么样",
+        "报工",
+        "报了多工",
+        "报工多少",
+        "报工总数",
+        "报工怎么样",
+        "记工总数"
+      ],
+      "formula": "当日/当月 报工总数、良品数、不良数、良品率、完工数、库存汇总",
+      "formulaNote": "产量口径=已审合格数（与质量页同源）；问「报工」行为（含未审核）时走全量口径：报工汇总=已审+未审；汇总口径与 /analysis/showTotalCount 一致",
+      "dims": [
+        "time",
+        "day",
+        "product",
+        "employee",
+        "process"
+      ],
+      "llmParams": [
+        "time"
+      ],
+      "dataSource": {
+        "api": "/analysis/index",
+        "paramMap": {
+          "timeType": "timeType(today=0,month=1,year=2,custom=3)"
+        },
+        "tables": [
+          "micro_work_submit",
+          "micro_product",
+          "micro_process_common",
+          "micro_user"
+        ]
+      },
+      "questionTemplates": [
+        "今天产量怎么样？",
+        "这个月情况怎么样？",
+        "今天良品率多少？",
+        "今天报了多工吗？",
+        "报了多工多少？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "PRODUCT_PASS_RATE",
+      "name": "产品良品率",
+      "aliases": [
+        "良品率",
+        "合格率",
+        "良率",
+        "哪个产品良品率低",
+        "产品良品率"
+      ],
+      "formula": "良品数 / 报工总数 × 100%（按产品分组）",
+      "formulaNote": "分母=报工总数（含不良与待审），口径与良品率分析页一致；不区分返修/让步",
+      "dims": [
+        "product",
+        "time",
+        "process",
+        "day"
+      ],
+      "llmParams": [
+        "productNameOrCode",
+        "time"
+      ],
+      "dataSource": {
+        "api": "/analysis/passRateAnalysisByProduct",
+        "paramMap": {
+          "productNameOrCode": "entities.productNameOrCode",
+          "startDate": "time.start",
+          "endDate": "time.end"
+        },
+        "tables": [
+          "micro_work_submit",
+          "micro_product"
+        ]
+      },
+      "questionTemplates": [
+        "这个月良品率最低的产品是什么？",
+        "法兰盘良品率多少？",
+        "哪个产品合格率最高？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "PROCESS_PASS_RATE",
+      "name": "工序良品率",
+      "aliases": [
+        "工序良品率",
+        "哪道工序不良多",
+        "哪个工序",
+        "不良率最高的工序"
+      ],
+      "formula": "良品数 / 报工总数 × 100%（按工序分组）",
+      "formulaNote": "口径与良品率分析页(工序维度)一致",
+      "dims": [
+        "process",
+        "product",
+        "time"
+      ],
+      "llmParams": [
+        "productNameOrCode",
+        "processNameOrCode",
+        "time"
+      ],
+      "dataSource": {
+        "api": "/analysis/passRateAnalysisByProcess",
+        "paramMap": {
+          "productNameOrCode": "entities.productNameOrCode",
+          "processNameOrCode": "entities.processNameOrCode",
+          "startDate": "time.start",
+          "endDate": "time.end"
+        },
+        "tables": [
+          "micro_work_submit",
+          "micro_process_common"
+        ]
+      },
+      "questionTemplates": [
+        "哪道工序良品率最差？",
+        "车削工序的不良率多少？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "EMPLOYEE_PASS_RATE",
+      "name": "员工良品率/产量",
+      "aliases": [
+        "员工良品率",
+        "员工产量",
+        "员工合格率",
+        "谁良品率低",
+        "谁良品率最低",
+        "员工报工多少",
+        "员工报了多少工"
+      ],
+      "formula": "按员工分组：良品率=良品/报工总数；产量=报工合格数",
+      "formulaNote": "与良品率分析页(员工维度)一致；人员实体解析按租户 micro_user 字典（昵称/账号）",
+      "dims": [
+        "employee",
+        "time",
+        "product"
+      ],
+      "llmParams": [
+        "employeeName",
+        "time"
+      ],
+      "dataSource": {
+        "api": "/analysis/passRateAnalysisByEmployee",
+        "paramMap": {
+          "userName": "entities.employeeName",
+          "startDate": "time.start",
+          "endDate": "time.end"
+        },
+        "tables": [
+          "micro_work_submit",
+          "micro_user"
+        ]
+      },
+      "questionTemplates": [
+        "这个月哪个员工产量最高？",
+        "各员工良品率怎么样？",
+        "员工记工排名怎么样？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "SUBMIT_RANK",
+      "name": "记工排名",
+      "aliases": [
+        "记工排名",
+        "谁报工最多",
+        "报工最多",
+        "产量排名",
+        "排名",
+        "记工",
+        "谁记的工",
+        "记了多少工",
+        "谁记工多",
+        "谁产量最高"
+      ],
+      "formula": "按报工人汇总合格数并降序排名（记工排行页同口径）",
+      "formulaNote": "与 /analysis/submitRecordRank 一致",
+      "dims": [
+        "employee",
+        "time"
+      ],
+      "llmParams": [
+        "time"
+      ],
+      "dataSource": {
+        "api": "/analysis/submitRecordRank",
+        "paramMap": {
+          "startDate": "time.start",
+          "endDate": "time.end"
+        },
+        "tables": [
+          "micro_work_submit",
+          "micro_user"
+        ]
+      },
+      "questionTemplates": [
+        "这个月谁产量最高？",
+        "上周记工排名前十？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "NG_DETAIL",
+      "name": "不良明细",
+      "aliases": [
+        "不良",
+        "不良品",
+        "划伤有多少",
+        "不良明细"
+      ],
+      "formula": "报工维度的不良记录清单（按不良类型/产品/工序可筛选）",
+      "formulaNote": "与不良品列表页一致；ngType 映射租户标签字典（micro_tags）",
+      "dims": [
+        "ngType",
+        "product",
+        "process",
+        "time"
+      ],
+      "llmParams": [
+        "ngType",
+        "productNameOrCode",
+        "time"
+      ],
+      "dataSource": {
+        "api": "/analysis/showNgProductList",
+        "paramMap": {
+          "productNameOrCode": "entities.productNameOrCode",
+          "processSeq": "entities.processNameOrCode",
+          "startDate": "time.start",
+          "endDate": "time.end"
+        },
+        "tables": [
+          "micro_quality_control_record",
+          "micro_work_submit"
+        ]
+      },
+      "questionTemplates": [
+        "上个月的划伤有多少件？",
+        "这个月的不良明细有哪些？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "STOCK",
+      "name": "库存",
+      "aliases": [
+        "库存",
+        "还剩多少",
+        "库存量",
+        "在制品"
+      ],
+      "formula": "成品库存（micro_finished_product_storage）+ 工序在制品（micro_process_storage）汇总/排名",
+      "formulaNote": "与库存分析页一致",
+      "dims": [
+        "product",
+        "time"
+      ],
+      "llmParams": [],
+      "dataSource": {
+        "api": "/ai/registered/finishedStockByProduct（登记 SQL：成品库存按产品）",
+        "paramMap": {},
+        "tables": [
+          "micro_process_storage",
+          "micro_finished_product_storage",
+          "micro_product"
+        ]
+      },
+      "questionTemplates": [
+        "成品库存还有多少？",
+        "哪个产品库存最多？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "DELIVERY_RISK",
+      "name": "订单延期预警",
+      "aliases": [
+        "延期",
+        "交期",
+        "哪些订单会延期",
+        "会不会延期"
+      ],
+      "formula": "预计完成日 = 今日 + 剩余数量 ÷ 近30天日均产能 × 1.2；预计完成日 > 交付日 → 延期（风险天数=预计完成日-交付日）",
+      "formulaNote": "已实现（登记 SQL /ai/registered/deliveryRisk）：订单状态 10/20/30 且 plan_num>finish_num；日均产能=近30天已审 check 数/30，与页面统计口径一致",
+      "dims": [
+        "order",
+        "product",
+        "time"
+      ],
+      "llmParams": [
+        "productNameOrCode",
+        "time"
+      ],
+      "dataSource": {
+        "api": "/ai/registered/deliveryRisk",
+        "paramMap": {
+          "productNameOrCode": "entities.productNameOrCode",
+          "dailyCap": "metric.dailyCap"
+        },
+        "tables": [
+          "micro_manufacture_order",
+          "micro_product"
+        ]
+      },
+      "questionTemplates": [
+        "成品库存还有多少？",
+        "在制品还有多少？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "ENTITY_LIST",
+      "name": "实体清单",
+      "aliases": [
+        "有哪些",
+        "有什么",
+        "有哪些产品",
+        "有什么零件",
+        "产品有哪些",
+        "有哪些工序",
+        "有哪些员工"
+      ],
+      "formula": "按实体类型列举租户字典清单（产品/工序/员工），返回名称与编码",
+      "formulaNote": "与基础数据字典同源（micro_product / micro_process_common / micro_user），Top 10；更多见基础数据页面",
+      "dims": [
+        "product",
+        "process",
+        "employee"
+      ],
+      "llmParams": [
+        "entityType"
+      ],
+      "dataSource": {
+        "api": "/ai/dict/list",
+        "paramMap": {
+          "entityType": "entities.entityType"
+        },
+        "tables": [
+          "micro_product",
+          "micro_process_common",
+          "micro_user"
+        ]
+      },
+      "questionTemplates": [
+        "有哪些产品？",
+        "现在有什么零件？",
+        "有哪些工序？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "ATTRIBUTION",
+      "name": "变化归因",
+      "type": "analysis",
+      "aliases": [
+        "为什么",
+        "为什么降",
+        "为什么低",
+        "为什么这么低",
+        "原因",
+        "什么原因",
+        "咋回事",
+        "怎么降的",
+        "怎么这么低",
+        "谁拖后腿",
+        "差在哪",
+        "变化原因",
+        "异常原因",
+        "为什么突然变差"
+      ],
+      "formula": "本期 vs 基期 → 按维度做贡献度分解（贡献ᵢ = 本期占比 − 基期占比，Σ贡献 = 总变化）→ 对主因下钻一层 → 输出归因结论",
+      "formulaNote": "数字全部由 MiniAnalyst 确定性计算（可对账），LLM 只负责措辞；基期默认上一期（整月→上月）",
+      "dims": [
+        "process",
+        "product",
+        "employee",
+        "day"
+      ],
+      "llmParams": [
+        "metricCode",
+        "dimension",
+        "time"
+      ],
+      "dataSource": {
+        "api": "/ai/analysis/attribution（算子：AnalysisService + MiniAnalyst）",
+        "paramMap": {
+          "dimension": "groupBy",
+          "metricCode": "intentOfMetric"
+        },
+        "tables": [
+          "micro_work_submit",
+          "micro_product",
+          "micro_process_common",
+          "micro_user"
+        ]
+      },
+      "questionTemplates": [
+        "这个月良品率为什么降？",
+        "哪道工序变差了？",
+        "谁拖后腿了？",
+        "为什么9月19号良品率这么低？",
+        "前几天产量为什么掉下来了？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "CONCENTRATE",
+      "name": "集中度分析",
+      "type": "analysis",
+      "aliases": [
+        "集中在哪",
+        "主要是谁",
+        "主要是什么",
+        "占比最高",
+        "集中在哪个",
+        "都出在哪"
+      ],
+      "formula": "按维度汇总目标量（不良数/记工数等）→ 计算 Top-N 占比（集中度）",
+      "formulaNote": "不良类型维度依赖质检记录（质检开关未开时无数据，会如实说明）；其它维度不受影响",
+      "dims": [
+        "ngType",
+        "process",
+        "product",
+        "employee"
+      ],
+      "llmParams": [
+        "metricCode",
+        "time"
+      ],
+      "dataSource": {
+        "api": "/ai/analysis/ngTypeConcentration（算子：AnalysisService + MiniAnalyst）",
+        "paramMap": {},
+        "tables": [
+          "micro_work_submit",
+          "micro_quality_control_record",
+          "micro_process_common"
+        ]
+      },
+      "questionTemplates": [
+        "不良主要集中在哪一类？",
+        "不良主要出在哪道工序？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    },
+    {
+      "code": "COMPARE",
+      "name": "两期对比",
+      "type": "analysis",
+      "aliases": [
+        "下降了吗",
+        "上升了吗",
+        "涨了多少",
+        "降了多少",
+        "有没有下降",
+        "和上个月比",
+        "比上月怎么样",
+        "变化了多少",
+        "变好还是变差",
+        "趋势怎么样",
+        "趋势如何",
+        "同比",
+        "环比"
+      ],
+      "formula": "本期 vs 基期：总良品率变化（百分点）+ 各分组差值；只给对比结论，不做原因归因",
+      "formulaNote": "基期默认上一期（整月→上月；单日→前一日）；回答\"降了吗/差多少\"这类是/否与幅度问题",
+      "dims": [
+        "process",
+        "product",
+        "employee",
+        "day"
+      ],
+      "llmParams": [
+        "metricCode",
+        "dimension",
+        "time"
+      ],
+      "dataSource": {
+        "api": "/ai/analysis/compare（算子：AnalysisService + MiniAnalyst，仅对比不下钻）",
+        "paramMap": {
+          "dimension": "groupBy",
+          "metricCode": "intentOfMetric"
+        },
+        "tables": [
+          "micro_work_submit",
+          "micro_product",
+          "micro_process_common"
+        ]
+      },
+      "questionTemplates": [
+        "这个月良品率下降了吗？",
+        "和上个月比怎么样？",
+        "产量涨了多少？"
+      ],
+      "implemented": true,
+      "status": "ACTIVE"
+    }
+  ]
+}

@@ -1,0 +1,2572 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.submit.MicroWorkSubmitMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit" id="MicroWorkSubmitResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="workOrderNo" column="work_order_no"/>
+        <result property="taskNo" column="task_no"/>
+        <result property="submitType" column="submit_type"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="preProcessSeq" column="pre_process_seq"/>
+        <result property="operateProcessSeq" column="operate_process_seq"/>
+        <result property="preProcessGroup" column="pre_process_group"/>
+        <result property="operateProcessGroup" column="operate_process_group"/>
+        <result property="isLastProcess" column="is_last_process"/>
+        <result property="passNum" column="pass_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="submitUser" column="submit_user"/>
+        <result property="submitDay" column="submit_day"/>
+        <result property="submitStatus" column="submit_status"/>
+        <result property="submitNo" column="submit_no"/>
+        <result property="remark" column="remark"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="checkUser" column="check_user"/>
+        <result property="checkDate" column="check_date"/>
+        <result property="checkPassNum" column="check_pass_num"/>
+        <result property="checkNgNum" column="check_ng_num"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="dataStatus" column="data_status"/>
+        <result property="expiredRecordFlag" column="expired_record_flag"/>
+        <result property="submitPictures" column="submit_pictures"/>
+        <result property="isFirstProcess" column="is_first_process"/>
+        <result property="productName" column="product_name"/>
+        <result property="preProcessName" column="pre_process_name"/>
+        <result property="preProcessCode" column="pre_process_code"/>
+        <result property="operateProcessName" column="operate_process_name"/>
+        <result property="operateProcessCode" column="operate_process_code"/>
+        <result property="submitNickName" column="submit_nick_name"/>
+        <result property="checkNickName" column="check_nick_name"/>
+        <result property="productCode" column="product_code"/>
+        <result property="isComplete" column="is_complete"/>
+        <result property="checkStatus" column="check_status"/>
+        <result property="repairNum" column="repair_num"/>
+        <result property="abandonedNum" column="abandoned_num"/>
+        <result property="unit" column="unit"/>
+        <result property="productId" column="product_id"/>
+        <result property="qcDate" column="qc_date"/>
+        <result property="qcUser" column="qc_user"/>
+    </resultMap>
+
+    <resultMap id="MicroWorkSubmitDto" type="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitDto" extends="MicroWorkSubmitResult">
+        <result property="ids" column="ids"/>
+    </resultMap>
+
+    <resultMap id="MicroWorkSubmitProductCount" type="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitProductCount">
+        <result property="totalCounts" column="total_counts"/>
+        <result property="totalPassNum" column="total_pass_num"/>
+        <result property="totalNgNum" column="total_ng_num"/>
+        <result property="submitDay" column="submit_day"/>
+    </resultMap>
+
+    <resultMap id="ProductiveCapacityByDay" type="com.cosmo.hhim.micro.base.domain.entity.submit.ProductiveCapacityByDay">
+        <result property="submitUser" column="submit_user"/>
+        <result property="submitDay" column="submit_day"/>
+        <result property="totalPassNum" column="total_pass_num"/>
+        <result property="totalNgNum" column="total_ng_num"/>
+        <result property="totalNum" column="total_num"/>
+    </resultMap>
+
+    <resultMap id="DetailSubmitRecordInfoByWorkOrderResult" type="com.cosmo.hhim.micro.base.domain.entity.check.DetailSubmitRecordInfoByWorkOrder">
+        <id property="operateProcessSeq" column="operate_process_seq"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="operateProcessCode" column="operate_process_code"/>
+        <result property="operateProcessName" column="operate_process_name"/>
+        <result property="isLastProcess" column="is_last_process"/>
+        <result property="recordNum" column="record_num"/>
+        <result property="totalNum" column="total_num"/>
+        <result property="productUnit" column="product_unit"/>
+        <collection property="userSubmitRecordInfoByWorkOrderList" ofType="com.cosmo.hhim.micro.base.domain.entity.check.UserSubmitRecordInfoByWorkOrder">
+            <result property="userId" column="user_id" />
+            <result property="nickName" column="nick_name"/>
+            <result property="passNum" column="pass_num"/>
+            <result property="ngNum" column="ng_num"/>
+            <result property="ids" column="ids"/>
+        </collection>
+    </resultMap>
+
+    <sql id="selectMicroWorkSubmitVo">
+        select id,
+               tenant_code,
+               work_order_no,
+               task_no,
+               submit_type,
+               product_seq,
+               pre_process_seq,
+               operate_process_seq,
+               pre_process_group,
+               operate_process_group,
+               is_last_process,
+               pass_num,
+               ng_num,
+               submit_user,
+               submit_day,
+               submit_status,
+               submit_no,
+               remark,
+               created_by,
+               created_date,
+               check_user,
+               check_date,
+               check_pass_num,
+               check_ng_num,
+               last_upd_by,
+               last_upd_date,
+               data_status,
+               expired_record_flag,
+               submit_pictures,
+               is_first_process,
+               is_complete,
+               check_status,
+               repair_num,
+               abandoned_num,
+               qc_date,
+               qc_user
+        from micro_work_submit
+    </sql>
+
+    <sql id="selectMicroWorkSubmitVoEx">
+        select mws.id,
+               mws.tenant_code,
+               mws.work_order_no,
+               mws.task_no,
+               mws.submit_type,
+               mws.product_seq,
+               mp.product_name,
+               mp.product_code,
+               mp.unit,
+               mws.pre_process_seq,
+			   (SELECT GROUP_CONCAT(mpc.process_name) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq, mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as pre_process_name,
+			   (SELECT GROUP_CONCAT(mpc.process_code) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq, mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as pre_process_code,
+               mws.operate_process_seq,
+               mpc2.process_name as operate_process_name,
+               mpc2.process_code as operate_process_code,
+               mws.pre_process_group,
+               mws.operate_process_group,
+               mws.is_last_process,
+               mws.pass_num,
+               mws.ng_num,
+               mws.submit_user,
+               mws.submit_day,
+               mws.submit_status,
+               mws.submit_no,
+               mws.remark,
+               mws.created_by,
+               mws.created_date,
+               mws.check_user,
+               mws.check_date,
+               mws.check_pass_num,
+               mws.check_ng_num,
+               mws.last_upd_by,
+               mws.last_upd_date,
+               mws.data_status,
+               mws.expired_record_flag,
+               mws.submit_pictures,
+               mws.is_first_process,
+               mws.is_complete,
+               mws.check_status,
+               mws.repair_num,
+               mws.abandoned_num
+        from micro_work_submit mws
+                 left join micro_product mp on mp.product_seq = mws.product_seq and mp.tenant_code = mws.tenant_code
+                 left join micro_process_common mpc2 on mpc2.process_seq = mws.operate_process_seq and mpc2.tenant_code = mws.tenant_code
+    </sql>
+
+    <select id="selectMicroWorkSubmitList" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit"
+            resultMap="MicroWorkSubmitResult">
+        <include refid="selectMicroWorkSubmitVo"/>
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="workOrderNo != null and workOrderNo != ''">and work_order_no = #{workOrderNo}</if>
+            <if test="productSeq != null  and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="preProcessSeq != null  and preProcessSeq != ''">and pre_process_seq = #{preProcessSeq}</if>
+            <if test="operateProcessSeq != null  and operateProcessSeq != ''">and operate_process_seq = #{operateProcessSeq}</if>
+            <if test="preProcessGroup != null  and preProcessGroup != ''">and pre_process_group = #{preProcessGroup}</if>
+            <if test="operateProcessGroup != null  and operateProcessGroup != ''">and operate_process_group = #{operateProcessGroup}</if>
+            <if test="isLastProcess != null  and isLastProcess != ''">and is_last_process = #{isLastProcess}</if>
+            <if test="passNum != null ">and pass_num = #{passNum}</if>
+            <if test="ngNum != null ">and ng_num = #{ngNum}</if>
+            <if test="submitUser != null  and submitUser != ''">and submit_user = #{submitUser}</if>
+            <if test="submitDay != null ">and submit_day = #{submitDay}</if>
+            <if test="submitStatus != null ">and submit_status = #{submitStatus}</if>
+            <if test="submitNo != null  and submitNo != ''">and submit_no = #{submitNo}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and DATE_FORMAT(created_date, '%Y-%m-%d') = DATE_FORMAT(#{createdDate}, '%Y-%m-%d')</if>
+            <if test="checkUser != null  and checkUser != ''">and check_user = #{checkUser}</if>
+            <if test="checkDate != null">and check_date = #{checkDate}</if>
+            <if test="checkPassNum != null">and check_pass_num = #{checkPassNum}</if>
+            <if test="checkNgNum != null">and check_ng_num = #{checkNgNum}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="dataStatus != null ">and data_status = #{dataStatus}</if>
+            <if test="isFirstProcess != null  and isFirstProcess != ''">and is_first_process = #{isFirstProcess}</if>
+            <if test="isComplete != null  and isComplete != ''">and is_complete = #{isComplete}</if>
+            <if test="submitType != null">and submit_type = #{submitType}</if>
+        </where>
+        order by last_upd_date desc
+    </select>
+
+    <select id="selectMicroWorkSubmitExList" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit"
+            resultMap="MicroWorkSubmitDto">
+        <include refid="selectMicroWorkSubmitVoEx"/>
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and mws.tenant_code = #{tenantCode}</if>
+            <if test="productSeq != null  and productSeq != ''">and mws.product_seq = #{productSeq}</if>
+            <if test="preProcessSeq != null  and preProcessSeq != ''">and mws.pre_process_seq = #{preProcessSeq}</if>
+            <if test="operateProcessSeq != null  and operateProcessSeq != ''">and mws.operate_process_seq = #{operateProcessSeq}</if>
+            <if test="preProcessGroup != null  and preProcessGroup != ''">and mws.pre_process_group = #{preProcessGroup}</if>
+            <if test="operateProcessGroup != null  and operateProcessGroup != ''">and mws.operate_process_group = #{operateProcessGroup}</if>
+            <if test="isLastProcess != null  and isLastProcess != ''">and mws.is_last_process = #{isLastProcess}</if>
+            <if test="passNum != null ">and mws.pass_num = #{passNum}</if>
+            <if test="ngNum != null ">and mws.ng_num = #{ngNum}</if>
+            <if test="submitUser != null  and submitUser != ''">and mws.submit_user = #{submitUser}</if>
+            <if test="submitDay != null ">and submit_day = #{submitDay}</if>
+            <if test="submitStatus != null ">and submit_status = #{submitStatus}</if>
+            <if test="submitNo != null  and submitNo != ''">and mws.submit_no = #{submitNo}</if>
+            <if test="createdBy != null  and createdBy != ''">and mws.created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and mws.created_date = #{createdDate}</if>
+            <if test="checkUser != null  and checkUser != ''">and mws.check_user = #{checkUser}</if>
+            <if test="checkDate != null">and mws.check_date = #{checkDate}</if>
+            <if test="checkPassNum != null">and mws.check_pass_num = #{checkPassNum}</if>
+            <if test="checkNgNum != null">and mws.check_ng_num = #{checkNgNum}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and mws.last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and mws.last_upd_date = #{lastUpdDate}</if>
+            <if test="dataStatus != null ">and data_status = #{dataStatus}</if>
+            <if test="isComplete != null ">and is_complete = #{isComplete}</if>
+            <if test="submitType != null">and submit_type = #{submitType}</if>
+        </where>
+        GROUP BY mws.id
+        order by mws.submit_status desc, mws.id desc
+    </select>
+
+    <select id="selectMicroWorkSubmitById" parameterType="Long" resultMap="MicroWorkSubmitResult">
+        <include refid="selectMicroWorkSubmitVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectSubmitRecordByProduct" resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroExistEntity">
+        SELECT
+        mp.id AS id,
+        mp.product_name AS itemName,
+        mp.product_code AS itemCode,
+        mp.product_seq AS itemSeq,
+        mw.id AS existItem
+        FROM
+        micro_product mp
+        LEFT JOIN micro_work_submit mw ON mp.tenant_code = mw.tenant_code
+        AND mp.product_seq = mw.product_seq
+        WHERE
+        mp.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        UNION
+        SELECT
+        mp.id AS id,
+        mp.product_name AS itemName,
+        mp.product_code AS itemCode,
+        mp.product_seq AS itemSeq,
+        IF( mt.id IS NULL, NULL, 1 ) AS existItem
+        FROM
+        micro_product mp
+        LEFT JOIN micro_technology mt ON mp.tenant_code = mt.tenant_code
+        AND mp.id = mt.product_id
+        WHERE
+        mp.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        UNION
+        SELECT
+        mp.id AS id,
+        mp.product_name AS itemName,
+        mp.product_code AS itemCode,
+        mp.product_seq AS itemSeq,
+        IF( mmwo.id IS NULL, NULL, 1 ) AS existItem
+        FROM
+        micro_product mp
+        LEFT JOIN micro_manufacture_work_order mmwo ON mp.tenant_code = mmwo.tenant_code
+        AND mp.product_seq = mmwo.product_seq
+        WHERE
+        mp.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        UNION
+        SELECT
+        mp.id AS id,
+        mp.product_name AS itemName,
+        mp.product_code AS itemCode,
+        mp.product_seq AS itemSeq,
+        IF( t.stockOrNot = 1, 1, NULL ) AS existItem
+        FROM
+        micro_product mp
+        LEFT JOIN (
+        SELECT
+        mps.tenant_code,
+        mps.product_seq,
+        IF ( sum( mps.pass_num ) = 0 AND sum( mps.ng_num )= 0, 0, 1 ) AS stockOrNot
+        FROM
+        micro_process_storage mps
+        GROUP BY
+        mps.tenant_code,
+        mps.product_seq
+        ) AS t
+        ON mp.tenant_code = t.tenant_code AND mp.product_seq = t.product_seq
+        WHERE
+        mp.id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectMicroWorkSubmitExById" parameterType="Long" resultMap="MicroWorkSubmitResult">
+        <include refid="selectMicroWorkSubmitVoEx"/>
+        where mws.id = #{id}
+    </select>
+
+    <select id="selectMicroWorkSubmitExByIds" resultMap="MicroWorkSubmitDto">
+        select
+            mws.id,
+            mws.tenant_code,
+            mws.product_seq,
+            mp.id as product_id,
+            mp.product_name,
+            mp.product_code,
+            mp.unit,
+            mws.pre_process_seq,
+            (SELECT GROUP_CONCAT(mpc.process_name) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq, mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as pre_process_name,
+            (SELECT GROUP_CONCAT(mpc.process_code) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq, mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as pre_process_code,
+            mws.operate_process_seq,
+            mpc2.process_name as operate_process_name,
+            mpc2.process_code as operate_process_code,
+            mws.pre_process_group,
+            mws.operate_process_group,
+            mws.is_last_process,
+            mws.pass_num,
+            mws.ng_num,
+            mws.submit_user,
+            mws.submit_day,
+            mws.submit_status,
+            mws.submit_no,
+            mws.remark,
+            mws.created_by,
+            mws.created_date,
+            mws.check_user,
+            mws.check_date,
+            mws.check_pass_num,
+            mws.check_ng_num,
+            mws.last_upd_by,
+            mws.last_upd_date,
+            mws.data_status,
+            mws.expired_record_flag,
+            mws.submit_pictures,
+            mu.nick_name as submit_nick_name,
+            mws.is_first_process,
+            mws.check_status,
+            mws.repair_num,
+            mws.abandoned_num
+        from micro_work_submit mws
+        left join micro_product mp on mp.product_seq = mws.product_seq and mp.tenant_code = mws.tenant_code
+        left join micro_process_common mpc2 on mpc2.process_seq = mws.operate_process_seq and mpc2.tenant_code = mws.tenant_code
+        left join micro_user mu on mu.id = mws.submit_user
+        <where>
+            mws.id in
+            <foreach item="id" collection="ids" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+            <if test="submitNickName != null and submitNickName != ''">
+                and mu.nick_name like concat('%', #{submitNickName}, '%')
+            </if>
+            <if test="submitStatus != null and submitStatus != ''">
+                and mws.submit_status = #{submitStatus}
+            </if>
+        </where>
+        order by mws.id desc
+    </select>
+
+    <select id="selectMicroWorkSubmitByIds" resultMap="MicroWorkSubmitResult">
+        <include refid="selectMicroWorkSubmitVoEx"/>
+        <where>
+            mws.id in
+            <foreach item="id" collection="ids" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+
+    <insert id="insertMicroWorkSubmit" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into micro_work_submit
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="orderNo != null and orderNo != ''">order_no,</if>
+            <if test="workOrderNo != null and workOrderNo != ''">work_order_no,</if>
+            <if test="taskNo != null and taskNo != ''">task_no,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="preProcessSeq != null and preProcessSeq != ''">pre_process_seq,</if>
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">operate_process_seq,</if>
+            <if test="preProcessGroup != null">pre_process_group,</if>
+            <if test="operateProcessGroup != null">operate_process_group,</if>
+            <if test="isLastProcess != null">is_last_process,</if>
+            <if test="passNum != null">pass_num,</if>
+            <if test="ngNum != null">ng_num,</if>
+            <if test="submitUser != null and submitUser != ''">submit_user,</if>
+            <if test="submitDay != null">submit_day,</if>
+            <if test="submitStatus != null">submit_status,</if>
+            <if test="submitNo != null and submitNo != ''">submit_no,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="checkUser != null and checkUser != ''">check_user,</if>
+            <if test="checkDate != null">check_date,</if>
+            <if test="checkPassNum != null">check_pass_num,</if>
+            <if test="checkNgNum != null">check_ng_num,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="dataStatus != null">data_status,</if>
+            <if test="expiredRecordFlag != null">expired_record_flag,</if>
+            <if test="submitPictures != null and submitPictures != ''">submit_pictures,</if>
+            <if test="isFirstProcess != null and isFirstProcess != ''">is_first_process,</if>
+            <if test="submitType != null">submit_type,</if>
+            <if test="isComplete != null and isComplete != ''">is_complete,</if>
+            <if test="checkStatus != null">check_status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+            <if test="workOrderNo != null and workOrderNo != ''">#{workOrderNo},</if>
+            <if test="taskNo != null and taskNo != ''">#{taskNo},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="preProcessSeq != null and preProcessSeq != ''">#{preProcessSeq},</if>
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">#{operateProcessSeq},</if>
+            <if test="preProcessGroup != null">#{preProcessGroup},</if>
+            <if test="operateProcessGroup != null">#{operateProcessGroup},</if>
+            <if test="isLastProcess != null">#{isLastProcess},</if>
+            <if test="passNum != null">#{passNum},</if>
+            <if test="ngNum != null">#{ngNum},</if>
+            <if test="submitUser != null and submitUser != ''">#{submitUser},</if>
+            <if test="submitDay != null">#{submitDay},</if>
+            <if test="submitStatus != null">#{submitStatus},</if>
+            <if test="submitNo != null and submitNo != ''">#{submitNo},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="checkUser != null and checkUser != ''">#{checkUser},</if>
+            <if test="checkDate != null">#{checkDate},</if>
+            <if test="checkPassNum != null">#{checkPassNum},</if>
+            <if test="checkNgNum != null">#{checkNgNum},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="dataStatus != null">#{dataStatus},</if>
+            <if test="expiredRecordFlag != null">#{expiredRecordFlag},</if>
+            <if test="submitPictures != null and submitPictures != ''">#{submitPictures},</if>
+            <if test="isFirstProcess != null and isFirstProcess != ''">#{isFirstProcess},</if>
+            <if test="submitType != null">#{submitType},</if>
+            <if test="isComplete != null and isComplete != ''">#{isComplete},</if>
+            <if test="checkStatus != null">#{checkStatus},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertMicroWorkSubmitBatch">
+        insert into micro_work_submit
+        (tenant_code,
+        product_seq,
+        pre_process_seq,
+        operate_process_seq,
+        pre_process_group,
+        operate_process_group,
+        is_last_process,
+        pass_num,
+        ng_num,
+        submit_user,
+        submit_day,
+        submit_status,
+        submit_no,
+        remark,
+        created_by,
+        created_date,
+        check_user,
+        check_date,
+        check_pass_num,
+        check_ng_num,
+        last_upd_by,
+        last_upd_date,
+        data_status,
+        expired_record_flag,
+        submit_pictures,
+        is_first_process,
+        is_complete) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.tenantCode},
+            #{item.productSeq},
+            #{item.preProcessSeq},
+            #{item.operateProcessSeq},
+            #{item.preProcessGroup},
+            #{item.operateProcessGroup},
+            #{item.isLastProcess},
+            #{item.passNum},
+            #{item.ngNum},
+            #{item.submitUser},
+            #{item.submitDay},
+            #{item.submitStatus},
+            #{item.submitNo},
+            #{item.remark},
+            #{item.createdBy},
+            #{item.createdDate},
+            #{item.checkUser},
+            #{item.checkDate},
+            #{item.checkPassNum},
+            #{item.checkNgNum},
+            #{item.lastUpdBy},
+            #{item.lastUpdDate},
+            #{item.dataStatus},
+            #{item.expiredRecordFlag},
+            #{item.submitPictures},
+            #{item.isFirstProcess})
+            #{item.isComplete})
+        </foreach>
+    </insert>
+
+    <update id="updateMicroWorkSubmit" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit">
+        update micro_work_submit
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            pre_process_seq = #{preProcessSeq},
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">operate_process_seq = #{operateProcessSeq},</if>
+            <if test="preProcessGroup != null">pre_process_group = #{preProcessGroup},</if>
+            <if test="operateProcessGroup != null">operate_process_group = #{operateProcessGroup},</if>
+            <if test="isLastProcess != null">is_last_process = #{isLastProcess},</if>
+            <if test="passNum != null">pass_num = #{passNum},</if>
+            <if test="ngNum != null">ng_num = #{ngNum},</if>
+            <if test="submitUser != null and submitUser != ''">submit_user = #{submitUser},</if>
+            <if test="submitDay != null">submit_day = #{submitDay},</if>
+            <if test="submitStatus != null">submit_status = #{submitStatus},</if>
+            <if test="submitNo != null and submitNo != ''">submit_no = #{submitNo},</if>
+            remark = #{remark},
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            check_user = #{checkUser},
+            check_date = #{checkDate},
+            check_pass_num = #{checkPassNum},
+            check_ng_num = #{checkNgNum},
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="dataStatus != null">data_status = #{dataStatus},</if>
+            <if test="expiredRecordFlag != null">expired_record_flag = #{expiredRecordFlag},</if>
+            submit_pictures = #{submitPictures},
+            <if test="isFirstProcess != null and isFirstProcess != ''">is_first_process = #{isFirstProcess},</if>
+            <if test="isComplete != null and isComplete != ''">is_complete = #{isComplete},</if>
+            <if test="checkStatus != null">check_status = #{checkStatus},</if>
+            <if test="repairNum != null">repair_num = #{repairNum},</if>
+            <if test="abandonedNum != null">abandoned_num = #{abandonedNum},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateWorkSubmitCompleteFlag" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit">
+        update micro_work_submit
+        set is_complete   = #{isComplete},
+            last_upd_by   = #{lastUpdBy},
+            last_upd_date = #{lastUpdDate}
+        where id = #{id}
+    </update>
+
+    <update id="updateSubmitRecordCheckStatus" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit">
+        update micro_work_submit
+        set check_status   = #{checkStatus},
+            check_pass_num = #{checkPassNum},
+            check_ng_num   = #{checkNgNum},
+            last_upd_by    = #{lastUpdBy},
+            last_upd_date  = #{lastUpdDate},
+            qc_date        = #{qcDate},
+            qc_user        = #{qcUser}
+        where id = #{id}
+    </update>
+
+    <update id="updateSubmitRecordCheckStatusBatch" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit">
+        update micro_work_submit
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="check_status =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.checkStatus}
+                </foreach>
+            </trim>
+            <trim prefix="check_pass_num =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.checkPassNum}
+                </foreach>
+            </trim>
+            <trim prefix="check_ng_num =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.checkNgNum}
+                </foreach>
+            </trim>
+            <trim prefix="last_upd_by =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.lastUpdBy}
+                </foreach>
+            </trim>
+            <trim prefix="last_upd_date =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.lastUpdDate}
+                </foreach>
+            </trim>
+            <trim prefix="qc_date =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.qcDate}
+                </foreach>
+            </trim>
+            <trim prefix="qc_user =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.qcUser}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="microWorkSubmits" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <update id="updateSubmitRecordRepairNumBatch" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit">
+        update micro_work_submit
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="repair_num =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.repairNum}
+                </foreach>
+            </trim>
+            <trim prefix="abandoned_num =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.abandonedNum}
+                </foreach>
+            </trim>
+            <trim prefix="last_upd_by =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.lastUpdBy}
+                </foreach>
+            </trim>
+            <trim prefix="last_upd_date =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.lastUpdDate}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="microWorkSubmits" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <update id="updateMicroWorkSubmitBatch">
+        update micro_work_submit
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="product_seq =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.productSeq}
+                </foreach>
+            </trim>
+            <trim prefix="pre_process_seq =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.preProcessSeq}
+                </foreach>
+            </trim>
+            <trim prefix="operate_process_seq =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.operateProcessSeq}
+                </foreach>
+            </trim>
+            <trim prefix="is_last_process =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    <if test="item.isLastProcess != null">
+                        when id=#{item.id} then #{item.isLastProcess}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="submit_status =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.submitStatus}
+                </foreach>
+            </trim>
+            <trim prefix="check_user =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.checkUser}
+                </foreach>
+            </trim>
+            <trim prefix="check_date =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    <if test="item.checkDate != null">
+                        when id=#{item.id} then #{item.checkDate}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="check_pass_num =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    <if test="item.checkPassNum != null">
+                        when id=#{item.id} then #{item.checkPassNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="check_ng_num =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    <if test="item.checkPassNum != null">
+                        when id=#{item.id} then #{item.checkNgNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="check_ng_num =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    <if test="item.checkPassNum != null">
+                        when id=#{item.id} then #{item.checkNgNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="last_upd_by =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.lastUpdBy}
+                </foreach>
+            </trim>
+            <trim prefix="last_upd_date =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.lastUpdDate}
+                </foreach>
+            </trim>
+            <trim prefix="data_status =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.dataStatus}
+                </foreach>
+            </trim>
+            <trim prefix="expired_record_flag =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.expiredRecordFlag}
+                </foreach>
+            </trim>
+            <trim prefix="submit_pictures =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.submitPictures}
+                </foreach>
+            </trim>
+            <trim prefix="is_first_process =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    <if test="item.isFirstProcess != null">
+                        when id=#{item.id} then #{item.isFirstProcess}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="check_status =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    <if test="item.checkStatus != null">
+                        when id=#{item.id} then #{item.checkStatus}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="microWorkSubmits" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <delete id="deleteMicroWorkSubmitById" parameterType="Long">
+        delete
+        from micro_work_submit
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroWorkSubmitByIds" parameterType="Long">
+        delete from micro_work_submit where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAllMicroWorkSubmit">
+        delete
+        from micro_work_submit
+    </delete>
+
+    <select id="getProductCountForSubmitByDay" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitDto"
+            resultMap="MicroWorkSubmitProductCount">
+        SELECT
+        ifnull(sum(a.total_counts),0) as total_counts,
+        ifnull(sum(a.total_pass_num),0) as total_pass_num,
+        ifnull(sum(a.total_ng_num),0) as total_ng_num,
+        a.submit_day
+        FROM
+        (SELECT
+        ifnull(sum(check_pass_num + check_ng_num),0) as total_counts,
+        ifnull(sum(check_pass_num),0) as total_pass_num,
+        ifnull(sum(check_ng_num),0) as total_ng_num,
+        submit_day
+        FROM micro_work_submit
+        <where>
+            submit_status = '0'
+            <if test="submitType != null">and submit_type = #{submitType}</if>
+            <if test="dates != null">
+                and submit_day in
+                <foreach item="date" collection="dates" open="(" separator="," close=")">
+                    #{date}
+                </foreach>
+            </if>
+            <if test="userId != null and userId != ''">
+                and created_by = #{userId}
+            </if>
+        </where>
+        GROUP BY submit_day
+        UNION
+        SELECT
+        ifnull(sum(pass_num + ng_num),0) as total_counts,
+        ifnull(sum(pass_num),0) as total_pass_num,
+        ifnull(sum(ng_num),0) as total_ng_num,
+        submit_day
+        FROM micro_work_submit
+        <where>
+            submit_status in ('1', '2')
+            <if test="submitType != null">and submit_type = #{submitType}</if>
+            <if test="dates != null">
+                and submit_day in
+                <foreach item="date" collection="dates" open="(" separator="," close=")">
+                    #{date}
+                </foreach>
+            </if>
+            <if test="userId != null and userId != ''">
+                and created_by = #{userId}
+            </if>
+        </where>
+        GROUP BY submit_day) a
+        GROUP BY a.submit_day
+    </select>
+
+    <select id="getProductCountForSubmitByMonth" resultMap="MicroWorkSubmitProductCount">
+        SELECT
+        ifnull(sum(a.total_counts),0) as total_counts,
+        ifnull(sum(a.total_pass_num),0) as total_pass_num,
+        ifnull(sum(a.total_ng_num),0) as total_ng_num,
+        a.submit_day
+        FROM
+        (SELECT
+        ifnull(sum(check_pass_num + check_ng_num),0) as total_counts,
+        ifnull(sum(check_pass_num),0) as total_pass_num,
+        ifnull(sum(check_ng_num),0) as total_ng_num,
+        submit_day
+        FROM micro_work_submit
+        <where>
+            submit_type = '1'
+            and submit_status = '0'
+            <if test="userId != null and userId != ''">
+                and created_by = #{userId}
+            </if>
+            and submit_day BETWEEN #{startDayOfMonth} and #{endDayOfMonth}
+        </where>
+        GROUP BY submit_day
+        UNION
+        SELECT
+        ifnull(sum(pass_num + ng_num),0) as total_counts,
+        ifnull(sum(pass_num),0) as total_pass_num,
+        ifnull(sum(ng_num),0) as total_ng_num,
+        submit_day
+        FROM micro_work_submit
+        <where>
+            submit_type = '1'
+            and submit_status in ('1', '2')
+            <if test="userId != null and userId != ''">
+                and created_by = #{userId}
+            </if>
+            and submit_day BETWEEN #{startDayOfMonth} and #{endDayOfMonth}
+        </where>
+        GROUP BY submit_day) a
+        GROUP BY a.submit_day
+    </select>
+
+    <select id="selectSubmitRecordGroupByProduct" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitDto"
+            resultMap="MicroWorkSubmitDto">
+        select GROUP_CONCAT(mws.id) as ids,
+        mws.tenant_code,
+        mws.product_seq,
+        mp.product_name,
+        mp.product_code,
+        mp.unit,
+        mws.operate_process_seq,
+        mpc.process_name as operate_process_name,
+        mpc.process_code as operate_process_code,
+        ifnull(sum(mws.pass_num),0) as pass_num,
+        ifnull(sum(mws.ng_num),0) as ng_num,
+        mws.submit_day,
+        mws.submit_status,
+        group_concat(mws.is_last_process) as is_last_process,
+        group_concat(mws.is_first_process) as is_first_process,
+        min(mws.expired_record_flag) as expired_record_flag
+        from micro_work_submit mws
+        left join micro_product mp on mws.product_seq = mp.product_seq AND mws.tenant_code = mp.tenant_code
+        left join micro_process_common mpc on mws.operate_process_seq = mpc.process_seq AND mpc.tenant_code = mws.tenant_code
+        left join micro_user mu on mws.submit_user = mu.id AND mws.tenant_code = mu.tenant_code
+        <where>
+            mws.submit_type = '1'
+            <if test="submitStatus != null">and mws.submit_status = #{submitStatus}</if>
+            <if test="remark != null and remark !='' ">and mws.remark like concat('%', #{remark}, '%')</if>
+            <if test="submitNickName != null and submitNickName != ''">
+                and mu.nick_name like concat('%', #{submitNickName}, '%')
+            </if>
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="processNameOrCode != null and processNameOrCode != ''">
+                and (mpc.process_code like concat('%', #{processNameOrCode}, '%') or mpc.process_name like concat('%', #{processNameOrCode}, '%'))
+            </if>
+            <if test="startDate !=null">and mws.submit_day &gt;= date_format(#{startDate},'%Y-%m-%d')</if>
+            <if test="endDate !=null">and mws.submit_day &lt;= date_format(#{endDate},'%Y-%m-%d')</if>
+        </where>
+        group by mws.submit_day, mws.product_seq, mws.operate_process_seq
+        order by submit_day desc
+    </select>
+
+    <select id="selectSubmitRecordGroupByProductList" parameterType="com.cosmo.hhim.micro.base.domain.entity.check.CheckByProductParam"
+            resultType="com.cosmo.hhim.micro.base.domain.entity.check.SubmitRecordGroupByProduct">
+        SELECT
+            a.id as productId,
+            a.product_seq as productSeq,
+            a.product_code as productCode,
+            a.product_name as productName,
+            a.unit as productUnit,
+            CONCAT(a.operate_process_seq, ',', IFNULL(a.pre_process_seq, '')) as processSeq,
+            a.record_count as recordCount,
+            a.ids,
+            IF(mt.id IS NULL, 0, 1 ) AS standard
+        FROM
+        (
+            SELECT
+                GROUP_CONCAT(mws.id) as ids,
+                mp.id,
+                mws.product_seq,
+                mp.product_code,
+                mp.product_name,
+                mp.unit,
+                GROUP_CONCAT(DISTINCT mws.pre_process_seq) as pre_process_seq,
+                GROUP_CONCAT(DISTINCT mws.operate_process_seq) as operate_process_seq,
+                COUNT(1) as record_count,
+                mws.tenant_code,
+                MAX(mws.created_date) as created_date
+            FROM micro_work_submit mws
+            LEFT JOIN micro_product mp on mws.product_seq = mp.product_seq AND mws.tenant_code = mp.tenant_code
+            <where>
+                mws.submit_type = '1'
+                <if test="submitStatus != null">and mws.submit_status = #{submitStatus}</if>
+                <if test="remark != null and remark !='' ">and mws.remark like concat('%', #{remark}, '%')</if>
+                <if test="productNameOrCode != null and productNameOrCode != ''">
+                    and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+                </if>
+            </where>
+            GROUP BY mws.product_seq
+        ) a
+        LEFT JOIN micro_technology mt on a.product_seq = mt.product_seq AND a.tenant_code = mt.tenant_code AND mt.active_flag = '1' AND mt.tech_type = 'STANDARD'
+        ORDER BY a.created_date desc
+    </select>
+
+    <select id="obtainedTodoNumsByProduct" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitDto" resultType="Integer">
+        select count(1) from
+        (SELECT
+        mp.id as productId,
+        mws.product_seq as productSeq,
+        mp.product_code as productCode,
+        mp.product_name as productName,
+        GROUP_CONCAT(mws.id) as ids,
+        COUNT(DISTINCT operate_process_seq) as processCount,
+        COUNT(1) as recordCount,
+        IF(mt.id IS NULL, 0, 1 ) AS standard
+        FROM micro_work_submit mws
+        LEFT JOIN micro_product mp on mws.product_seq = mp.product_seq AND mws.tenant_code = mp.tenant_code
+        LEFT JOIN micro_technology mt on mp.product_seq = mt.product_seq AND mt.active_flag = '1' AND mws.tenant_code = mt.tenant_code
+        <where>
+            mws.submit_type = '1'
+            <if test="submitStatus != null">and mws.submit_status = #{submitStatus}</if>
+            <if test="remark != null and remark !='' ">and mws.remark like concat('%', #{remark}, '%')</if>
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+        </where>
+        GROUP BY mws.product_seq) as a
+    </select>
+
+    <select id="selectSubmitRecordByUser" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.SubmitRecordQueryParam" resultMap="MicroWorkSubmitResult">
+        select
+            mws.id,
+            mws.tenant_code,
+            mws.product_seq,
+            mp.id as product_id,
+            mp.product_name,
+            mp.product_code,
+            mp.unit,
+            mws.operate_process_seq,
+            mpc.process_name as operate_process_name,
+            mpc.process_code as operate_process_code,
+            mws.pre_process_seq,
+            (SELECT GROUP_CONCAT(mpc.process_name) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq, mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as pre_process_name,
+            (SELECT GROUP_CONCAT(mpc.process_code) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq, mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as pre_process_code,
+            mws.pre_process_group,
+            mws.operate_process_group,
+            mws.is_last_process,
+            mws.pass_num,
+            mws.ng_num,
+            mws.submit_user,
+            mws.submit_day,
+            mws.submit_status,
+            mws.submit_no,
+            mws.remark,
+            mws.created_by,
+            mws.created_date,
+            mws.check_user,
+            mws.check_date,
+            mws.check_pass_num,
+            mws.check_ng_num,
+            mws.last_upd_by,
+            mws.last_upd_date,
+        mws.data_status,
+        mws.expired_record_flag,
+        mws.submit_pictures,
+        mu.nick_name as submit_nick_name,
+        mws.is_first_process,
+        mws.is_complete,
+        mws.check_status,
+        mws.repair_num,
+        mws.qc_date
+        from micro_work_submit mws
+        left join micro_product mp on mws.product_seq = mp.product_seq AND mws.tenant_code = mp.tenant_code
+        left join micro_process_common mpc on mws.operate_process_seq = mpc.process_seq AND mpc.tenant_code = mws.tenant_code
+        left join micro_user mu on mws.submit_user = mu.id AND mws.tenant_code = mu.tenant_code
+        <where>
+            <if test="submitType != null">and mws.submit_type = #{submitType}</if>
+            <if test="submitStatus != null">and mws.submit_status = #{submitStatus}</if>
+            <if test="submitNickName != null and submitNickName != ''">
+                and mu.nick_name like concat('%', #{submitNickName}, '%')
+            </if>
+            <if test="submitUserIds != null and submitUserIds.size() &gt; 0 ">
+                and mws.submit_user in
+                <foreach collection="submitUserIds" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="processNameOrCode != null and processNameOrCode != ''">
+                and (mpc.process_code like concat('%', #{processNameOrCode}, '%') or mpc.process_name like concat('%', #{processNameOrCode}, '%'))
+            </if>
+            <if test="startDate !=null">and mws.submit_day &gt;= date_format(#{startDate},'%Y-%m-%d')</if>
+            <if test="endDate !=null">and mws.submit_day &lt;= date_format(#{endDate},'%Y-%m-%d')</if>
+            <if test="cancelCheckType != null and cancelCheckType == 0">
+                AND date_format(mws.check_date, '%Y-%m-%d') &lt;= CURRENT_DATE()
+                AND date_format(mws.check_date, '%Y-%m-%d') &gt;= DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH)
+            </if>
+            <if test="ids != null and ids != ''">
+                and mws.id in
+                <foreach item="id" collection='ids.split(",")' open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="productSeq != null and productSeq != ''">
+                and mws.product_seq = #{productSeq}
+            </if>
+            <if test="remark != null and remark != ''">
+                and mws.remark like concat('%', #{remark}, '%')
+            </if>
+            <if test="checkStatus != null">
+                and mws.check_status = #{checkStatus}
+            </if>
+        </where>
+        <choose>
+            <when test="submitStatus != null and submitStatus == 0">
+                order by mws.check_date desc
+            </when>
+            <when test="checkStatus != null and checkStatus == 2">
+                order by mws.qc_date desc
+            </when>
+            <otherwise>
+                order by mws.id desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="obtainedTodoNumsByUser" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitDto" resultType="Integer">
+        select
+count(1)
+        from micro_work_submit mws
+        left join micro_product mp on mws.product_seq = mp.product_seq AND mws.tenant_code = mp.tenant_code
+        left join micro_process_common mpc on mws.operate_process_seq = mpc.process_seq AND mpc.tenant_code = mws.tenant_code
+        left join micro_user mu on mws.submit_user = mu.id AND mws.tenant_code = mu.tenant_code
+        <where>
+            mws.submit_type = '1'
+            <if test="submitStatus != null">and mws.submit_status = #{submitStatus}</if>
+            <if test="submitNickName != null and submitNickName != ''">
+                and mu.nick_name like concat('%', #{submitNickName}, '%')
+            </if>
+            <if test="submitUserIds != null and submitUserIds.size() &gt; 0 ">
+                and mu.id in
+                <foreach collection="submitUserIds" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="processNameOrCode != null and processNameOrCode != ''">
+                and (mpc.process_code like concat('%', #{processNameOrCode}, '%') or mpc.process_name like concat('%', #{processNameOrCode}, '%'))
+            </if>
+            <if test="startDate !=null">and mws.submit_day &gt;= date_format(#{startDate},'%Y-%m-%d')</if>
+            <if test="endDate !=null">and mws.submit_day &lt;= date_format(#{endDate},'%Y-%m-%d')</if>
+        </where>
+    </select>
+
+    <select id="getProcessByProductSeq" resultMap="MicroWorkSubmitDto">
+        SELECT DISTINCT
+        mws.operate_process_seq,
+        mpc.process_name as operate_process_name,
+        mpc.process_code as operate_process_code
+        FROM micro_work_submit mws
+        left join micro_process_common mpc on mpc.process_seq = mws.operate_process_seq and mws.tenant_code=mpc.tenant_code
+        <where>
+            mws.submit_type = '1'
+            <if test="productSeq != null and productSeq != ''">and mws.product_seq = #{productSeq}</if>
+            <if test="isLastProcess != null and isLastProcess != ''">and mws.is_last_process = #{isLastProcess}</if>
+            <if test="isFirstProcess != null and isFirstProcess != ''">and mws.is_first_process = #{isFirstProcess}</if>
+            <if test="submitStatus != null">and mws.submit_status = #{submitStatus}</if>
+        </where>
+        order by mws.id desc
+    </select>
+
+    <select id="selectCompletedProductListByProductAddProcess" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitDto"
+            resultMap="MicroWorkSubmitDto">
+        select
+        mp.product_name,
+        mp.product_code,
+        mpc.process_name as operate_process_name,
+        mws.product_seq,
+        ifnull(sum(mws.check_pass_num),0) as check_pass_num,
+        ifnull(sum(mws.check_ng_num),0) as check_ng_num
+        from micro_work_submit mws
+        left join micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code=mp.tenant_code
+        left join micro_process_common mpc on mws.operate_process_seq = mpc.process_seq and mws.tenant_code=mpc.tenant_code
+        <where>
+            <if test="submitType != null">and mws.submit_type = #{submitType}</if>
+            <if test="submitStatus != null">and mws.submit_status = #{submitStatus}</if>
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="processNameOrCode != null and processNameOrCode != ''">
+                and (mpc.process_code like concat('%', #{processNameOrCode}, '%') or mpc.process_name like concat('%', #{processNameOrCode}, '%'))
+            </if>
+            <if test="startDate !=null">and date_format(mws.submit_day, '%Y-%m-%d') &gt;= date_format(#{startDate},'%Y-%m-%d')</if>
+            <if test="endDate !=null">and date_format(mws.submit_day, '%Y-%m-%d') &lt;= date_format(#{endDate},'%Y-%m-%d')</if>
+            <if test="productSeq !=null and productSeq != ''">and mws.product_seq = #{productSeq}</if>
+            <if test="operateProcessSeq !=null and operateProcessSeq != ''">and mws.operate_process_seq = #{operateProcessSeq}</if>
+        </where>
+        group by mws.product_seq, mws.operate_process_seq
+    </select>
+
+    <select id="selectCompletedProductListByProduct" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitDto"
+            resultMap="MicroWorkSubmitDto">
+        select
+        mp.product_name,
+        mp.product_code,
+        mws.product_seq,
+        ifnull(sum(mws.check_pass_num),0) as check_pass_num,
+        ifnull(sum(mws.check_ng_num),0) as check_ng_num
+        from micro_work_submit mws
+        left join micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code=mp.tenant_code
+        left join micro_process_common mpc on mws.operate_process_seq = mpc.process_seq and mws.tenant_code=mpc.tenant_code
+        <where>
+            <if test="submitType != null">and mws.submit_type = #{submitType}</if>
+            <if test="submitStatus != null">and mws.submit_status = #{submitStatus}</if>
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="processNameOrCode != null and processNameOrCode != ''">
+                and (mpc.process_code like concat('%', #{processNameOrCode}, '%') or mpc.process_name like concat('%', #{processNameOrCode}, '%'))
+            </if>
+            <if test="startDate !=null">and date_format(mws.submit_day, '%Y-%m-%d') &gt;= date_format(#{startDate},'%Y-%m-%d')</if>
+            <if test="endDate !=null">and date_format(mws.submit_day, '%Y-%m-%d') &lt;= date_format(#{endDate},'%Y-%m-%d')</if>
+        </where>
+        group by mws.product_seq
+    </select>
+
+    <select id="selectCompletedProductListByProcess" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitDto"
+            resultMap="MicroWorkSubmitDto">
+        SELECT
+        mws.operate_process_seq,
+        mpc.process_code as operate_process_code,
+        mpc.process_name as operate_process_name,
+        ifnull(sum( mws.check_pass_num ), 0) AS check_pass_num,
+        ifnull(sum( mws.check_ng_num ), 0) AS check_ng_num
+        FROM micro_work_submit mws
+        LEFT JOIN micro_process_common mpc on mws.operate_process_seq = mpc.process_seq and mws.tenant_code=mpc.tenant_code
+        LEFT JOIN micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code=mp.tenant_code
+        <where>
+            mws.submit_type = '1'
+            <if test="submitStatus != null">and mws.submit_status = #{submitStatus}</if>
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code = #{productNameOrCode} or mp.product_name = #{productNameOrCode})
+            </if>
+            <if test="processNameOrCode != null and processNameOrCode != ''">
+                and (mpc.process_code like concat('%', #{processNameOrCode}, '%') or mpc.process_name like concat('%', #{processNameOrCode}, '%'))
+            </if>
+            <if test="startDate !=null">and date_format(mws.submit_day, '%Y-%m-%d') &gt;= date_format(#{startDate},'%Y-%m-%d')</if>
+            <if test="endDate !=null">and date_format(mws.submit_day, '%Y-%m-%d') &lt;= date_format(#{endDate},'%Y-%m-%d')</if>
+        </where>
+        GROUP BY mws.operate_process_seq
+    </select>
+
+    <select id="selectCompletedProductListByEmployee" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitDto"
+            resultMap="MicroWorkSubmitDto">
+        SELECT
+        mu.nick_name as submit_nick_name,
+        mu.user_name as created_by,
+        IFNULL(sum(check_pass_num), 0) as check_pass_num,
+        IFNULL(sum(check_ng_num), 0) as check_ng_num
+        FROM micro_work_submit mws
+        LEFT JOIN micro_product mp ON mp.product_seq = mws.product_seq and mp.tenant_code = mws.tenant_code
+        LEFT JOIN micro_user mu on mu.id = mws.submit_user and mu.tenant_code = mws.tenant_code
+        <where>
+            mws.submit_type = '1'
+            <if test="submitStatus != null">and mws.submit_status = #{submitStatus}</if>
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code = #{productNameOrCode} or mp.product_name = #{productNameOrCode})
+            </if>
+            <if test="processNameOrCode != null and processNameOrCode != ''">
+                and (mpc.process_code like concat('%', #{processNameOrCode}, '%') or mpc.process_name like concat('%', #{processNameOrCode}, '%'))
+            </if>
+            <if test="startDate !=null">and date_format(mws.submit_day, '%Y-%m-%d') &gt;= date_format(#{startDate},'%Y-%m-%d')</if>
+            <if test="endDate !=null">and date_format(mws.submit_day, '%Y-%m-%d') &lt;= date_format(#{endDate},'%Y-%m-%d')</if>
+        </where>
+        GROUP BY mws.created_by
+    </select>
+
+    <select id="selectFirstSubmitInfo" resultType="com.cosmo.hhim.micro.base.domain.entity.common.FirstSubmitOrCheckInfoResult">
+        select a.submit_user         operator,
+               a.created_date        operateDate,
+               a.product_seq         productSeq,
+               a.operate_process_seq processSeq,
+               b.process_name        processName,
+               c.product_name        productName
+        from micro_work_submit a
+                 left join micro_process_common b on a.operate_process_seq = b.process_seq and a.tenant_code = b.tenant_code
+                 left join micro_product c on a.product_seq = c.product_seq and a.tenant_code = c.tenant_code
+        where a.submit_type = '1'
+          and a.submit_user != #{userId}
+        order by a.created_date
+        limit 1
+    </select>
+
+    <select id="selectFirstCheckInfo" resultType="com.cosmo.hhim.micro.base.domain.entity.common.FirstSubmitOrCheckInfoResult">
+        select a.check_user          operator,
+               a.check_date          operateDate,
+               a.product_seq         productSeq,
+               a.operate_process_seq processSeq,
+               b.process_name        processName,
+               c.product_name        productName
+        from micro_work_submit a
+                 left join micro_process_common b on a.operate_process_seq = b.process_seq and a.tenant_code = b.tenant_code
+                 left join micro_product c on a.product_seq = c.product_seq and a.tenant_code = c.tenant_code
+        where a.submit_status = '0'
+          and a.submit_type = '1'
+          and a.check_user != #{userId}
+        order by a.check_date
+        limit 1
+    </select>
+
+    <select id="findSubmitterWithSubmitDay" resultType="com.cosmo.hhim.micro.base.domain.entity.submit.Submitter">
+        select distinct
+        submit_user as submitUser,
+        submit_day as submitDay
+        from micro_work_submit
+        <where>
+            submit_type = '1'
+            <if test="startDate != null">and submit_day &gt;= #{startDate}</if>
+            <if test="endDate != null">and submit_day &lt;= #{endDate}</if>
+            <if test="submitUser != null and submitUser != ''">and submit_user = #{submitUser}</if>
+        </where>
+        group by submit_user, submit_day
+    </select>
+
+    <select id="getAvgSubmitNumForUserAndProductAndProcess" resultType="decimal">
+        SELECT IFNULL(sum(check_pass_num + check_ng_num), 0) / count(1) as avgSubmitNum
+        FROM micro_work_submit
+        WHERE submit_status = '0'
+          and submit_type = '1'
+          and submit_user = #{submitUser}
+          and product_seq = #{productSeq}
+          and operate_process_seq = #{processSeq}
+        GROUP BY submit_user, product_seq, operate_process_seq
+        HAVING count(1) > 10
+    </select>
+
+    <select id="selectIsFirstAndLastProcess" resultType="com.cosmo.hhim.micro.base.domain.entity.submit.FirstOrLastProcess">
+        SELECT
+        min(is_last_process) as isLastProcess,
+        min(is_first_process) as isFirstProcess
+        FROM micro_work_submit
+        <where>
+            submit_type = '1'
+            <if test="productSeq != null and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="processSeq != null and processSeq != ''">and operate_process_seq = #{processSeq}</if>
+            <if test="submitStatus != null">and submit_status = #{submitStatus}</if>
+        </where>
+    </select>
+
+    <select id="obtainedProductiveCapacityByDayForEmployee" resultMap="ProductiveCapacityByDay">
+        SELECT IFNULL(sum(a.total_pass_num), 0) as total_pass_num,
+               IFNULL(sum(a.total_ng_num), 0)   as total_ng_num,
+               IFNULL(sum(a.total_num), 0)      as total_num,
+               a.submit_user,
+               a.submit_day
+        FROM (SELECT IFNULL(sum(check_pass_num), 0)                as total_pass_num,
+                     IFNULL(sum(check_ng_num), 0)                  as total_ng_num,
+                     IFNULL(sum(check_pass_num + check_ng_num), 0) as total_num,
+                     submit_user,
+                     submit_day
+              FROM micro_work_submit
+              WHERE submit_day = DATE_FORMAT(#{submitDay}, '%Y-%m-%d')
+                and submit_status = '0' and submit_type = '1'
+              group by submit_user
+              UNION
+              SELECT IFNULL(sum(pass_num), 0)          as total_pass_num,
+                     IFNULL(sum(ng_num), 0)            as total_ng_num,
+                     IFNULL(sum(pass_num + ng_num), 0) as total_num,
+                     submit_user,
+                     submit_day
+              FROM micro_work_submit
+              WHERE submit_day = DATE_FORMAT(#{submitDay}, '%Y-%m-%d')
+                and submit_status = '1' and submit_type = '1'
+              group by submit_user) a
+        group by a.submit_user
+    </select>
+
+    <select id="obtainedAverageDayProductiveCapacityForFactory" resultType="decimal">
+        SELECT IFNULL(sum(check_pass_num) + sum(check_ng_num), 0) / COUNT(DISTINCT submit_day) as avgDayProductiveCapacityForFactory
+        FROM micro_work_submit
+        WHERE submit_day &lt; DATE_FORMAT(CURRENT_DATE, '%Y-%m-%d')
+          and submit_status = '0' and submit_type = '1'
+    </select>
+
+    <select id="obtainedAverageDayProductiveCapacityForEmployeeFromFactory" resultType="decimal">
+        SELECT IFNULL(sum(a.avgDayProductiveCapacityForEmployee), 0) / COUNT(*) AS avgDayProductiveCapacityForEmployee
+        FROM (SELECT submit_day,
+                     IFNULL(sum(check_pass_num) + sum(check_ng_num), 0) / COUNT(DISTINCT submit_user) AS avgDayProductiveCapacityForEmployee
+              FROM micro_work_submit
+              WHERE submit_day &lt; DATE_FORMAT(CURRENT_DATE, '%Y-%m-%d')
+                AND submit_status = '0' and submit_type = '1'
+              GROUP BY submit_day) AS a
+    </select>
+
+    <select id="obtainedAverageDayProductiveCapacityForEmployee" resultType="map">
+        SELECT submit_user                                                                     as submitUser,
+               IFNULL(sum(check_pass_num) + sum(check_ng_num), 0) / COUNT(DISTINCT submit_day) as averageDayProductiveCapacityForEmployee
+        FROM micro_work_submit
+        WHERE submit_day &lt; DATE_FORMAT(CURRENT_DATE, '%Y-%m-%d')
+          and submit_status = '0' and submit_type = '1'
+        GROUP BY submit_user
+    </select>
+
+    <select id="obtainedCountForProductAndProcess" resultType="com.cosmo.hhim.micro.base.domain.entity.submit.CountForProductAndProcess">
+        SELECT
+        IFNULL(sum(pass_num), 0) as totalPassNum,
+        IFNULL(sum(ng_num), 0) as totalNgNum,
+        IFNULL(sum(pass_num + ng_num), 0) as totalNum
+        FROM micro_work_submit
+        <where>
+            submit_type = '1'
+            <if test="productSeq != null and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="submitStatus != null">and submit_status = #{submitStatus}</if>
+            <if test="processSeq != null and processSeq != ''">and operate_process_seq = #{processSeq}</if>
+        </where>
+    </select>
+
+    <select id="obtainedCountForAllProductAndProcess" resultType="com.cosmo.hhim.micro.base.domain.entity.submit.CountForProductAndProcess">
+        SELECT
+        CONCAT(product_seq , '_', operate_process_seq) AS seqKey,
+        IFNULL(sum(pass_num), 0) as totalPassNum,
+        IFNULL(sum(ng_num), 0) as totalNgNum,
+        IFNULL(sum(pass_num + ng_num), 0) as totalNum
+        FROM micro_work_submit
+        <where>
+            submit_type = '1'
+            <if test="submitStatus != null">and submit_status = #{submitStatus}</if>
+        </where>
+        group by product_seq, operate_process_seq
+    </select>
+
+    <select id="selectWorkSubmitInfosBySubmitUserAndDay" resultMap="MicroWorkSubmitResult">
+        <include refid="selectMicroWorkSubmitVo"/>
+        <where>
+            <if test="submitUser != null  and submitUser != ''">and submit_user = #{submitUser}</if>
+            <if test="submitStartDay != null ">and submit_day &gt;= date_format(#{submitStartDay}, '%Y-%m-%d')</if>
+            <if test="submitEndDay != null ">and submit_day &lt;= date_format(#{submitEndDay}, '%Y-%m-%d')</if>
+            <if test="submitType != null">and submit_type = #{submitType}</if>
+        </where>
+    </select>
+
+    <select id="selectAllWorkOrderFromSubmitRecordByUserAndDay" resultType="java.lang.String">
+        select distinct work_order_no from micro_work_submit
+        <where>
+            <if test="submitUser != null  and submitUser != ''">and submit_user = #{submitUser}</if>
+            <if test="submitStartDay != null ">and submit_day &gt;= date_format(#{submitStartDay}, '%Y-%m-%d')</if>
+            <if test="submitEndDay != null ">and submit_day &lt;= date_format(#{submitEndDay}, '%Y-%m-%d')</if>
+            <if test="submitType != null">and submit_type = #{submitType}</if>
+        </where>
+    </select>
+
+    <select id="selectWorkSubmitExInfosBySubmitUserAndDay" resultMap="MicroWorkSubmitResult">
+        select mws.id,
+            mws.tenant_code,
+            mws.work_order_no,
+            mws.task_no,
+            mws.submit_type,
+            mws.product_seq,
+            mp.product_code,
+            mp.product_name,
+            mws.pre_process_seq,
+            mws.operate_process_seq,
+            mpc.process_name as operate_process_name,
+            mpc.process_code as operate_process_code,
+            mws.pre_process_group,
+            mws.operate_process_group,
+            mws.is_last_process,
+            mws.pass_num,
+            mws.ng_num,
+            mws.submit_user,
+            mws.submit_day,
+            mws.submit_status,
+            mws.submit_no,
+            mws.remark,
+            mws.created_by,
+            mws.created_date,
+            mws.check_user,
+            mws.check_date,
+            mws.check_pass_num,
+            mws.check_ng_num,
+            mws.last_upd_by,
+            mws.last_upd_date,
+            mws.data_status,
+            mws.expired_record_flag,
+            mws.submit_pictures,
+            mws.is_first_process,
+            mws.is_complete,
+            mws.check_status,
+            mws.repair_num,
+            mws.abandoned_num,
+            mws.qc_date,
+            mws.qc_user
+        from micro_work_submit mws
+        left join micro_product mp on mws.product_seq = mp.product_seq
+        left join micro_process_common mpc on mpc.process_seq = mws.operate_process_seq
+        <where>
+            <if test="submitUser != null  and submitUser != ''">and submit_user = #{submitUser}</if>
+            <if test="submitStartDay != null ">and submit_day &gt;= date_format(#{submitStartDay}, '%Y-%m-%d')</if>
+            <if test="submitEndDay != null ">and submit_day &lt;= date_format(#{submitEndDay}, '%Y-%m-%d')</if>
+            <if test="submitType != null">and submit_type = #{submitType}</if>
+            <if test="submitStatus != null">and submit_status = #{submitStatus}</if>
+        </where>
+    </select>
+
+    <select id="getSubmitSummaryInfoByUser" resultType="com.cosmo.hhim.micro.base.domain.entity.submit.SubmitTotalInfoInDifferentStatusByUser">
+        select
+            count(1) as recordNum,
+            sum(pass_num) + sum(ng_num) as totalNum
+        from micro_work_submit
+        <where>
+            <if test="submitUser != null  and submitUser != ''">and submit_user = #{submitUser}</if>
+            <if test="submitStartDay != null ">and submit_day &gt;= date_format(#{submitStartDay}, '%Y-%m-%d')</if>
+            <if test="submitEndDay != null ">and submit_day &lt;= date_format(#{submitEndDay}, '%Y-%m-%d')</if>
+            <if test="submitType != null">and submit_type = #{submitType}</if>
+            <if test="submitStatus != null">and submit_status = #{submitStatus}</if>
+        </where>
+    </select>
+
+    <select id="selectWorkSubmitInfos" parameterType="MicroWorkSubmitDto" resultMap="MicroWorkSubmitResult">
+        <include refid="selectMicroWorkSubmitVo"/>
+        <where>
+            submit_type = '1'
+            <if test="productSeq != null  and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="preProcessSeq != null  and preProcessSeq != ''">and pre_process_seq = #{preProcessSeq}</if>
+            <if test="operateProcessSeq != null  and operateProcessSeq != ''">and operate_process_seq = #{operateProcessSeq}</if>
+            <if test="preProcessGroup != null  and preProcessGroup != ''">and pre_process_group = #{preProcessGroup}</if>
+            <if test="operateProcessGroup != null  and operateProcessGroup != ''">and operate_process_group = #{operateProcessGroup}</if>
+            <if test="isLastProcess != null  and isLastProcess != ''">and is_last_process = #{isLastProcess}</if>
+            <if test="passNum != null ">and pass_num = #{passNum}</if>
+            <if test="ngNum != null ">and ng_num = #{ngNum}</if>
+            <if test="submitUser != null  and submitUser != ''">and submit_user = #{submitUser}</if>
+            <if test="startDate != null ">and submit_day &gt;= #{startDate}</if>
+            <if test="endDate != null ">and submit_day &lt; #{endDate}</if>
+            <if test="submitStatus != null ">and submit_status = #{submitStatus}</if>
+            <if test="submitNo != null  and submitNo != ''">and submit_no = #{submitNo}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="checkUser != null  and checkUser != ''">and check_user = #{checkUser}</if>
+            <if test="checkDate != null">and check_date = #{checkDate}</if>
+            <if test="checkPassNum != null">and check_pass_num = #{checkPassNum}</if>
+            <if test="checkNgNum != null">and check_ng_num = #{checkNgNum}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="dataStatus != null ">and data_status = #{dataStatus}</if>
+            <if test="isFirstProcess != null  and isFirstProcess != ''">and is_first_process = #{isFirstProcess}</if>
+            <if test="isComplete != null  and isComplete != ''">and is_complete = #{isComplete}</if>
+        </where>
+        order by last_upd_date desc
+    </select>
+
+    <select id="selectWorkSubmitSumGroupByUser" parameterType="MicroWorkSubmitDto" resultType="java.util.Map">
+        select submit_user submitUser, sum(pass_num) + sum(ng_num) totalNum from micro_work_submit
+        <where>
+            <if test="productSeq != null  and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="preProcessSeq != null  and preProcessSeq != ''">and pre_process_seq = #{preProcessSeq}</if>
+            <if test="operateProcessSeq != null  and operateProcessSeq != ''">and operate_process_seq = #{operateProcessSeq}</if>
+            <if test="preProcessGroup != null  and preProcessGroup != ''">and pre_process_group = #{preProcessGroup}</if>
+            <if test="operateProcessGroup != null  and operateProcessGroup != ''">and operate_process_group = #{operateProcessGroup}</if>
+            <if test="isLastProcess != null  and isLastProcess != ''">and is_last_process = #{isLastProcess}</if>
+            <if test="passNum != null ">and pass_num = #{passNum}</if>
+            <if test="ngNum != null ">and ng_num = #{ngNum}</if>
+            <if test="submitUser != null  and submitUser != ''">and submit_user = #{submitUser}</if>
+            <if test="startDate != null ">and submit_day &gt;= #{startDate}</if>
+            <if test="endDate != null ">and submit_day &lt; #{endDate}</if>
+            <if test="submitStatus != null ">and submit_status = #{submitStatus}</if>
+            <if test="submitNo != null  and submitNo != ''">and submit_no = #{submitNo}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="checkUser != null  and checkUser != ''">and check_user = #{checkUser}</if>
+            <if test="checkDate != null">and check_date = #{checkDate}</if>
+            <if test="checkPassNum != null">and check_pass_num = #{checkPassNum}</if>
+            <if test="checkNgNum != null">and check_ng_num = #{checkNgNum}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="dataStatus != null ">and data_status = #{dataStatus}</if>
+            <if test="isFirstProcess != null  and isFirstProcess != ''">and is_first_process = #{isFirstProcess}</if>
+            <if test="isComplete != null  and isComplete != ''">and is_complete = #{isComplete}</if>
+            <if test="submitType != null">and submit_type = #{submitType}</if>
+        </where>
+        group by submit_user
+    </select>
+
+    <select id="selectUserSubmitNumGroupBySubmitDay" parameterType="long"
+            resultType="com.cosmo.hhim.micro.base.domain.entity.submit.ProductiveCapacityByDay">
+        SELECT a.submit_day                as submitDay,
+               IFNULL(sum(a.total_num), 0) AS totalNum
+        FROM (SELECT IFNULL(sum(check_pass_num + check_ng_num), 0) AS total_num,
+                     submit_day
+              FROM micro_work_submit
+              WHERE submit_user = #{userId} and submit_type = '1'
+                and submit_status = '0'
+              GROUP BY submit_day
+              UNION
+              SELECT IFNULL(sum(pass_num + ng_num), 0) AS total_num,
+                     submit_day
+              FROM micro_work_submit
+              WHERE submit_user = #{userId} and submit_type = '1'
+                and submit_status = '1'
+              GROUP BY submit_day) a
+        GROUP BY a.submit_day
+    </select>
+    <select id="selectProcessByProduct" resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        select *
+        from (SELECT mpc.process_name AS itemName,
+                     mpc.process_code AS itemCode,
+                     mpc.process_seq  AS itemSeq,
+                     mpc.id           AS itemId
+              FROM micro_work_submit mws
+                       INNER JOIN micro_process_common mpc ON
+                          mws.tenant_code = mpc.tenant_code
+                      AND mws.operate_process_seq = mpc.process_seq
+              WHERE mws.submit_status = '0'
+                and mws.submit_type = '1'
+                AND mws.product_seq = #{productSeq}
+                AND mpc.process_name like concat('%', #{key}, '%')
+              GROUP BY mpc.process_name,
+                       mpc.process_seq,
+                       mpc.process_code
+              UNION
+              SELECT mpc.process_name AS itemName,
+                     mpc.process_code AS itemCode,
+                     mpc.process_seq  AS itemSeq,
+                     mpc.id           AS itemId
+              FROM micro_work_submit mws
+                       INNER JOIN micro_process_common mpc ON
+                          mws.tenant_code = mpc.tenant_code
+                      AND FIND_IN_SET(mpc.process_seq, mws.pre_process_seq)
+              WHERE mws.submit_status = '0'
+                and mws.submit_type = '1'
+                AND mws.product_seq = #{productSeq}
+                AND mpc.process_name like concat('%', #{key}, '%')
+              GROUP BY mpc.process_name,
+                       mpc.process_seq,
+                       mpc.process_code) as t
+        order by t.itemCode
+    </select>
+
+    <select id="obtainedTotalSubmitNum" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit"
+            resultType="com.cosmo.hhim.micro.base.domain.entity.submit.TotalSubmitNumByUser">
+        SELECT
+        SUM(IFNULL(a.total_num, 0)) as totalSubmitNum,
+        group_concat(ids) as ids
+        FROM
+        (
+        SELECT
+        SUM(IFNULL(check_pass_num, 0)) + SUM(IFNULL(check_ng_num, 0)) AS total_num,
+        group_concat(id) as ids
+        FROM
+        micro_work_submit
+        <where>
+            submit_type = '1'
+            and submit_status = 0
+            <if test="submitUser != null and submitUser != ''">
+                and submit_user = #{submitUser}
+            </if>
+            <if test="productSeq != null and productSeq != ''">
+                and product_seq = #{productSeq}
+            </if>
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">
+                and operate_process_seq = #{operateProcessSeq}
+            </if>
+            <if test="submitDay != null">
+                and submit_day = #{submitDay}
+            </if>
+        </where>
+        UNION ALL
+        SELECT
+        SUM(IFNULL(pass_num, 0)) + SUM(IFNULL(ng_num, 0))AS total_num,
+        group_concat(id) as ids
+        FROM
+        micro_work_submit
+        <where>
+            submit_type = '1'
+            and submit_status = 1
+            <if test="submitUser != null">
+                and submit_user = #{submitUser}
+            </if>
+            <if test="productSeq != null and productSeq != ''">
+                and product_seq = #{productSeq}
+            </if>
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">
+                and operate_process_seq = #{operateProcessSeq}
+            </if>
+            <if test="submitDay != null">
+                and submit_day = #{submitDay}
+            </if>
+        </where>
+        ) a
+    </select>
+
+    <select id="obtainedTotalSubmitNumByCondition" resultType="com.cosmo.hhim.micro.base.domain.entity.submit.TotalSubmitNumByCondition">
+        SELECT
+            SUM(IFNULL(a.total_num, 0)) as totalSubmitNum,
+            group_concat(ids) as ids,
+            concat(product_seq, '_', operate_process_seq, '_', submit_user, '_', submit_day) as conditionKey
+        FROM
+        (
+            SELECT
+                SUM(IFNULL(check_pass_num, 0)) + SUM(IFNULL(check_ng_num, 0)) AS total_num,
+                null as ids,
+                product_seq,
+                operate_process_seq,
+                submit_user,
+                submit_day
+            FROM
+            micro_work_submit
+            where submit_status = 0 and submit_type = '1'
+            group by product_seq, operate_process_seq, submit_user, submit_day
+        UNION ALL
+            SELECT
+                SUM(IFNULL(pass_num, 0)) + SUM(IFNULL(ng_num, 0))AS total_num,
+                group_concat(id) as ids,
+                product_seq,
+                operate_process_seq,
+                submit_user,
+                submit_day
+            FROM micro_work_submit
+            where submit_status = 1 and submit_type = '1'
+            group by product_seq, operate_process_seq, submit_user, submit_day
+        ) a
+        group by product_seq, operate_process_seq, submit_user, submit_day
+    </select>
+    <select id="selectAllProcess" resultType="java.lang.String">
+        SELECT DISTINCT mws.operate_process_seq AS process_seq
+        FROM micro_work_submit mws
+        UNION
+        SELECT DISTINCT mws.pre_process_seq AS process_seq
+        FROM micro_work_submit mws
+        WHERE (mws.pre_process_seq IS NOT NULL
+            OR mws.pre_process_seq != '')
+        UNION
+        SELECT DISTINCT mps.process_seq AS process_seq
+        FROM micro_process_storage mps
+        where mps.pass_num != 0
+          and mps.ng_num != 0
+        UNION
+        SELECT DISTINCT ch.process_seq AS process_seq
+        FROM micro_process_chain ch
+        WHERE ch.active_flag = '1'
+        UNION
+        SELECT DISTINCT mmt.process_seq AS process_seq
+        FROM micro_manufacture_task mmt
+    </select>
+
+    <select id="selectSubmitRecordInfoByWorkOrderList" resultType="com.cosmo.hhim.micro.base.domain.entity.check.SubmitRecordInfoByWorkOrder">
+        SELECT
+            mws.work_order_no as workOrderNo,
+            mws.product_seq as productSeq,
+            mp.product_name as productName,
+            mp.product_code as productCode,
+            mp.unit as productUnit,
+            group_concat(mws.id) as ids,
+            count(1) as recordNum,
+            count(DISTINCT mws.operate_process_seq) as processNum
+        FROM micro_work_submit mws
+        left join micro_product mp on mws.product_seq = mp.product_seq
+        <where>
+            mws.submit_type = '2'
+            <if test="seqKey != null and seqKey != ''">
+                and (mws.work_order_no like concat('%', #{seqKey}, '%')
+                        or mws.order_no like concat('%', #{seqKey}, '%')
+                        or mp.product_code like concat('%', #{seqKey}, '%')
+                        or mp.product_name like concat('%', #{seqKey}, '%'))
+            </if>
+            <if test="submitStatus != null">
+                and mws.submit_status = #{submitStatus}
+            </if>
+        </where>
+        GROUP BY work_order_no
+        <choose>
+            <when test="submitStatus != null and submitStatus == 0">
+                order by mws.check_date desc
+            </when>
+            <when test="submitStatus != null and submitStatus == 1">
+                order by mws.created_date desc
+            </when>
+        </choose>
+    </select>
+
+    <select id="selectDetailSubmitRecordInfoByWorkOrderList" resultMap="DetailSubmitRecordInfoByWorkOrderResult">
+        SELECT
+            a.product_seq,
+            a.operate_process_seq,
+            mpc.process_code as operate_process_code,
+            mpc.process_name as operate_process_name,
+            min(a.is_last_process) as is_last_process,
+            a.unit as product_unit,
+            a.submit_user as user_id,
+            mu.nick_name,
+            sum(a.pass_num) as pass_num,
+            sum(a.ng_num ) as ng_num,
+            group_concat(a.id) as ids
+        FROM
+            (SELECT
+                mws.id,
+                mws.operate_process_seq,
+                mws.submit_user,
+                <if test="submitStatus == 1">
+                    mws.pass_num as pass_num,
+                    mws.ng_num as ng_num,
+                </if>
+                <if test="submitStatus == 0">
+                    mws.check_pass_num as pass_num,
+                    mws.check_ng_num as ng_num,
+                </if>
+                mws.is_last_process,
+                mp.unit,
+                mp.product_seq
+            FROM micro_work_submit mws
+            INNER join micro_product mp on mws.product_seq = mp.product_seq
+            <where>
+                mws.submit_type = '2'
+                <if test="workOrderNo != null and workOrderNo != ''">
+                    and mws.work_order_no = #{workOrderNo}
+                </if>
+                <if test="submitStatus != null and submitStatus != ''">
+                    and mws.submit_status = #{submitStatus}
+                </if>
+            </where>) a
+        INNER JOIN micro_user mu ON a.submit_user = mu.id
+        INNER JOIN micro_process_common mpc ON a.operate_process_seq = mpc.process_seq
+        GROUP BY operate_process_seq, submit_user
+    </select>
+
+    <select id="selectUserDetailSubmitRecordInfoByWorkOder" parameterType="com.cosmo.hhim.micro.base.domain.entity.check.UserSubmitRecordQueryParam" resultType="com.cosmo.hhim.micro.base.domain.entity.check.UserDetailSubmitRecordInfoByWorkOder">
+        SELECT
+            mws.id,
+            mws.created_date as createdDate,
+            <if test="submitStatus == 1">
+                mws.pass_num as passNum,
+                mws.ng_num as ngNum,
+            </if>
+            <if test="submitStatus == 0">
+                mws.check_pass_num as passNum,
+                mws.check_ng_num as ngNum,
+            </if>
+            mws.submit_user as userId,
+            mu.nick_name as nickName
+        FROM micro_work_submit mws
+        left join micro_user mu on mws.submit_user = mu.id
+        <where>
+            mws.submit_type = '2'
+            <if test="workOrderNo != null and workOrderNo != ''">
+                and mws.work_order_no = #{workOrderNo}
+            </if>
+            <if test="processSeq != null and processSeq != ''">
+                and mws.operate_process_seq = #{processSeq}
+            </if>
+            <if test="submitStatus != null and submitStatus != ''">
+                and mws.submit_status = #{submitStatus}
+            </if>
+            <if test="userIds != null">
+                and mws.submit_user in
+                <foreach item="userId" collection="userIds" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectLastProcessWorkSubmitInfos" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.WaitDealQueryDto"
+            resultType="com.cosmo.hhim.micro.base.domain.entity.submit.WaitDealResultDto">
+        select
+            a.id workSubmitId,
+            a.product_seq productSeq,
+            b.product_code productCode,
+            b.product_name productName,
+            c.nick_name submitUserNickName,
+            a.created_date submitWorkDate,
+        a.check_pass_num goodNum,
+        a.check_ng_num ngNum,
+        a.operate_process_seq processSeq,
+        a.remark remark,
+        a.check_status checkStatus,
+        a.check_user checkUser,
+        a.check_date checkDate,
+        a.qc_date qcDate,
+        a.qc_user qcUser
+        from micro_work_submit a
+        inner join micro_product b on a.product_seq = b.product_seq and a.tenant_code = b.tenant_code
+        inner join micro_user c on a.submit_user = c.id and a.tenant_code = c.tenant_code
+        <where>
+            <if test="productSeqOrName != null and productSeqOrName != ''">
+                and (a.product_seq like concat('%', #{productSeqOrName}, '%') or b.product_name like concat('%', #{productSeqOrName}, '%'))
+            </if>
+            <if test="nickName != null and nickName != ''">
+                and c.nick_name like concat ('%', #{nickName}, '%')
+            </if>
+            <if test="submitType != null">
+                and a.submit_type = #{submitType}
+            </if>
+            and a.is_last_process = '0'
+            and a.submit_status = '0'
+            and a.is_complete = '1'
+            and a.check_pass_num &gt; 0
+        </where>
+        order by a.created_date desc
+    </select>
+    
+    <select id="obtainedSubmitRecordNumInDifferentStatus" parameterType="MicroWorkSubmit" resultType="Map">
+        SELECT
+            CASE
+            submit_status
+            WHEN 1 THEN
+            'waitCheckRecordNum'
+            WHEN 2 THEN
+            'rejectRecordNum' ELSE 'checkRecordNum'
+            END AS statusKey,
+            count( 1 ) AS num
+        FROM
+            micro_work_submit
+        <where>
+            <if test="submitType != null">and submit_type = #{submitType}</if>
+            <if test="submitUser != null">and submit_user = #{submitUser}</if>
+        </where>
+        GROUP BY
+            submit_status
+    </select>
+
+    <select id="selectNgProductListFromAlreadyCheck" resultType="com.cosmo.hhim.micro.base.domain.entity.ng.NgProductByProductFromAlreadyCheck">
+        SELECT
+        mws.product_seq as productSeq,
+        mp.product_code as productCode,
+        mp.product_name as productName,
+        mp.unit as productUnit,
+        sum( mws.check_ng_num ) - sum( mws.repair_num ) - sum( mws.abandoned_num ) AS totalNgNum
+        FROM micro_work_submit mws
+        INNER JOIN micro_product mp ON mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        <where>
+            mws.submit_status = 0
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') OR mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="submitType != null">
+                and mws.submit_type = #{submitType}
+            </if>
+        </where>
+        GROUP BY
+            mws.product_seq
+        HAVING totalNgNum > 0
+        ORDER BY totalNgNum DESC
+    </select>
+
+    <select id="selectNgProductAndProcessListFromAlreadyCheck" resultType="com.cosmo.hhim.micro.base.domain.entity.ng.NgProductAndProcessByProductFromAlreadyCheck">
+        SELECT
+            mws.product_seq as productSeq,
+            mws.operate_process_seq as processSeq,
+            mpc.process_name as processName,
+            sum( mws.check_ng_num ) - sum( mws.repair_num ) - sum( mws.abandoned_num )  AS ngNum
+        FROM micro_work_submit mws
+            INNER JOIN micro_process_common mpc ON mws.operate_process_seq = mpc.process_seq
+        <where>
+            mws.submit_status = 0
+            <if test="productSeqList != null">
+                and mws.product_seq in
+                <foreach item="productSeq" collection='productSeqList.split(",")' open="(" separator="," close=")">
+                    #{productSeq}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+            mws.product_seq, mws.operate_process_seq
+        HAVING ngNum > 0
+        ORDER BY ngNum DESC
+    </select>
+
+    <select id="selectNgProductAndProcessAndUserByProductFromAlreadyCheck" resultType="com.cosmo.hhim.micro.base.domain.entity.ng.NgProductAndProcessAndUserByProduct">
+        SELECT
+        mws.product_seq as productSeq,
+        mp.product_code as productCode,
+        mp.product_name as productName,
+        mws.operate_process_seq as processSeq,
+        mpc.process_name as processName,
+        mws.submit_user as submitUser,
+        mu.nick_name as submitNickName,
+        sum( mws.check_ng_num ) - sum( mws.repair_num ) - sum( mws.abandoned_num ) AS ngNum
+        FROM micro_work_submit mws
+        LEFT JOIN micro_process_common mpc ON mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+        LEFT JOIN micro_product mp ON mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        LEFT JOIN micro_user mu on mu.id = mws.submit_user and mws.tenant_code = mu.tenant_code
+        <where>
+            mws.submit_status = 0
+            <if test="productSeq != null and productSeq != ''">
+                and mws.product_seq = #{productSeq}
+            </if>
+            <if test="processSeq != null and processSeq != ''">
+                and mws.operate_process_seq = #{processSeq}
+            </if>
+        </where>
+        GROUP BY
+            mws.submit_user
+        HAVING ngNum > 0
+        ORDER BY ngNum DESC
+    </select>
+
+    <select id="selectNgProductByUserFromAlreadyCheck" resultType="com.cosmo.hhim.micro.base.domain.entity.ng.NgProductByUserFromAlreadyCheck">
+        SELECT
+            mws.submit_user as submitUser,
+            mu.nick_name as submitNickName,
+            sum(check_ng_num) - sum(repair_num) - sum(abandoned_num) as totalNgNum
+        FROM micro_work_submit mws
+        LEFT JOIN micro_user mu on mws.submit_user = mu.id
+        <where>
+            mws.submit_status = 0
+            <if test="submitNickName != null and submitNickName != ''">
+                and mu.nick_name like concat('%', #{submitNickName}, '%')
+            </if>
+            <if test="submitType != null">
+                and mws.submit_type = #{submitType}
+            </if>
+        </where>
+        GROUP BY mws.submit_user
+        HAVING totalNgNum > 0
+        ORDER BY totalNgNum DESC
+    </select>
+
+    <select id="selectNgProductAndProcessByUserFromAlreadyCheck" resultType="com.cosmo.hhim.micro.base.domain.entity.ng.NgProductAndProcessByUserFromAlreadyCheck">
+        SELECT
+        mws.product_seq as productSeq,
+        mp.product_code as productCode,
+        mp.product_name as productName,
+        mp.unit as productUnit,
+        mws.operate_process_seq as processSeq,
+        mpc.process_name as processName,
+        mws.submit_user as submitUser,
+        sum(check_ng_num) - sum(repair_num) - sum(abandoned_num) as ngNum
+        FROM micro_work_submit mws
+        LEFT JOIN micro_product mp ON mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        LEFT JOIN micro_process_common mpc ON mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+        <where>
+            mws.submit_status = 0
+            <if test="list != null">
+                and mws.submit_user in
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="submitType != null">
+                and mws.submit_type = #{submitType}
+            </if>
+        </where>
+        GROUP BY mws.submit_user, mws.product_seq, mws.operate_process_seq
+        HAVING ngNum > 0
+        ORDER BY ngNum desc
+    </select>
+
+    <select id="selectMicroWorkSubmitListByNgManage" parameterType="com.cosmo.hhim.micro.base.domain.entity.ng.NgQueryParam" resultMap="MicroWorkSubmitResult">
+        select
+            mws.id,
+            mws.tenant_code,
+            mws.work_order_no,
+            mws.task_no,
+            mws.submit_type,
+            mws.product_seq,
+            mp.product_name,
+            mp.product_code,
+            mp.unit,
+            mws.operate_process_seq,
+            mpc.process_name as operate_process_name,
+            mpc.process_code as operate_process_code,
+--             mws.pre_process_seq,
+--             (SELECT GROUP_CONCAT(mpc.process_name) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq, mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as pre_process_name,
+--             (SELECT GROUP_CONCAT(mpc.process_code) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq, mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as pre_process_code,
+            mws.is_last_process,
+            mws.pass_num,
+            mws.ng_num,
+            mws.submit_user,
+            mu.nick_name as submit_nick_name,
+            mws.submit_day,
+            mws.submit_status,
+            mws.submit_no,
+            mws.remark,
+            mws.created_by,
+            mws.created_date,
+            mws.check_user,
+            mws.check_date,
+            mws.check_pass_num,
+            mws.check_ng_num,
+            mws.data_status,
+            mws.expired_record_flag,
+            mws.submit_pictures,
+            mws.is_first_process,
+            mws.is_complete,
+            mws.check_status,
+            mws.repair_num,
+            mws.abandoned_num
+        from micro_work_submit mws
+        left join micro_product mp on mp.product_seq = mws.product_seq and mp.tenant_code = mws.tenant_code
+        left join micro_process_common mpc on mpc.process_seq = mws.operate_process_seq and mpc.tenant_code = mws.tenant_code
+        left join micro_user mu on mws.submit_user = mu.id and mu.tenant_code = mws.tenant_code
+        <where>
+            mws.submit_status = 0
+            <if test="productSeq != null and productSeq != ''">
+                and mws.product_seq = #{productSeq}
+            </if>
+            <if test="operateProcessSeq != null and operateProcessSeq != null">
+                and mws.operate_process_seq = #{operateProcessSeq}
+            </if>
+            <if test="submitUser != null">
+                and mws.submit_user = #{submitUser}
+            </if>
+            <if test="ids != null and ids != ''">
+                and mws.id in
+                <foreach collection='ids.split(",")' item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        order by mws.created_date asc
+    </select>
+    
+    <select id="obtainedNgProductTotalNumAndUser" resultType="com.cosmo.hhim.micro.base.domain.entity.ng.NgNumFromProductAndUser">
+       SELECT
+            COUNT(DISTINCT (submit_user)) as userNum,
+            IFNULL(sum( check_ng_num ) - sum(repair_num ) - sum(abandoned_num), 0)  AS totalNgNum
+        FROM micro_work_submit
+        <where>
+            submit_status = 0
+            <if test="submitType != null">
+                and submit_type = #{submitType}
+            </if>
+            and (check_ng_num - repair_num - abandoned_num) > 0
+        </where>
+    </select>
+
+    <select id="selectNgProductNumByProductAndProcessAndUser" resultType="com.cosmo.hhim.micro.base.domain.entity.ng.NgInfoByProductAndProcessAndUser">
+        SELECT
+            mws.product_seq                                          as productSeq,
+            mp.product_code                                          as productCode,
+            mp.product_name                                          as productName,
+            mws.operate_process_seq                                  as processSeq,
+            mpc.process_code                                         as processCode,
+            mpc.process_name                                         as processName,
+            mws.submit_user                                          as submitUser,
+            mu.nick_name                                             as submitNickName,
+            sum(check_ng_num) - sum(repair_num) - sum(abandoned_num) as ngNum
+        FROM micro_work_submit mws
+                 left join micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+                 left join micro_process_common mpc on mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+                 left join micro_user mu on mws.submit_user = mu.id and mws.tenant_code = mu.tenant_code
+        where mws.submit_status = 0
+        group by mws.product_seq, mws.operate_process_seq, mws.submit_user
+        having ngNum > 0
+        order by ngNum desc
+    </select>
+    <select id="findLastedPreProcess" resultType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroLastPreProcessEntity">
+        SELECT
+        concat_ws('&amp;',mws.product_seq,mws.operate_process_seq) as productAndProcess,
+        mws.tenant_code as tenantCode,
+        mws.product_seq as productSeq,
+        mws.operate_process_seq as operateProcessSeq,
+        mws.pre_process_seq as preProcessSeq,
+        (SELECT GROUP_CONCAT(mpc.process_name) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq,
+        mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as preProcessName,
+        (SELECT GROUP_CONCAT(mpc.process_code) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq,
+        mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as preProcessCode,
+        (SELECT GROUP_CONCAT(mpc.id) FROM micro_process_common mpc where FIND_IN_SET(mpc.process_seq,
+        mws.pre_process_seq) and mpc.tenant_code = mws.tenant_code) as preProcessId
+        FROM
+        micro_work_submit mws
+        INNER JOIN
+        (
+        SELECT
+        a.tenant_code ,
+        a.product_seq ,
+        a.operate_process_seq,
+        max(a.id) AS id
+        FROM
+        micro_work_submit a
+        WHERE a.submit_type='1' and a.is_first_process != '0'
+        <if test="list != null and list.size() &gt; 0 ">
+            and (a.product_seq,a.operate_process_seq) in
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                (#{item.productSeq},#{item.operateProcessSeq})
+            </foreach>
+        </if>
+        GROUP BY
+        a.tenant_code ,
+        a.product_seq ,
+        a.operate_process_seq
+        ) AS mws2 ON mws.id = mws2.id
+        AND mws.tenant_code = mws2.tenant_code
+        where mws.submit_type='1'
+        <if test="list != null and list.size() &gt; 0 ">
+            and (mws.product_seq,mws.operate_process_seq) in
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                (#{item.productSeq},#{item.operateProcessSeq})
+            </foreach>
+        </if>
+    </select>
+    <select id="findFirstOrLastProcess" resultType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroLastPreProcessEntity">
+        SELECT
+        concat_ws('&amp;',mws.product_seq,mws.operate_process_seq) as productAndProcess,
+        mws.tenant_code as tenantCode,
+        mws.product_seq as productSeq,
+        mws.operate_process_seq as operateProcessSeq,
+        IF(MIN(mws.is_last_process) = 0, 1, 0) AS isLastProcess,
+        IF(MIN(mws.is_first_process) = 0, 1, 0) AS isFirstProcess
+        FROM micro_work_submit mws
+        where mws.submit_type='1'
+        <if test="list != null and list.size() &gt; 0 ">
+            and (mws.product_seq,mws.operate_process_seq) in
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                (#{item.productSeq},#{item.operateProcessSeq})
+            </foreach>
+        </if>
+        GROUP BY mws.tenant_code,
+        mws.product_seq,
+        mws.operate_process_seq
+    </select>
+    <select id="selectMicroWorkSubmitByProduct" resultMap="MicroWorkSubmitResult">
+        <include refid="selectMicroWorkSubmitVo"/>
+        <where>
+            <if test="productList != null and productList.size() &gt; 0 ">
+                and product_seq in
+                <foreach collection="productList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="selectAllProductBySubmit" resultType="java.lang.String">
+        select concat_ws('&amp;',mp.product_seq,mp.id,mp.product_name)from micro_work_submit mws
+        left join micro_product mp
+        on mws.product_seq = mp.product_seq and mws.tenant_code=mp.tenant_code
+        <where>
+            <if test="submitStatus != null ">and mws.submit_status = #{submitStatus}</if>
+            <if test="createdDate != null ">and date_format(mws.created_date,'%Y-%m-%d') =
+                date_format(#{createdDate},'%Y-%m-%d')
+            </if>
+        </where>
+        group by mp.product_seq,mp.id
+    </select>
+    <select id="selectReProductByProductIds"
+            resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        SELECT mp.id AS itemId,
+        mp.product_seq AS itemSeq,
+        mp.product_code AS itemCode,
+        mp.product_name AS itemName
+        FROM micro_work_submit mws
+        INNER JOIN micro_product mp ON mws.tenant_code = mp.tenant_code AND mws.product_seq = mp.product_seq
+        WHERE
+        mp.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectReProcessByProcessIds"
+            resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        SELECT * FROM (
+        SELECT
+        mpc.process_seq AS itemSeq,
+        mpc.process_name AS itemName,
+        mpc.process_code AS itemCode,
+        mpc.id AS itemId
+        FROM micro_work_submit mws
+        INNER JOIN micro_process_common mpc ON mpc.tenant_code = mws.tenant_code AND mpc.process_seq
+        =mws.operate_process_seq
+        WHERE mpc.id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        UNION
+        SELECT
+        mpc.process_seq AS itemSeq,
+        mpc.process_name AS itemName,
+        mpc.process_code AS itemCode,
+        mpc.id as itemId
+        FROM micro_work_submit mws
+        INNER JOIN micro_process_common mpc on mpc.tenant_code = mws.tenant_code and FIND_IN_SET(mpc.process_seq,
+        mws.pre_process_seq)
+        WHERE mpc.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ) AS t
+        WHERE t.itemId IS NOT NULL
+    </select>
+
+    <select id="selectProductiveSubmitSummaryAnalysisByProduct" parameterType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductionQualityAnalysisParam"
+            resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductiveSubmitAnalysisByProduct">
+            SELECT
+                a.product_seq as productSeq,
+                a.product_code as productCode,
+                a.product_name as productName,
+                a.product_unit as productUnit,
+                sum(a.pass_num) + sum(a.ng_num) as totalNum
+            FROM
+                    (SELECT
+                        mws.product_seq,
+                        mp.product_code,
+                        mp.product_name,
+                        mp.unit as product_unit,
+                        mws.submit_status,
+                        sum( pass_num ) AS pass_num,
+                        sum( ng_num ) AS ng_num
+                    FROM
+                    micro_work_submit mws
+                    INNER JOIN micro_product mp ON mws.product_seq = mp.product_seq
+                    AND mws.tenant_code = mp.tenant_code
+                    <where>
+                        mws.submit_type = 2
+                        AND mws.submit_status = 1
+                        <if test="startDate != null">
+                            and mws.submit_day &gt;= #{startDate}
+                        </if>
+                        <if test="endDate != null">
+                            and mws.submit_day &lt;= #{endDate}
+                        </if>
+                        <if test="productNameOrCode != null and productNameOrCode != ''">
+                            and (mp.product_code like concat('%', #{productNameOrCode}, '%') OR mp.product_name like concat('%', #{productNameOrCode}, '%'))
+                        </if>
+                    </where>
+                    GROUP BY
+                    mws.product_seq
+                UNION ALL
+                    SELECT
+                        mws.product_seq,
+                        mp.product_code,
+                        mp.product_name,
+                        mp.unit as product_unit,
+                        mws.submit_status,
+                        sum( check_pass_num ) AS pass_num,
+                        sum( check_ng_num ) AS ng_num
+                    FROM
+                    micro_work_submit mws
+                    INNER JOIN micro_product mp ON mws.product_seq = mp.product_seq
+                    AND mws.tenant_code = mp.tenant_code
+                    <where>
+                        mws.submit_type = 2
+                        AND mws.submit_status = 0
+                        <if test="startDate != null">
+                            and mws.submit_day &gt;= #{startDate}
+                        </if>
+                        <if test="endDate != null">
+                            and mws.submit_day &lt;= #{endDate}
+                        </if>
+                        <if test="productNameOrCode != null and productNameOrCode != ''">
+                            and (mp.product_code like concat('%', #{productNameOrCode}, '%') OR mp.product_name like concat('%', #{productNameOrCode}, '%'))
+                        </if>
+                    </where>
+                    GROUP BY
+                    mws.product_seq ) a
+            GROUP BY a.product_seq
+            ORDER BY totalNum DESC
+    </select>
+
+    
+    <select id="selectProductiveSubmitAnalysisByProductInDifferentStatus" parameterType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductionQualityAnalysisParam"
+            resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.DifferentStatusSubmitAnalysisByProduct">
+            SELECT
+                product_seq as productSeq,
+                submit_status as submitStatus,
+                sum( pass_num ) AS passNum,
+                sum( ng_num ) AS ngNum
+            FROM
+            micro_work_submit
+            <where>
+                submit_type = 2
+                AND submit_status = 1
+                <if test="startDate != null">
+                    and submit_day &gt;= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    and submit_day &lt;= #{endDate}
+                </if>
+                <if test="productSeqList != null and productSeqList != ''">
+                    and product_seq in
+                    <foreach item="productSeq" collection='productSeqList.split(",")' open="(" separator="," close=")">
+                        #{productSeq}
+                    </foreach>
+                </if>
+            </where>
+            GROUP BY productSeq
+        UNION ALL
+            SELECT
+                product_seq as productSeq,
+                submit_status as submitStatus,
+                sum( check_pass_num ) AS passNum,
+                sum( check_ng_num ) AS ngNum
+            FROM
+            micro_work_submit
+            <where>
+                submit_type = 2
+                AND submit_status = 0
+                <if test="startDate != null">
+                    and submit_day &gt;= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    and submit_day &lt;= #{endDate}
+                </if>
+                <if test="productSeqList != null and productSeqList != ''">
+                    and product_seq in
+                    <foreach item="productSeq" collection='productSeqList.split(",")' open="(" separator="," close=")">
+                        #{productSeq}
+                    </foreach>
+                </if>
+            </where>
+            GROUP BY productSeq
+    </select>
+    
+    <select id="selectProductiveSubmitAnalysisByProcessBaseProduct" parameterType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductionQualityAnalysisParam"
+            resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductiveSubmitAnalysisByProcessBaseProduct">
+            SELECT
+                mws.product_seq as productSeq,
+                mp.product_code as productCode,
+                mp.product_name as productName,
+                mp.unit as productUnit,
+                mws.submit_status as submitStatus,
+                mpc.process_name as processName,
+                mpc.process_code as processCode,
+                mws.operate_process_seq as processSeq,
+                sum( pass_num ) AS passNum,
+                sum( ng_num ) AS ngNum
+            FROM
+            micro_work_submit mws
+            INNER JOIN micro_product mp ON mws.product_seq = mp.product_seq
+            AND mws.tenant_code = mp.tenant_code
+            INNER JOIN micro_process_common mpc ON mws.operate_process_seq = mpc.process_seq
+            AND mws.tenant_code = mp.tenant_code
+            <where>
+                mws.submit_type = 2
+                AND mws.submit_status = 1
+                <if test="startDate != null">
+                    and mws.submit_day &gt;= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    and mws.submit_day &lt;= #{endDate}
+                </if>
+                <if test="productSeq != null and productSeq != ''">
+                    and mws.product_seq = #{productSeq}
+                </if>
+            </where>
+            GROUP BY
+            mws.operate_process_seq
+        UNION
+            SELECT
+                mws.product_seq as productSeq,
+                mp.product_code as productCode,
+                mp.product_name as productName,
+                mp.unit as productUnit,
+                mws.submit_status as submitStatus,
+                mpc.process_name as processName,
+                mpc.process_code as processCode,
+                mws.operate_process_seq as processSeq,
+                sum( check_pass_num ) AS passNum,
+                sum( check_ng_num ) AS ngNum
+            FROM
+            micro_work_submit mws
+            INNER JOIN micro_product mp ON mws.product_seq = mp.product_seq
+            AND mws.tenant_code = mp.tenant_code
+            INNER JOIN micro_process_common mpc ON mws.operate_process_seq = mpc.process_seq
+            AND mws.tenant_code = mp.tenant_code
+            <where>
+                mws.submit_type = 2
+                AND mws.submit_status = 0
+                <if test="startDate != null">
+                    and mws.submit_day &gt;= #{startDate}
+                </if>
+                <if test="endDate != null">
+                    and mws.submit_day &lt;= #{endDate}
+                </if>
+                <if test="productSeq != null and productSeq != ''">
+                    and mws.product_seq = #{productSeq}
+                </if>
+            </where>
+            GROUP BY
+            mws.operate_process_seq
+    </select>
+
+    <select id="selectProductiveSubmitAnalysisByUser" parameterType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductionQualityAnalysisParam"
+        resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductiveSubmitAnalysisByUser">
+
+            SELECT
+                a.submitUser,
+                a.submitNickName,
+                a.userName,
+                sum(a.totalNum) as totalNum
+            FROM
+                (
+                SELECT
+                    mws.submit_user as submitUser,
+                    mu.nick_name as submitNickName,
+                    mu.user_name as userName,
+                    sum(pass_num) + sum(ng_num) as totalNum
+                FROM micro_work_submit mws
+                INNER JOIN micro_user mu on mws.submit_user  = mu.id and mws.tenant_code = mu.tenant_code
+                <where>
+                    mws.submit_type = 2
+                    and mws.submit_status = 1
+                    <if test="startDate != null">
+                        and mws.submit_day &gt;= #{startDate}
+                    </if>
+                    <if test="endDate != null">
+                        and mws.submit_day &lt;= #{endDate}
+                    </if>
+                    <if test="submitNickName != null and submitNickName != ''">
+                        and mu.nick_name like concat('%', #{submitNickName}, '%')
+                    </if>
+                </where>
+                GROUP BY mws.submit_user
+            UNION
+                SELECT
+                    mws.submit_user as submitUser,
+                    mu.nick_name as submitNickName,
+                    mu.user_name as userName,
+                    sum(check_pass_num) + sum(check_ng_num) as totalNum
+                FROM micro_work_submit mws
+                INNER JOIN micro_user mu on mws.submit_user  = mu.id and mws.tenant_code = mu.tenant_code
+                <where>
+                    mws.submit_type = 2
+                    and mws.submit_status = 0
+                    <if test="startDate != null">
+                        and mws.submit_day &gt;= #{startDate}
+                    </if>
+                    <if test="endDate != null">
+                        and mws.submit_day &lt;= #{endDate}
+                    </if>
+                    <if test="submitNickName != null and submitNickName != ''">
+                        and mu.nick_name like concat('%', #{submitNickName}, '%')
+                    </if>
+                </where>
+                GROUP BY mws.submit_user ) a
+                GROUP BY a.submitUser
+                ORDER BY totalNum DESC
+    </select>
+
+    <select id="selectProductiveSubmitAnalysisByProductAndProcessBaseUser" parameterType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductionQualityAnalysisParam"
+            resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductiveSubmitAnalysisByProductAndProcessBaseUser">
+        SELECT
+            a.product_seq as productSeq,
+            mp.product_name as productName,
+            mp.product_code as productCode,
+            mp.unit as productUnit,
+            a.operate_process_seq as processSeq,
+            mpc.process_name as processName,
+            mpc.process_code as processCode,
+            sum( a.pass_num ) AS passNum,
+            sum( a.ng_num ) AS ngNum
+        FROM
+            (
+                SELECT
+                    mws.product_seq,
+                    mws.operate_process_seq,
+                    sum( check_pass_num ) AS pass_num,
+                    sum( check_ng_num ) AS ng_num,
+                    mws.tenant_code
+                FROM
+                micro_work_submit mws
+                <where>
+                    mws.submit_type = 2
+                    and mws.submit_status = 0
+                    <if test="startDate != null">
+                        and mws.submit_day &gt;= #{startDate}
+                    </if>
+                    <if test="endDate != null">
+                        and mws.submit_day &lt;= #{endDate}
+                    </if>
+                    <if test="userName != null and userName != ''">
+                        and mws.submit_user = #{userName}
+                    </if>
+                </where>
+                GROUP BY
+                mws.product_seq,
+                mws.operate_process_seq
+            UNION
+                SELECT
+                    mws.product_seq,
+                    mws.operate_process_seq,
+                    sum( pass_num ) AS pass_num,
+                    sum( ng_num ) AS ng_num,
+                    mws.tenant_code
+                FROM
+                micro_work_submit mws
+                <where>
+                    mws.submit_type = 2
+                    and mws.submit_status = 1
+                    <if test="startDate != null">
+                        and mws.submit_day &gt;= #{startDate}
+                    </if>
+                    <if test="endDate != null">
+                        and mws.submit_day &lt;= #{endDate}
+                    </if>
+                    <if test="userName != null and userName != ''">
+                        and mws.submit_user = #{userName}
+                    </if>
+                </where>
+                GROUP BY
+                mws.product_seq,
+                mws.operate_process_seq
+            ) a
+        INNER JOIN micro_product mp ON a.product_seq = mp.product_seq
+        AND a.tenant_code = mp.tenant_code
+        INNER JOIN micro_process_common mpc ON a.operate_process_seq = mpc.process_seq
+        AND a.tenant_code = mpc.tenant_code
+        GROUP BY
+        a.product_seq,
+        a.operate_process_seq
+    </select>
+</mapper>

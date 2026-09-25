@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.customer.MicroCustomerMapper">
+    
+    <resultMap type="MicroCustomer" id="MicroCustomerResult">
+        <result property="id"    column="id"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="customerCode"    column="customer_code"    />
+        <result property="customerName"    column="customer_name"    />
+        <result property="customerShortName"    column="customer_short_name"    />
+        <result property="remark"    column="remark"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updatedDate"    column="updated_date"    />
+    </resultMap>
+
+    <sql id="selectMicroCustomerVo">
+        select id, tenant_code, customer_code, customer_name, customer_short_name, remark, active_flag, create_by, created_date, update_by, updated_date from micro_customer
+    </sql>
+
+    <select id="selectMicroCustomerList" parameterType="MicroCustomer" resultMap="MicroCustomerResult">
+        <include refid="selectMicroCustomerVo"/>
+        <where>  
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+            <if test="searchValue != null  and searchValue != ''"> and (customer_name like concat('%', #{searchValue}, '%') or customer_code like concat('%', #{searchValue}, '%'))</if>
+            <if test="customerCode != null  and customerCode != ''"> and customer_code = #{customerCode}</if>
+            <if test="customerName != null  and customerName != ''"> and customer_name like concat('%', #{customerName}, '%')</if>
+            <if test="customerShortName != null  and customerShortName != ''"> and customer_short_name like concat('%', #{customerShortName}, '%')</if>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="updatedDate != null "> and updated_date = #{updatedDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectMicroCustomerById" parameterType="Long" resultMap="MicroCustomerResult">
+        <include refid="selectMicroCustomerVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectMicroCustomerListWithoutLike" parameterType="MicroCustomer" resultMap="MicroCustomerResult">
+        <include refid="selectMicroCustomerVo"/>
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+            <if test="customerCode != null  and customerCode != ''"> and customer_code = #{customerCode}</if>
+            <if test="customerName != null  and customerName != ''"> and customer_name = #{customerName}</if>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="updatedDate != null "> and updated_date = #{updatedDate}</if>
+        </where>
+    </select>
+
+    <insert id="insertMicroCustomer" parameterType="MicroCustomer" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="customerCode != null and customerCode != ''">customer_code,</if>
+            <if test="customerName != null and customerName != ''">customer_name,</if>
+            <if test="customerShortName != null">customer_short_name,</if>
+            <if test="remark != null">remark,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updatedDate != null">updated_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="customerCode != null and customerCode != ''">#{customerCode},</if>
+            <if test="customerName != null and customerName != ''">#{customerName},</if>
+            <if test="customerShortName != null">#{customerShortName},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updatedDate != null">#{updatedDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroCustomer" parameterType="MicroCustomer">
+        update micro_customer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="customerCode != null and customerCode != ''">customer_code = #{customerCode},</if>
+            <if test="customerName != null and customerName != ''">customer_name = #{customerName},</if>
+            <if test="customerShortName != null">customer_short_name = #{customerShortName},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updatedDate != null">updated_date = #{updatedDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroCustomerById" parameterType="Long">
+        delete from micro_customer where id = #{id}
+    </delete>
+
+    <update id="deleteMicroCustomerByIds" parameterType="String">
+        update micro_customer set active_flag = 0 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

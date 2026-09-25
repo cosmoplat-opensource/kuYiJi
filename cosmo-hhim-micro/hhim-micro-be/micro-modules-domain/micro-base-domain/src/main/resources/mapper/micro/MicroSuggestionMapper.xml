@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroSuggestionMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroSuggestion" id="MicroSuggestionResult">
+        <result property="id"         column="id"/>
+        <result property="phone"      column="phone"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="content"    column="content"/>
+        <result property="createdAt"  column="created_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroSuggestion">
+        insert into micro_suggestion (phone, tenant_code, content, created_at)
+        values (#{phone}, #{tenantCode}, #{content}, #{createdAt})
+    </insert>
+</mapper>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroUserTenantIndexMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroUserTenantIndex" id="MicroUserTenantIndexResult">
+        <result property="id"           column="id"/>
+        <result property="phone"        column="phone"/>
+        <result property="tenantCode"   column="tenant_code"/>
+        <result property="localUserId"  column="local_user_id"/>
+        <result property="isPrimary"    column="is_primary"/>
+        <result property="createdAt"    column="created_at"/>
+    </resultMap>
+
+    <sql id="selectMicroUserTenantIndexVo">
+        select id, phone, tenant_code, local_user_id, is_primary, created_at
+        from micro_user_tenant_index
+    </sql>
+
+    <select id="selectByPhone" resultMap="MicroUserTenantIndexResult">
+        <include refid="selectMicroUserTenantIndexVo"/>
+        where phone = #{phone}
+    </select>
+
+    <select id="selectByPhoneAndCode" resultMap="MicroUserTenantIndexResult">
+        <include refid="selectMicroUserTenantIndexVo"/>
+        where phone = #{phone} and tenant_code = #{tenantCode}
+    </select>
+
+    <insert id="insert" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroUserTenantIndex">
+        insert into micro_user_tenant_index (phone, tenant_code, local_user_id, is_primary, created_at)
+        values (#{phone}, #{tenantCode}, #{localUserId}, #{isPrimary}, #{createdAt})
+    </insert>
+
+    <delete id="deleteByTenantCode">
+        delete from micro_user_tenant_index where tenant_code = #{tenantCode}
+    </delete>
+</mapper>

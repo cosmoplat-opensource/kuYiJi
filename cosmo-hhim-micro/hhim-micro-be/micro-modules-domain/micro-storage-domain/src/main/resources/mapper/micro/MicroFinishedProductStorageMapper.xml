@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.storage.domain.mapper.MicroFinishedProductStorageMapper">
+    
+    <resultMap type="MicroFinishedProductStorage" id="MicroFinishedProductStorageResult">
+        <result property="id"    column="id"    />
+        <result property="productSeq"    column="product_seq"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="productName"    column="product_name"    />
+        <result property="num"    column="num"    />
+        <result property="remark"    column="remark"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+    </resultMap>
+
+    <sql id="selectMicroFinishedProductStorageVo">
+        select id, product_seq, product_name, num, remark, created_by, created_date, last_upd_by, last_upd_date from micro_finished_product_storage
+    </sql>
+
+    <select id="selectMicroFinishedProductStorageList" parameterType="MicroFinishedProductStorage" resultMap="MicroFinishedProductStorageResult">
+        select a.id, a.product_seq, b.product_code, a.product_name, a.num, a.remark, a.created_by, a.created_date, a.last_upd_by, a.last_upd_date
+        from micro_finished_product_storage a
+            left join micro_product b on a.product_seq = b.product_seq
+        <where>  
+            <if test="productSeq != null  and productSeq != ''"> and a.product_seq = #{productSeq}</if>
+            <if test="productName != null  and productName != ''"> and a.product_name like concat('%', #{productName}, '%')</if>
+            <if test="num != null "> and a.num = #{num}</if>
+            <if test="createdBy != null  and createdBy != ''"> and a.created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and a.created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and a.last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and a.last_upd_date = #{lastUpdDate}</if>
+            <if test="productCodeOrName != null and productCodeOrName != ''">
+                and (b.product_code like concat('%', #{productCodeOrName}, '%')
+                     or b.product_name like concat('%', #{productCodeOrName}, '%'))
+            </if>
+        </where>
+        order by a.num desc
+    </select>
+    
+    <select id="selectMicroFinishedProductStorageByProductSeq" parameterType="java.lang.String" resultMap="MicroFinishedProductStorageResult">
+        <include refid="selectMicroFinishedProductStorageVo"/>
+        where product_seq = #{productSeq}
+    </select>
+        
+    <insert id="insertMicroFinishedProductStorage" parameterType="MicroFinishedProductStorage" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_finished_product_storage
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="num != null">num,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="num != null">#{num},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+         </trim>
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_finished_product_storage(
+            product_seq, product_name, num, remark, created_by, created_date, last_upd_by, last_upd_date
+        ) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.productSeq},
+            #{item.productName},
+            #{item.num},
+            #{item.remark},
+            #{item.createdBy},
+            now(),
+            null,
+            null
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateMicroFinishedProductStorage" parameterType="MicroFinishedProductStorage">
+        update micro_finished_product_storage
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="num != null">num = #{num},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+
+    <update id="updateStorageByProductSeq" parameterType="MicroFinishedProductStorage">
+        update micro_finished_product_storage
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="num != null">num = #{num},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where product_seq = #{productSeq}
+    </update>
+
+
+    <update id="updateBatch" parameterType="java.util.List" >
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE micro_finished_product_storage
+            <set>
+                <if test="item.productSeq != null and item.productSeq != ''" >
+                    product_seq = #{item.productSeq},
+                </if>
+                <if test="item.productName != null and item.productName != ''" >
+                    product_name = #{item.productName},
+                </if>
+                <if test="item.num != null" >
+                    num = #{item.num},
+                </if>
+                <if test="item.remark != null" >
+                    remark = #{item.remark},
+                </if>
+                <if test="item.lastUpdBy != null">
+                    last_upd_by = #{item.lastUpdBy},
+                </if>
+                <if test="item.lastUpdDate != null">
+                    last_upd_date = #{item.lastUpdDate},
+                </if>
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <select id="selectMicroFinishedProductStorageFromOverSafetyStock" resultMap="MicroFinishedProductStorageResult">
+        SELECT
+            mfps.*
+        FROM micro_finished_product_storage mfps
+        INNER JOIN micro_product mp on mfps.product_seq = mp.product_seq
+        WHERE <![CDATA[ (mfps.num < 0 OR (mfps.num > 0 AND mfps.num < mp.stock_lower_limit) OR mfps.num > mp.stock_upper_limit) ]]>
+    </select>
+    
+    <select id="selectMicroFinishedProductStorageForWarn" parameterType="com.cosmo.hhim.micro.storage.domain.entity.WarnStorageParam" resultType="com.cosmo.hhim.micro.storage.domain.entity.WarnFinishedProductStorage">
+        select
+            mp.product_code as productCode,
+            mp.product_name as productName,
+            mfps.product_seq as productSeq,
+            mp.stock_lower_limit as stockLowerLimit,
+            mp.stock_upper_limit as stockUpperLimit,
+            mfps.num as stockNum,
+            CAST(mp.product_name as char character set gbk) as sortName
+        from micro_finished_product_storage mfps
+        INNER JOIN micro_product mp on mfps.product_seq = mp.product_seq
+        <where>
+            <![CDATA[(mfps.num < 0 or (mfps.num >0 and mfps.num < mp.stock_lower_limit)  or mfps.num > mp.stock_upper_limit)]]>
+            <if test="productNameOrCode != null  and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+            <choose>
+                <when test="stockWarnFlag == 1">
+                    <![CDATA[and mfps.num < 0]]>
+                </when>
+                <when test="stockWarnFlag == 2">
+                    <![CDATA[and mfps.num >0 and mfps.num < mp.stock_lower_limit]]>
+                </when>
+                <when test="stockWarnFlag == 3">
+                    <![CDATA[and mfps.num > mp.stock_upper_limit]]>
+                </when>
+            </choose>
+        </where>
+        order by sortName
+    </select>
+
+    <select id="countProductNumInDiffWarnStatus" parameterType="java.lang.String" resultType="com.cosmo.hhim.micro.storage.domain.entity.CountInDiffWarnStatus">
+        SELECT
+        <![CDATA[SUM(CASE WHEN mfps.num < 0 THEN 1 ELSE 0 END ) as negativeStockFlagNum,]]>
+        <![CDATA[SUM(CASE WHEN mfps.num > 0 and mfps.num < mp.stock_lower_limit THEN 1 ELSE 0 END ) as lowerSafetyStockFlagNum,]]>
+        <![CDATA[SUM(CASE WHEN mfps.num > mp.stock_upper_limit THEN 1 ELSE 0 END ) as upperSafetyStockFlagNum]]>
+        FROM micro_finished_product_storage mfps
+        INNER JOIN micro_product mp ON mfps.product_seq = mp.product_seq
+        <where>
+            <if test="productNameOrCode != null  and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="selectMicroFinishedProductStorageByProductSeqList" resultMap="MicroFinishedProductStorageResult">
+        <include refid="selectMicroFinishedProductStorageVo"/>
+        <if test="productSeqList != null  and productSeqList.size() > 0">
+            where product_seq in
+            <foreach collection="productSeqList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectReProductByProductIds"
+            resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        SELECT mp.id as itemId,
+        mp.product_seq as itemSeq,
+        mp.product_code as itemCode,
+        mp.product_name as itemName
+        FROM micro_finished_product_storage mfps
+        INNER JOIN micro_product mp
+        ON mfps.tenant_code = mp.tenant_code AND mfps.product_seq = mp.product_seq
+        WHERE
+        mp.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

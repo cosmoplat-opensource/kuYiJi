@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzWechatUserBindMapper">
+    
+    <resultMap type="HyzzWechatUserBind" id="HyzzWechatUserBindResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="userIdentity"    column="user_identity"    />
+        <result property="userName"    column="user_name"    />
+        <result property="driverName"    column="driver_name"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectHyzzWechatUserBindVo">
+        select id, openid, user_name, user_identity, driver_name, tenant_code, create_by, create_time, update_by, update_time
+        from hyzz_wechat_user_bind
+    </sql>
+
+    <select id="selectHyzzWechatUserBindList" parameterType="HyzzWechatUserBind" resultMap="HyzzWechatUserBindResult">
+        <include refid="selectHyzzWechatUserBindVo"/>
+        <where>  
+            <if test="openid != null  and openid != ''"> and openid = #{openid}</if>
+            <if test="userName != null  and userName != ''"> and user_name = #{userName}</if>
+            <if test="userIdentity != null  and userIdentity != ''"> and user_identity = #{userIdentity}</if>
+            <if test="driverName != null  and driverName != ''"> and driver_name = #{driverName}</if>
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+        </where>
+    </select>
+
+    <select id="selectUserBindInfo" resultMap="HyzzWechatUserBindResult">
+        <include refid="selectHyzzWechatUserBindVo"/>
+        where openid = #{openid} and user_name=#{username} and user_identity = #{userIdentity} and tenant_code = #{tenantCode}
+    </select>
+
+    <select id="selectBindUsersByOpenidAndTenant" resultMap="HyzzWechatUserBindResult">
+        <include refid="selectHyzzWechatUserBindVo"/>
+        where openid = #{openid} and tenant_code = #{tenantCode}
+    </select>
+
+    <select id="selectBindUsersByOpenid" parameterType="java.lang.String" resultMap="HyzzWechatUserBindResult">
+        <include refid="selectHyzzWechatUserBindVo"/>
+        where openid = #{openid}
+    </select>
+
+    <select id="selectHyzzWechatUserBindsByUsername" resultMap="HyzzWechatUserBindResult">
+        <include refid="selectHyzzWechatUserBindVo"/>
+        where user_name = #{username} and tenant_code = #{tenantCode}
+    </select>
+
+    <select id="selectWechatUserBindsByUsername" resultMap="HyzzWechatUserBindResult">
+        <include refid="selectHyzzWechatUserBindVo"/>
+        where user_name = #{username}
+    </select>
+
+    <select id="selectHyzzWechatUserBindsByCondition" resultMap="HyzzWechatUserBindResult">
+        <include refid="selectHyzzWechatUserBindVo"/>
+        where user_name = #{username} and user_identity = #{userIdentity} and tenant_code = #{tenantCode}
+    </select>
+
+        
+    <insert id="insertHyzzWechatUserBind" parameterType="HyzzWechatUserBind" useGeneratedKeys="true" keyProperty="id">
+        insert into hyzz_wechat_user_bind
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="openid != null">openid,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="userIdentity != null">user_identity,</if>
+            <if test="driverName != null">driver_name,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="openid != null">#{openid},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="userIdentity != null">#{userIdentity},</if>
+            <if test="driverName != null">#{driverName},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHyzzWechatUserBind" parameterType="com.cosmo.hhim.thirdplat.api.operation.domain.WechatUserBindUpdateParam">
+        update hyzz_wechat_user_bind
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="userIdentity != null">user_identity = #{userIdentity},</if>
+            <if test="driverName != null">driver_name = #{driverName},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where openid = #{openidCondition}
+            and user_name=#{userNameCondition}
+            and user_identity = #{userIdentityCondition}
+            and tenant_code = #{tenantCodeCondition}
+    </update>
+
+    <delete id="deleteHyzzWechatUserBind">
+        delete from hyzz_wechat_user_bind
+        <where>
+          <if test="tenantCode != null and tenantCode != ''">
+            and tenant_code = #{tenantCode}
+          </if>
+          <if test="param.openid != null and param.openid != ''">
+            and openid = #{param.openid}
+          </if>
+          <if test="param.username != null and param.username != ''">
+            and user_name=#{param.username}
+          </if>
+          <if test="param.userIdentity != null and param.userIdentity != ''">
+            and user_identity in
+              <foreach item="item" index="index" collection="param.userIdentity.split(',')" open="(" separator="," close=")">
+                  #{item}
+              </foreach>
+          </if>
+        </where>
+    </delete>
+
+    <delete id="deleteHyzzWechatUserBindByUsername">
+        delete from hyzz_wechat_user_bind where tenant_code = #{tenantCode} and user_name=#{username}
+    </delete>
+
+    <update id="updateWechatUserBindOpenId" parameterType="com.cosmo.hhim.thirdplat.api.operation.domain.WechatUserOpenIdUpdateParam">
+        update hyzz_wechat_user_bind
+        set openid = #{newOpenId},
+            update_time = NOW()
+        where openid = #{oldOpenId}
+    </update>
+</mapper>

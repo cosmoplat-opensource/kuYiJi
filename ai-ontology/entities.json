@@ -1,0 +1,124 @@
+{
+  "version": "1.1",
+  "description": "Ku易记 · 问数本体（实体层 v1.1）。scope=workshop 为当前产品范围（前端可触达的车间管理域）；scope=planning 为计划域（PC/ERP 侧，手机端无页面），保留设计记录但不参与可视化与 AI 提示词注入。",
+  "entities": [
+    {
+      "code": "product",
+      "name": "产品",
+      "scope": "workshop",
+      "aliases": ["产品", "物料", "工件", "零件", "成品"],
+      "source": { "table": "micro_product", "keyField": "product_seq", "displayFields": ["product_name", "product_code"] },
+      "fields": ["product_seq=产品序号", "product_code=产品编码", "product_name=产品名称", "unit=单位"],
+      "examples": ["有哪些产品？", "这个月良品率最低的产品是什么？"],
+      "note": "产品唯一编码/名称；绑定工艺链（见关系层）"
+    },
+    {
+      "code": "process",
+      "name": "工序",
+      "scope": "workshop",
+      "aliases": ["工序", "工艺", "工步"],
+      "source": { "table": "micro_process_common", "keyField": "process_seq", "displayFields": ["process_name", "process_code"] },
+      "fields": ["process_seq=工序序号", "process_code=工序编码", "process_name=工序名称", "is_first_process=是否首序", "is_last_process=是否尾序"],
+      "examples": ["哪道工序良品率最差？", "各工序的返修率排名"],
+      "note": "工序字典；工艺链节点（首序/尾序决定在制与完工口径）"
+    },
+    {
+      "code": "employee",
+      "name": "员工",
+      "scope": "workshop",
+      "aliases": ["员工", "工人", "人员", "师傅"],
+      "source": { "table": "micro_user", "keyField": "user_name", "displayFields": ["nick_name", "user_name"] },
+      "fields": ["id=用户ID", "nick_name=姓名", "user_name=账号"],
+      "examples": ["这个月谁产量最高？", "谁拖后腿了？"],
+      "note": "报工人；姓名/账号均可检索"
+    },
+    {
+      "code": "ngType",
+      "name": "不良类型",
+      "scope": "workshop",
+      "aliases": ["不良类型", "不良项", "缺陷类型"],
+      "source": { "table": "micro_quality_control_record", "keyField": "ng_type", "displayFields": ["ng_type"] },
+      "fields": ["ng_type=不良类型", "submit_id=关联报工"],
+      "examples": ["不良主要集中在哪一类？"],
+      "note": "取自质检记录的 ng_type（质检开关未开时无数据）"
+    },
+    {
+      "code": "submit",
+      "name": "报工",
+      "scope": "workshop",
+      "aliases": ["报工", "记工", "报工记录"],
+      "source": { "table": "micro_work_submit", "keyField": "id", "displayFields": ["submit_day", "submit_user"] },
+      "fields": ["submit_user=报工人", "submit_day=报工日期", "product_seq=产品", "operate_process_seq=工序",
+                 "check_pass_num=良品数", "check_ng_num=不良数", "repair_num=返修数", "submit_status=0已审/1待审",
+                 "submit_type=1报工类型"],
+      "examples": ["今天产量怎么样？", "这个月良品数是多少？", "为什么这个月良品率降了？"],
+      "note": "车间现场动作的**事实表**：AI 的产量/良品率/排名都源自这里（已审口径 submit_status=0）"
+    },
+    {
+      "code": "qualityControl",
+      "name": "质检记录",
+      "scope": "workshop",
+      "aliases": ["质检", "质检记录", "不良明细"],
+      "source": { "table": "micro_quality_control_record", "keyField": "id", "displayFields": ["ng_type", "submit_id"] },
+      "fields": ["submit_id=关联报工", "ng_type=不良类型", "pass_num=良品数", "ng_num=不良数"],
+      "examples": ["不良主要集中在哪一类？"],
+      "note": "不良明细口径；依赖质检开关（未开则无数据，AI 会如实说明）"
+    },
+    {
+      "code": "completeReport",
+      "name": "完工报告",
+      "scope": "workshop",
+      "aliases": ["完工", "完工单", "完工报告"],
+      "source": { "table": "micro_complete_report", "keyField": "id", "displayFields": ["work_submit_id"] },
+      "fields": ["work_submit_id=关联尾序报工", "num=完工数量"],
+      "examples": ["这个月完工数是多少？"],
+      "note": "尾序报工触发的完工记录（只在指标内部使用，不开放跨步）"
+    },
+    {
+      "code": "stock_wip",
+      "name": "工序在制品",
+      "scope": "workshop",
+      "aliases": ["在制", "在制品", "车间在制"],
+      "source": { "table": "micro_process_storage", "keyField": "product_seq", "displayFields": ["product_seq", "process_seq"] },
+      "fields": ["product_seq=产品", "process_seq=工序", "pass_num=在制数量（良品）", "ng_num=在制不良数"],
+      "examples": ["上周各产品在制余额", "各工序还有多少在制？"],
+      "note": "**时点快照**（与时间区间无关）；与车间库存页面同源"
+    },
+    {
+      "code": "stock_finished",
+      "name": "成品库存",
+      "scope": "workshop",
+      "aliases": ["成品库存", "仓库", "成品还有多少"],
+      "source": { "table": "micro_finished_product_storage", "keyField": "product_seq", "displayFields": ["product_seq"] },
+      "fields": ["product_seq=产品", "num=成品数量"],
+      "examples": ["成品库存还有多少？"],
+      "note": "**时点快照**；与车间库存页面同源"
+    },
+    {
+      "code": "order",
+      "name": "生产订单",
+      "scope": "planning",
+      "aliases": ["生产订单", "订单", "客户订单"],
+      "source": { "table": "micro_manufacture_order", "keyField": "order_no", "displayFields": ["order_no", "product_seq"] },
+      "fields": ["order_no=订单号", "product_seq=产品", "plan_num=计划数量", "finish_num=完成数量", "delivery_date=交付日期", "order_status=订单状态"],
+      "examples": ["哪些订单要延期？"],
+      "note": "计划域（手机端无页面）。仅「订单延期预警」能力在用；当前部署无数据时不投入"
+    },
+    {
+      "code": "workOrder",
+      "name": "生产工单",
+      "scope": "planning",
+      "aliases": ["工单", "生产工单"],
+      "source": { "table": "micro_manufacture_work_order", "keyField": "work_order_no", "displayFields": ["work_order_no", "order_no"] },
+      "note": "计划域（手机端无页面）"
+    },
+    {
+      "code": "task",
+      "name": "生产任务",
+      "scope": "planning",
+      "aliases": ["任务", "任务单"],
+      "source": { "table": "micro_manufacture_task", "keyField": "task_no", "displayFields": ["task_no", "work_order_no", "process_seq"] },
+      "note": "计划域（手机端无页面）；任务=工单×工序，含可报数量"
+    }
+  ]
+}

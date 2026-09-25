@@ -1,0 +1,46 @@
+{
+  "name": "hhim-micro-app",
+  "version": "0.0.0",
+  "scripts": {
+    "dev:app": "uni -p app",
+    "dev:h5": "uni",
+    "dev:mp-weixin": "uni -p mp-weixin --minify",
+    "build:app": "uni build -p app",
+    "build:custom": "uni build -p",
+    "build:h5": "uni build",
+    "build:mp-weixin": "uni build -p mp-weixin"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-alpha-3060420220922001",
+    "@dcloudio/uni-app-plus": "3.0.0-alpha-3060420220922001",
+    "@dcloudio/uni-components": "3.0.0-alpha-3060420220922001",
+    "@dcloudio/uni-h5": "3.0.0-alpha-3060420220922001",
+    "@dcloudio/uni-mp-weixin": "3.0.0-alpha-3060420220922001",
+    "@dcloudio/uni-quickapp-webview": "3.0.0-alpha-3060420220922001",
+    "@dcloudio/uni-ui": "1.4.22",
+    "bignumber.js": "9.1.0",
+    "dayjs": "1.11.6",
+    "echarts": "^5.4.0",
+    "gio-miniprogram-sdk-saas": "^3.8.9",
+    "md5": "^2.3.0",
+    "vue": "^3.2.39",
+    "vuex": "4.0.2"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "3.0.14",
+    "@dcloudio/uni-automator": "3.0.0-alpha-3060420220922001",
+    "@dcloudio/uni-cli-shared": "3.0.0-alpha-3060420220922001",
+    "@dcloudio/uni-stacktracey": "3.0.0-alpha-3060420220922001",
+    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-3060420220922001",
+    "@types/md5": "^2.3.2",
+    "eslint": "^8.57.1",
+    "prettier": "2.7.1",
+    "sass": "1.32.8",
+    "sass-loader": "10.1.1",
+    "svgo": "^3.0.0",
+    "terser": "^5.48.0",
+    "typescript": "4.8.3",
+    "vite": "2.9.14",
+    "vite-plugin-style-import": "1.4.1"
+  }
+}

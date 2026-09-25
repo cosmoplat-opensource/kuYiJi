@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroUserMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroUser" id="MicroUserResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="tenantName" column="tenant_name"/>
+        <result property="userName" column="user_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="userType" column="user_type"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="phonenumber" column="phonenumber"/>
+        <result property="remark" column="remark"/>
+        <result property="validDate" column="valid_date"/>
+        <result property="status" column="status"/>
+        <result property="roleCode" column="role_code"/>
+        <result property="roleName" column="role_name"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroRole" id="MicroRoleResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="roleCode" column="role_code"/>
+        <result property="roleName" column="role_name"/>
+        <result property="status" column="status"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+
+    <resultMap id="UserCompleteInfoResult" type="MicroUser">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="tenantName" column="tenant_name"/>
+        <result property="userName" column="user_name"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="userType" column="user_type"/>
+        <result property="sex" column="sex"/>
+        <result property="avatar" column="avatar"/>
+        <result property="phonenumber" column="phonenumber"/>
+        <result property="remark" column="remark"/>
+        <result property="validDate" column="valid_date"/>
+        <result property="status" column="status"/>
+
+        <association property="microUserPlatformRe" javaType="MicroUserPlatformRe">
+            <id property="id" column="dId"/>
+            <result property="openId" column="open_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="platformType" column="platform_type"/>
+            <result property="remark" column="remark"/>
+            <result property="activeFlag" column="active_flag"/>
+        </association>
+
+        <collection property="microRoles" ofType="MicroRole">
+            <id property="id" column="cId"/>
+            <result property="roleCode" column="role_code"/>
+            <result property="roleName" column="role_name"/>
+            <result property="status" column="cStatus"/>
+        </collection>
+
+        <collection property="microUserAppRes" ofType="MicroUserAppRe">
+            <id property="id" column="eId"/>
+            <result property="appCode" column="app_code"/>
+            <result property="userStatus" column="user_status"/>
+            <result property="validDate" column="appValidDate"/>
+        </collection>
+    </resultMap>
+
+    <sql id="selectMicroUserVo">
+        select id,
+               tenant_code,
+               tenant_name,
+               user_name,
+               nick_name,
+               user_type,
+               sex,
+               avatar,
+               phonenumber,
+               remark,
+               valid_date,
+               status,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_user
+    </sql>
+
+    <select id="selectMicroNotManagerList" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroUserQueryParam" resultMap="MicroUserResult">
+        select
+        mu.id,
+        max(mu.tenant_code) as tenant_code,
+        max(mu.tenant_name) as tenant_name,
+        max(mu.user_name) as user_name,
+        max(mu.nick_name) as nick_name,
+        max(mu.user_type) as user_type,
+        max(mu.sex) as sex,
+        max(mu.avatar) as avatar,
+        max(mu.phonenumber) as phonenumber,
+        max(mu.remark) as remark,
+        max(mu.valid_date) as valid_date,
+        max(mar.user_status) as status,
+        group_concat(distinct mr.role_code) as role_code,
+        group_concat(distinct mr.role_name) as role_name
+        from micro_user mu
+        inner join micro_user_role_re re on mu.tenant_code = re.tenant_code and mu.id = re.user_id
+        inner join micro_role mr on mr.tenant_code = re.tenant_code and mr.id = re.role_id and mr.role_code !='10'
+        inner join micro_user_app_re mar on mar.tenant_code = mu.tenant_code and mu.id = mar.user_id
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="tenantName != null  and tenantName != ''">and tenant_name like concat('%', #{tenantName}, '%')</if>
+            <if test="userName != null  and userName != ''">and user_name like concat('%', #{userName}, '%')</if>
+            <if test="nickName != null  and nickName != ''">and nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="userType != null  and userType != ''">and user_type = #{userType}</if>
+            <if test="sex != null  and sex != ''">and sex = #{sex}</if>
+            <if test="avatar != null  and avatar != ''">and avatar = #{avatar}</if>
+            <if test="phonenumber != null  and phonenumber != ''">and phonenumber = #{phonenumber}</if>
+            <if test="validDate != null ">and valid_date = #{validDate}</if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="key != null  and key != ''">
+                and ( mu.user_name like concat('%', #{key}, '%')
+                or mu.nick_name like concat('%', #{key}, '%') )
+            </if>
+            <if test="appCode != null and appCode != ''">
+                and mar.app_code = #{appCode}
+            </if>
+        </where>
+        group by mu.id
+        order by mu.last_upd_date desc
+    </select>
+
+    <select id="selectMicroList" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroUserQueryParam" resultMap="MicroUserResult">
+        select
+        mu.id,
+        max(mu.tenant_code) as tenant_code,
+        max(mu.tenant_name) as tenant_name,
+        max(mu.user_name) as user_name,
+        max(mu.nick_name) as nick_name,
+        max(mu.user_type) as user_type,
+        max(mu.sex) as sex,
+        max(mu.avatar) as avatar,
+        max(mu.phonenumber) as phonenumber,
+        max(mu.remark) as remark,
+        max(mu.valid_date) as valid_date,
+        max(mar.user_status) as status,
+        group_concat(distinct mr.role_code) as role_code,
+        group_concat(distinct mr.role_name) as role_name
+        from micro_user mu
+        inner join micro_user_role_re re on mu.tenant_code = re.tenant_code and mu.id = re.user_id
+        inner join micro_role mr on mr.tenant_code = re.tenant_code and mr.id = re.role_id
+        inner join micro_user_app_re mar on mar.tenant_code = mu.tenant_code and mu.id = mar.user_id
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="tenantName != null  and tenantName != ''">and tenant_name like concat('%', #{tenantName}, '%')</if>
+            <if test="userName != null  and userName != ''">and user_name like concat('%', #{userName}, '%')</if>
+            <if test="nickName != null  and nickName != ''">and nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="userType != null  and userType != ''">and user_type = #{userType}</if>
+            <if test="sex != null  and sex != ''">and sex = #{sex}</if>
+            <if test="avatar != null  and avatar != ''">and avatar = #{avatar}</if>
+            <if test="phonenumber != null  and phonenumber != ''">and phonenumber = #{phonenumber}</if>
+            <if test="validDate != null ">and valid_date = #{validDate}</if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="key != null  and key != ''">
+                and ( mu.user_name like concat('%', #{key}, '%')
+                or mu.nick_name like concat('%', #{key}, '%') )
+            </if>
+            <if test="appCode != null and appCode != ''">
+                and mar.app_code = #{appCode}
+            </if>
+        </where>
+        group by mu.id
+        order by mu.last_upd_date desc
+    </select>
+
+    <select id="selectMicroUserByIdAndAppCode" resultMap="MicroUserResult">
+        select mu.id,
+               mu.tenant_code,
+               mu.tenant_name,
+               mu.user_name,
+               mu.nick_name,
+               mu.user_type,
+               mu.sex,
+               mu.avatar,
+               mu.phonenumber,
+               mu.remark,
+               mu.valid_date,
+               mar.user_status as status,
+               mu.created_by,
+               mu.created_date,
+               mu.last_upd_by,
+               mu.last_upd_date
+        from micro_user mu
+                 inner join micro_user_app_re mar on mar.tenant_code = mu.tenant_code and mu.id = mar.user_id
+        where mu.id = #{id} and mar.app_code = #{appCode}
+    </select>
+
+    <select id="selectMicroUserById" parameterType="java.lang.Long" resultMap="MicroUserResult">
+        <include refid="selectMicroUserVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectRoleInfoByUserId" parameterType="java.lang.Long" resultMap="MicroRoleResult">
+        select c.id,
+               c.tenant_code,
+               c.role_code,
+               c.role_name,
+               c.status,
+               c.created_by,
+               c.created_date,
+               c.last_upd_by,
+               c.last_upd_date
+        from micro_user a
+                 left join micro_user_role_re b on a.id = b.user_id
+                 left join micro_role c on b.role_id = c.id and c.`status` = '0'
+        where a.id = #{userId}
+    </select>
+
+    <select id="selectUserInfoByUserNameOrPhoneNumber" resultMap="MicroUserResult">
+        <include refid="selectMicroUserVo"/>
+        <where>
+            <if test="userName != null  and userName != ''">and user_name = #{userName}</if>
+            <if test="phoneNumber != null  and phoneNumber != ''">and phonenumber = #{phoneNumber}</if>
+        </where>
+    </select>
+
+    <insert id="insertMicroUser" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroUser" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="tenantName != null">tenant_name,</if>
+            <if test="userName != null and userName != ''">user_name,</if>
+            <if test="nickName != null and nickName != ''">nick_name,</if>
+            <if test="userType != null">user_type,</if>
+            <if test="sex != null">sex,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="phonenumber != null">phonenumber,</if>
+            <if test="remark != null">remark,</if>
+            <if test="validDate != null">valid_date,</if>
+            <if test="status != null">status,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="tenantName != null">#{tenantName},</if>
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="nickName != null and nickName != ''">#{nickName},</if>
+            <if test="userType != null">#{userType},</if>
+            <if test="sex != null">#{sex},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="phonenumber != null">#{phonenumber},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="validDate != null">#{validDate},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroUser" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroUser">
+        update micro_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="nickName != null and nickName != ''">nick_name = #{nickName},</if>
+            <if test="userType != null">user_type = #{userType},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            remark = #{remark},
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="validDate != null">valid_date = #{validDate},</if>
+            <if test="phonenumber != null">phonenumber = #{phonenumber},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="updateAppRe">
+        update micro_user_app_re
+        set user_status = #{user.status}
+        where user_id = #{user.id}
+    </update>
+
+    <delete id="deleteMicroUserById" parameterType="Long">
+        delete
+        from micro_user
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroUserByIds" parameterType="String">
+        delete from micro_user where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectUserBaseInfo" resultMap="MicroUserResult">
+        <include refid="selectMicroUserVo"/>
+        <where>
+            <if test="username != null  and username != ''">and user_name = #{username}</if>
+            <if test="phoneNum != null  and phoneNum != ''">and phonenumber = #{phoneNum}</if>
+        </where>
+    </select>
+
+    <select id="selectUserCompleteInfo" resultMap="UserCompleteInfoResult">
+        select a.id,
+        a.tenant_code,
+        a.tenant_name,
+        a.user_name,
+        a.nick_name,
+        a.user_type,
+        a.sex,
+        a.avatar,
+        a.phonenumber,
+        a.remark,
+        a.valid_date,
+        e.user_status AS status,
+        c.id cId,
+        c.role_code,
+        c.role_name,
+        c.status cStatus,
+        d.id dId,
+        d.open_id,
+        d.user_id,
+        d.platform_type,
+        d.remark,
+        d.active_flag,
+        e.id eId,
+        e.app_code,
+        e.user_status,
+        e.valid_date appValidDate
+        from micro_user a
+        left join micro_user_role_re b on a.id = b.user_id
+        left join micro_role c on c.id = b.role_id and c.`status` = '0'
+        left join micro_user_platfrom_re d on d.user_id = a.id and d.active_flag = '0'
+            <if test="appSign != null and appSign != ''">and d.application_sign = #{appSign}</if>
+        left join micro_user_app_re e on a.id = e.user_id
+            <if test="appCode != null and appCode != ''">and e.app_code = #{appCode}</if>
+        <where>
+            <if test="username != null  and username != ''">and a.user_name = #{username}</if>
+            <if test="phoneNum != null  and phoneNum != ''">and a.phonenumber = #{phoneNum}</if>
+            <if test="userId != null  and userId != ''">and a.id = #{userId}</if>
+            <if test="tenantCode != null  and tenantCode != ''">and a.tenant_code = #{tenantCode}</if>
+        </where>
+    </select>
+    <select id="getBusinessInfo" resultType="com.cosmo.hhim.micro.base.domain.entity.common.MicroUserBusinessEntity">
+        SELECT SUM(t.staffNum)   as staffNum,
+               SUM(t.processNum) as processNum,
+               SUM(t.productNum) as productNum
+        FROM (SELECT u.tenant_code,
+                     COUNT(DISTINCT u.id) AS staffNum,
+                     0                    AS processNum,
+                     0                    AS productNum
+              FROM micro_user u
+                       INNER JOIN micro_user_role_re re ON u.tenant_code = re.tenant_code AND u.id = re.user_id
+                       INNER JOIN micro_role mr ON mr.tenant_code = re.tenant_code AND mr.id = re.role_id AND mr.role_code != '10'
+              GROUP BY
+                  u.tenant_code
+              UNION ALL
+              SELECT
+                  u.tenant_code, 0 AS staffNum, COUNT (DISTINCT mpc.process_seq) AS processNum, 0 AS productNum
+              FROM
+                  micro_user u
+                  INNER JOIN micro_process_common mpc
+              ON u.tenant_code = mpc.tenant_code
+              GROUP BY
+                  u.tenant_code
+              UNION ALL
+              SELECT
+                  u.tenant_code, 0 AS staffNum, 0 AS processNum, COUNT (DISTINCT mp.product_seq) AS productNum
+              FROM
+                  micro_user u
+                  INNER JOIN micro_product mp
+              ON u.tenant_code = mp.tenant_code
+              GROUP BY
+                  u.tenant_code) AS t
+        GROUP BY t.tenant_code
+    </select>
+
+    <select id="selectMicroUserByRoleCode" resultType="com.cosmo.hhim.micro.base.domain.entity.common.MicroSimpleUserInfo">
+        SELECT
+        distinct
+        mu.id as userId,
+        mu.user_name as userName
+        from micro_user mu
+        inner join micro_user_role_re ere on mu.tenant_code = ere.tenant_code and mu.id = ere.user_id
+        inner join micro_role mr on mr.tenant_code = ere.tenant_code and mr.id = ere.role_id
+        inner join micro_user_app_re pre on mu.tenant_code = pre.tenant_code and mu.id = pre.user_id
+        <where>
+            pre.user_status = '0'
+            <if test="roleCode != null and roleCode != ''">and mr.role_code = #{roleCode}</if>
+            <if test="appCode != null and appCode != ''">and pre.app_code = #{appCode}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroUserPhoneByRoleCodes" parameterType="java.util.List" resultType="java.lang.String">
+        select distinct a.phonenumber
+        from micro_user a
+            left join micro_user_role_re b on a.id = b.user_id
+            left join micro_role c on b.role_id = c.id
+        where c.role_code in
+        <foreach item="item" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectMicroUserInfoByRoleCode" parameterType="java.lang.String" resultMap="MicroUserResult">
+        select a.id,
+               a.tenant_code,
+               a.tenant_name,
+               a.user_name,
+               a.nick_name,
+               a.user_type,
+               a.sex,
+               a.avatar,
+               a.phonenumber,
+               a.remark,
+               a.valid_date,
+               a.status,
+               a.created_by,
+               a.created_date,
+               a.last_upd_by,
+               a.last_upd_date
+        from micro_user a
+                 left join micro_user_role_re b on a.id = b.user_id
+                 left join micro_role c on b.role_id = c.id
+        where c.role_code = #{roleCode}
+    </select>
+
+    <select id="selectMicroUserListByUserIdList" parameterType="String" resultMap="MicroUserResult">
+        <include refid="selectMicroUserVo"/>
+        <where>
+            <if test="userIdList != null">
+                and id in
+                <foreach item="userId" collection="userIdList" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectMicroUserListByAppCode" parameterType="java.lang.String" resultMap="MicroUserResult">
+        select a.id,
+               a.tenant_code,
+               a.tenant_name,
+               a.user_name,
+               a.nick_name,
+               a.user_type,
+               a.sex,
+               a.avatar,
+               a.phonenumber,
+               a.remark,
+               a.valid_date,
+               a.status,
+               a.created_by,
+               a.created_date,
+               a.last_upd_by,
+               a.last_upd_date
+        from micro_user a
+                 left join micro_user_app_re b on a.id = b.user_id
+        where b.app_code = #{appCode}
+    </select>
+
+    <select id="selectPlatformOpenIdsByRoles" resultType="java.lang.String">
+        select distinct e.open_id
+        from
+        micro_user a
+        inner join micro_user_role_re b on a.id = b.user_id
+        inner join micro_role c on b.role_id = c.id
+        inner join micro_user_app_re d on a.id = d.user_id
+        inner join micro_user_platfrom_re e on a.id = e.user_id
+        <where>
+            d.user_status = '0'
+            and d.valid_date &gt;= now()
+            <if test="roleCodeList != null and roleCodeList.size() > 0">
+                and c.role_code in
+                <foreach item="roleCode" collection="roleCodeList" open="(" separator="," close=")">
+                    #{roleCode}
+                </foreach>
+            </if>
+            <if test="appCode != null and appCode != ''">
+                and d.app_code = #{appCode}
+            </if>
+            <if test="appSign != null and appSign != ''">
+                and e.application_sign = #{appSign}
+            </if>
+            <if test="platformType != null and platformType != ''">
+                and e.platform_type =#{platformType}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="selectPlatformOpenIdsByUserIds" resultType="java.lang.String">
+        select distinct open_id
+        from micro_user_platfrom_re
+        <where>
+            <if test="userIds != null and userIds.size() > 0">
+                and user_id in
+                <foreach item="userId" collection="userIds" open="(" separator="," close=")">
+                    #{userId}
+                </foreach>
+            </if>
+            <if test="appSign != null and appSign != ''">
+                and application_sign = #{appSign}
+            </if>
+            <if test="platformType != null and platformType != ''">
+                and platform_type =#{platformType}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectAllUserCompleteInfo" resultMap="UserCompleteInfoResult">
+        select a.id,
+               a.tenant_code,
+               a.tenant_name,
+               a.user_name,
+               a.nick_name,
+               a.user_type,
+               a.sex,
+               a.avatar,
+               a.phonenumber,
+               a.remark,
+               a.valid_date,
+               e.user_status AS status,
+               c.id             cId,
+               c.role_code,
+               c.role_name,
+               c.status         cStatus,
+               d.id             dId,
+               d.open_id,
+               d.user_id,
+               d.platform_type,
+               d.remark,
+               d.active_flag,
+               e.id             eId,
+               e.app_code,
+               e.user_status,
+               e.valid_date     appValidDate
+        from micro_user a
+                 left join micro_user_role_re b on a.id = b.user_id
+                 left join micro_role c on c.id = b.role_id and c.`status` = '0'
+                 left join micro_user_platfrom_re d on d.user_id = a.id and d.active_flag = '0'
+                 left join micro_user_app_re e on a.id = e.user_id
+    </select>
+
+</mapper>

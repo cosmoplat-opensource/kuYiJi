@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzWechatConfigMapper">
+    
+    <resultMap type="HyzzWechatConfig" id="HyzzWechatConfigResult">
+        <result property="id"    column="id"    />
+        <result property="appId"    column="app_id"    />
+        <result property="appSecret"    column="app_secret"    />
+        <result property="appName"    column="app_name"    />
+        <result property="appType"    column="app_type"    />
+        <result property="mainInfo"    column="main_info"    />
+        <result property="serverToken"    column="server_token"    />
+        <result property="serverEncodeAeskey"    column="server_encode_aeskey"    />
+        <result property="customerCode"    column="customer_code"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectHyzzWechatConfigVo">
+        select id, app_id, app_secret, app_name, app_type, main_info, server_token, server_encode_aeskey, customer_code, create_by, create_time, update_by, update_time from hyzz_wechat_config
+    </sql>
+    
+    <select id="selectHyzzWechatConfigByCustomerCode" parameterType="java.lang.String" resultMap="HyzzWechatConfigResult">
+        <include refid="selectHyzzWechatConfigVo"/>
+        where customer_code = #{customerCode}
+    </select>
+
+    <select id="selectHyzzWechatConfigList" resultMap="HyzzWechatConfigResult">
+        <include refid="selectHyzzWechatConfigVo"/>
+    </select>
+
+    <select id="selectHyzzWechatConfigByAppId" resultMap="HyzzWechatConfigResult" parameterType="java.lang.String">
+        <include refid="selectHyzzWechatConfigVo"/>
+        where app_id = #{appId}
+    </select>
+
+</mapper>

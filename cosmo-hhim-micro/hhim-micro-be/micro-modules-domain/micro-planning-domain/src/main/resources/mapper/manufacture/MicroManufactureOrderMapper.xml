@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.planning.domain.mapper.manufacture.MicroManufactureOrderMapper">
+    
+    <resultMap type="MicroManufactureOrder" id="MicroManufactureOrderResult">
+        <result property="id"    column="id"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="owCode"    column="ow_code"    />
+        <result property="productSeq"    column="product_seq"    />
+        <result property="planNum"    column="plan_num"    />
+        <result property="deliveryDate"    column="delivery_date"    />
+        <result property="startDate"    column="start_date"    />
+        <result property="endDate"    column="end_date"    />
+        <result property="orderStatus"    column="order_status"    />
+        <result property="beforeStatus"    column="before_status"    />
+        <result property="remark"    column="remark"    />
+        <result property="finishNum"    column="finish_num"    />
+        <result property="ngNum"    column="ng_num"    />
+        <result property="closeReason"    column="close_reason"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="extendContent"    column="extend_content"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="productName"    column="product_name"    />
+        <result property="unit"    column="unit"    />
+        <result property="owName"    column="ow_name"    />
+        <result property="techCode"    column="tech_code"    />
+        <result property="techName"    column="tech_name"    />
+    </resultMap>
+
+    <sql id="selectMicroManufactureOrderVo">
+        select id, order_no, ow_code, product_seq, plan_num, delivery_date, start_date, end_date, order_status, before_status, remark, finish_num, ng_num, close_reason, tenant_code, extend_content, created_by, created_date, last_upd_by, last_upd_date, active_flag from micro_manufacture_order
+    </sql>
+
+    <sql id="selectMicroManufactureOrderVoFirst">
+        select mmo.id,
+               order_no,
+               ow_code,
+               customer_name as ow_name,
+               mmo.product_seq,
+               mp.product_name,
+               mp.product_code,
+               mp.unit,
+               plan_num,
+               finish_num,
+               delivery_date,
+               order_status,
+               before_status,
+               mt.tech_code,
+               mt.tech_name,
+               mmo.extend_content
+        from micro_manufacture_order mmo
+        left join micro_product mp on mp.product_seq=mmo.product_seq
+        left join micro_customer mc on mc.customer_code=mmo.ow_code
+        left join micro_technology mt on mt.product_seq=mmo.product_seq AND mt.active_flag = '1' AND mt.tech_type='STANDARD'
+    </sql>
+
+    <select id="selectMicroManufactureOrderList" parameterType="MicroManufactureOrder" resultMap="MicroManufactureOrderResult">
+        <include refid="selectMicroManufactureOrderVo"/>
+        <where>  
+            <if test="orderNo != null  and orderNo != ''"> and order_no = #{orderNo}</if>
+            <if test="owCode != null  and owCode != ''"> and ow_code = #{owCode}</if>
+            <if test="productSeq != null  and productSeq != ''"> and product_seq = #{productSeq}</if>
+            <if test="planNum != null "> and plan_num = #{planNum}</if>
+            <if test="deliveryDate != null "> and delivery_date = #{deliveryDate}</if>
+            <if test="startDate != null "> and start_date = #{startDate}</if>
+            <if test="endDate != null "> and end_date = #{endDate}</if>
+            <if test="orderStatus != null  and orderStatus != ''"> and order_status = #{orderStatus}</if>
+            <if test="beforeStatus != null  and beforeStatus != ''"> and before_status = #{beforeStatus}</if>
+            <if test="finishNum != null "> and finish_num = #{finishNum}</if>
+            <if test="ngNum != null "> and ng_num = #{ngNum}</if>
+            <if test="closeReason != null  and closeReason != ''"> and close_reason = #{closeReason}</if>
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+            <if test="extendContent != null  and extendContent != ''"> and extend_content = #{extendContent}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and last_upd_date = #{lastUpdDate}</if>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+        </where>
+    </select>
+    
+    <select id="selectMicroManufactureOrderById" parameterType="Long" resultMap="MicroManufactureOrderResult">
+        <include refid="selectMicroManufactureOrderVoFirst"/>
+        where mmo.id = #{id}
+    </select>
+
+
+    <select id="selectMicroManufactureOrderByOrderNo" parameterType="String" resultMap="MicroManufactureOrderResult">
+        <include refid="selectMicroManufactureOrderVoFirst"/>
+        where mmo.order_no = #{orderNo}
+    </select>
+
+    <select id="productionSchedulingDetails" parameterType="Long" resultMap="MicroManufactureOrderResult">
+        <include refid="selectMicroManufactureOrderVoFirst"/>
+        where mmo.id = #{id}
+    </select>
+
+    <select id="selectMicroManufactureOrderListByCondition" parameterType="MicroManufactureOrder" resultMap="MicroManufactureOrderResult">
+        <include refid="selectMicroManufactureOrderVoFirst"/>
+        <where>
+            <if test="orderNo != null  and orderNo != ''"> and mmo.order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="owName != null  and owName != ''"> and (mc.customer_name like concat('%', #{owName}, '%') or mmo.ow_code like concat('%', #{owName}, '%')) </if>
+            <if test="productName != null  and productName != ''"> and (mp.product_name like concat('%', #{productName}, '%') or mp.product_code like concat('%', #{productName}, '%')) </if>
+            <if test="startDate != null ">
+                <![CDATA[ and date_format(mmo.delivery_date, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="endDate != null ">
+                <![CDATA[ and date_format(mmo.delivery_date, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="orderStatus != null  and orderStatus != ''"> and order_status = #{orderStatus}</if>
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+            <if test="extendContent != null  and extendContent != ''"> and extend_content = #{extendContent}</if>
+            <if test="orderStatusList != null and orderStatusList.size() > 0">
+                and mmo.order_status in
+                <foreach collection="orderStatusList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+            <if test="availableFlag == 1">and order_status in ('10', '20', '30')</if>
+            <if test="orderWarnQueryFlag == 1">
+                <![CDATA[and (DATEDIFF(date_format(mmo.delivery_date, '%Y-%m-%d'), DATE_FORMAT(CURRENT_DATE, '%Y-%m-%d')) = 1 or
+                            DATE_FORMAT(mmo.delivery_date, '%Y-%m-%d') <= DATE_FORMAT(CURRENT_DATE, '%Y-%m-%d'))]]>
+            </if>
+            <if test="productSeq != null and productSeq != ''">
+                and mmo.product_seq = #{productSeq}
+            </if>
+            <if test="owCode != null and owCode != ''">
+                and mmo.ow_code = #{owCode}
+            </if>
+        </where>
+        order by mmo.delivery_date desc, mmo.id desc
+    </select>
+
+    <select id="countOrderByCondition" resultType="java.lang.Integer">
+        select count(1) from micro_manufacture_order mmo
+        left join micro_product mp on mp.product_seq=mmo.product_seq
+        left join micro_customer mc on mc.customer_code=mmo.ow_code
+        <where>
+            <if test="orderNo != null  and orderNo != ''"> and mmo.order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="owName != null  and owName != ''"> and (mc.customer_name like concat('%', #{owName}, '%') or mmo.ow_code like concat('%', #{owName}, '%'))</if>
+            <if test="productName != null  and productName != ''"> and (mp.product_name like concat('%', #{productName}, '%') or mp.product_code like concat('%', #{productName}, '%'))</if>
+            <if test="startDate != null ">
+                <![CDATA[ and date_format(mmo.delivery_date, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="endDate != null ">
+                <![CDATA[ and date_format(mmo.delivery_date, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="productSeq != null and productSeq != ''">
+                and mmo.product_seq = #{productSeq}
+            </if>
+            <if test="owCode != null and owCode != ''">
+                and mmo.ow_code = #{owCode}
+            </if>
+            <if test="orderStatus != null  and orderStatus != ''"> and mmo.order_status = #{orderStatus}</if>
+            <if test="tenantCode != null  and tenantCode != ''"> and mmo.tenant_code = #{tenantCode}</if>
+            <if test="orderWarnQueryFlag == 1">
+                <![CDATA[and (DATEDIFF(date_format(mmo.delivery_date, '%Y-%m-%d'), DATE_FORMAT(CURRENT_DATE, '%Y-%m-%d')) = 1 or
+                            DATE_FORMAT(mmo.delivery_date, '%Y-%m-%d') <= DATE_FORMAT(CURRENT_DATE, '%Y-%m-%d'))]]>
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertMicroManufactureOrder" parameterType="MicroManufactureOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_manufacture_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null and orderNo != ''">order_no,</if>
+            <if test="owCode != null and owCode != ''">ow_code,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="planNum != null">plan_num,</if>
+            <if test="deliveryDate != null">delivery_date,</if>
+            <if test="startDate != null">start_date,</if>
+            <if test="endDate != null">end_date,</if>
+            <if test="orderStatus != null and orderStatus != ''">order_status,</if>
+            <if test="beforeStatus != null">before_status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="finishNum != null">finish_num,</if>
+            <if test="ngNum != null">ng_num,</if>
+            <if test="closeReason != null">close_reason,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="extendContent != null">extend_content,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="activeFlag != null">active_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+            <if test="owCode != null and owCode != ''">#{owCode},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="planNum != null">#{planNum},</if>
+            <if test="deliveryDate != null">#{deliveryDate},</if>
+            <if test="startDate != null">#{startDate},</if>
+            <if test="endDate != null">#{endDate},</if>
+            <if test="orderStatus != null and orderStatus != ''">#{orderStatus},</if>
+            <if test="beforeStatus != null">#{beforeStatus},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="finishNum != null">#{finishNum},</if>
+            <if test="ngNum != null">#{ngNum},</if>
+            <if test="closeReason != null">#{closeReason},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="extendContent != null">#{extendContent},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroManufactureOrder" parameterType="MicroManufactureOrder">
+        update micro_manufacture_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="beforeStatus != null and beforeStatus != ''">before_status = #{beforeStatus},</if>
+            <if test="owCode != null and owCode != ''">ow_code = #{owCode},</if>
+            <if test="orderNo != null and orderNo != ''">order_no = #{orderNo},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="planNum != null">plan_num = #{planNum},</if>
+            <if test="deliveryDate != null">delivery_date = #{deliveryDate},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="orderStatus != null and orderStatus != ''">order_status = #{orderStatus},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="finishNum != null">finish_num = #{finishNum},</if>
+            <if test="ngNum != null">ng_num = #{ngNum},</if>
+            <if test="closeReason != null">close_reason = #{closeReason},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="extendContent != null">extend_content = #{extendContent},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateOrderByNo" parameterType="MicroManufactureOrder">
+        update micro_manufacture_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="beforeStatus != null and beforeStatus != ''">before_status = #{beforeStatus},</if>
+            <if test="owCode != null and owCode != ''">ow_code = #{owCode},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="planNum != null">plan_num = #{planNum},</if>
+            <if test="deliveryDate != null">delivery_date = #{deliveryDate},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="orderStatus != null and orderStatus != ''">order_status = #{orderStatus},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="finishNum != null">finish_num = #{finishNum},</if>
+            <if test="ngNum != null">ng_num = #{ngNum},</if>
+            <if test="closeReason != null">close_reason = #{closeReason},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="extendContent != null">extend_content = #{extendContent},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where order_no = #{orderNo}
+    </update>
+
+    <update id="updateMicroManufactureOrder4Status">
+        update micro_manufacture_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderStatus != null and orderStatus != ''">order_status = #{orderStatus},</if>
+            <if test="beforeStatus != null">before_status = #{beforeStatus},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+        </trim>
+        where order_no = #{orderNo} and order_status!=#{orderStatus}
+    </update>
+
+    <delete id="deleteMicroManufactureOrderById" parameterType="Long">
+        delete from micro_manufacture_order where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroManufactureOrderByIds" parameterType="String">
+        delete from micro_manufacture_order where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="addOrderFinishNum">
+        update micro_manufacture_order
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="finish_num =case" suffix="end,">
+                <foreach collection="orderList" item="i" index="index">
+                    <if test="i.finishNum!=null">
+                        when order_no=#{i.orderNo} then finish_num + #{i.finishNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="ng_num =case" suffix="end,">
+                <foreach collection="orderList" item="i" index="index">
+                    <if test="i.ngNum!=null">
+                        when order_no=#{i.orderNo} then ng_num + #{i.ngNum}
+                    </if>
+                </foreach>
+            </trim>
+            <if test="userId!=null and userId!=''">
+                last_upd_by= #{userId},
+            </if>
+            last_upd_date= sysdate()
+        </trim>
+        where order_no in
+        <foreach collection="orderList" item="i" index="index" separator="," open="(" close=")" >
+            #{i.orderNo}
+        </foreach>
+    </update>
+    <update id="updateWithFiledNull">
+        update micro_manufacture_order
+        <trim prefix="SET" suffixOverrides=",">
+            before_status = #{beforeStatus},
+            ow_code = #{owCode},
+            <if test="orderNo != null and orderNo != ''">order_no = #{orderNo},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="planNum != null">plan_num = #{planNum},</if>
+            <if test="deliveryDate != null">delivery_date = #{deliveryDate},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="orderStatus != null and orderStatus != ''">order_status = #{orderStatus},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="finishNum != null">finish_num = #{finishNum},</if>
+            <if test="ngNum != null">ng_num = #{ngNum},</if>
+            <if test="closeReason != null">close_reason = #{closeReason},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="extendContent != null">extend_content = #{extendContent},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <select id="getAllExistOrderNoListInCurrentDate" resultType="java.lang.String">
+        select order_no
+        from micro_manufacture_order
+        where order_no like CONCAT('SC', DATE_FORMAT(CURRENT_DATE, '%y%m%d'), '%')
+    </select>
+</mapper>

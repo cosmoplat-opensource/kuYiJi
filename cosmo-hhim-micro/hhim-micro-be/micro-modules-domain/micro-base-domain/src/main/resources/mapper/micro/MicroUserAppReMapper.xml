@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroUserAppReMapper">
+
+    <resultMap type="MicroUserAppRe" id="MicroUserAppReResult">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="appCode" column="app_code"/>
+        <result property="userStatus" column="user_status"/>
+        <result property="validDate" column="valid_date"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+    </resultMap>
+
+    <sql id="selectMicroUserAppReVo">
+        select id,
+               user_id,
+               user_name,
+               tenant_code,
+               app_code,
+               user_status,
+               valid_date,
+               created_by,
+               created_date
+        from micro_user_app_re
+    </sql>
+
+    <select id="selectMicroUserAppReList" parameterType="MicroUserAppRe" resultMap="MicroUserAppReResult">
+        <include refid="selectMicroUserAppReVo"/>
+        <where>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="userName != null  and userName != ''">and user_name like concat('%', #{userName}, '%')</if>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="appCode != null  and appCode != ''">and app_code = #{appCode}</if>
+            <if test="userStatus != null  and userStatus != ''">and user_status = #{userStatus}</if>
+            <if test="validDate != null ">and valid_date = #{validDate}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroUserAppReByAppCodeAndUserId" resultMap="MicroUserAppReResult">
+        <include refid="selectMicroUserAppReVo"/>
+        where user_id = #{userId} and app_code = #{appCode}
+    </select>
+
+    <insert id="insertMicroUserAppRe" parameterType="MicroUserAppRe" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_user_app_re
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="appCode != null and appCode != ''">app_code,</if>
+            <if test="userStatus != null and userStatus != ''">user_status,</if>
+            <if test="validDate != null">valid_date,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="appCode != null and appCode != ''">#{appCode},</if>
+            <if test="userStatus != null and userStatus != ''">#{userStatus},</if>
+            <if test="validDate != null">#{validDate},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroUserAppRe" parameterType="MicroUserAppRe">
+        update micro_user_app_re
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="userStatus != null and userStatus != ''">user_status = #{userStatus},</if>
+            <if test="validDate != null">valid_date = #{validDate},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+        </trim>
+        where app_code = #{appCode}
+    </update>
+
+    <update id="updateMicroUserAppReByUserId" parameterType="MicroUserAppRe">
+        update micro_user_app_re
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="appCode != null">app_code = #{appCode},</if>
+            <if test="userStatus != null and userStatus != ''">user_status = #{userStatus},</if>
+            <if test="validDate != null">valid_date = #{validDate},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+        </trim>
+        where user_id = #{userId}
+    </update>
+
+    <delete id="deleteMicroUserAppReById" parameterType="Long">
+        delete
+        from micro_user_app_re
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroUserAppReByIds" parameterType="String">
+        delete from micro_user_app_re where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteMicroUserAppReByUserId" parameterType="java.lang.Long">
+        delete from micro_user_app_re where user_id = #{userId}
+    </delete>
+</mapper>

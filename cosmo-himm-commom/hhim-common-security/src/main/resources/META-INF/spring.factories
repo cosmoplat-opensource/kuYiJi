@@ -1,0 +1,8 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.common.security.service.TokenService,\
+  com.cosmo.hhim.common.security.aspect.PreAuthorizeAspect,\
+  com.cosmo.hhim.common.security.feign.FeignAutoConfiguration,\
+  com.cosmo.hhim.common.security.handler.GlobalExceptionHandler,\
+  com.cosmo.hhim.common.security.datamask.aspect.DataMaskControllerAdvice,\
+  com.cosmo.hhim.common.security.datamask.aspect.DataMaskExcelAspect,\
+  com.cosmo.hhim.common.security.config.WebMvcConfig

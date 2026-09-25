@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroUserRoleReMapper">
+
+    <resultMap type="MicroUserRoleRe" id="MicroUserRoleReResult">
+        <result property="id" column="id"/>
+        <result property="roleId" column="role_id"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <sql id="selectMicroUserRoleReVo">
+        select id, role_id, user_id
+        from micro_user_role_re
+    </sql>
+
+    <select id="selectMicroUserRoleReList" parameterType="MicroUserRoleRe" resultMap="MicroUserRoleReResult">
+        <include refid="selectMicroUserRoleReVo"/>
+        <where>
+            <if test="roleId != null  and roleId != ''">and role_id = #{roleId}</if>
+            <if test="userId != null  and userId != ''">and user_id = #{userId}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroUserRoleReById" parameterType="Long" resultMap="MicroUserRoleReResult">
+        <include refid="selectMicroUserRoleReVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectUserRoleInfoByRoleIdAndUserId" resultMap="MicroUserRoleReResult">
+        <include refid="selectMicroUserRoleReVo"/>
+        where role_id = #{roleId} and user_id = #{userId}
+    </select>
+
+    <insert id="insertMicroUserRoleRe" parameterType="MicroUserRoleRe" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_user_role_re
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="roleId != null">role_id,</if>
+            <if test="userId != null">user_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="roleId != null">#{roleId},</if>
+            <if test="userId != null">#{userId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroUserRoleRe" parameterType="MicroUserRoleRe">
+        update micro_user_role_re
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="roleId != null">role_id = #{roleId},</if>
+        </trim>
+        where user_id = #{userId}
+    </update>
+
+    <delete id="deleteMicroUserRoleReById" parameterType="Long">
+        delete
+        from micro_user_role_re
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroUserRoleReByIds" parameterType="String">
+        delete from micro_user_role_re where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteMicroUserRoleReByUser">
+        delete
+        from micro_user_role_re
+        where user_id = #{userId}
+          and tenant_code = #{tenantCode}
+    </delete>
+
+    <delete id="deleteMicroUserRoleReByUserId" parameterType="java.lang.Long">
+        delete from micro_user_role_re where user_id = #{userId}
+    </delete>
+</mapper>

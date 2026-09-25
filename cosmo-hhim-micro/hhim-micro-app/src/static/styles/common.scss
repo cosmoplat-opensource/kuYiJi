@@ -1,0 +1,3 @@
+@function px2vw($var) {
+  @return $var / 720 * 100vw;
+}

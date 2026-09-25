@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzPortalSuggestionLogMapper">
+    
+    <resultMap type="HyzzPortalSuggestionLog" id="HyzzPortalSuggestionLogResult">
+        <result property="id"    column="id"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="operateName"    column="operate_name"    />
+        <result property="operateResult"    column="operate_result"    />
+        <result property="remark"    column="remark"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createByName"    column="create_by_name"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectHyzzPortalSuggestionLogVo">
+        select id, order_no, operate_name, operate_result, remark, active_flag, create_by, create_by_name, create_time from hyzz_portal_suggestion_log
+    </sql>
+
+    <select id="selectHyzzPortalSuggestionLogList" parameterType="HyzzPortalSuggestionLog" resultMap="HyzzPortalSuggestionLogResult">
+        <include refid="selectHyzzPortalSuggestionLogVo"/>
+        <where>  
+            <if test="orderNo != null  and orderNo != ''"> and order_no = #{orderNo}</if>
+            <if test="operateName != null  and operateName != ''"> and operate_name like concat('%', #{operateName}, '%')</if>
+            <if test="operateResult != null  and operateResult != ''"> and operate_result = #{operateResult}</if>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+            <if test="createByName != null  and createByName != ''"> and create_by_name like concat('%', #{createByName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectHyzzPortalSuggestionLogById" parameterType="Long" resultMap="HyzzPortalSuggestionLogResult">
+        <include refid="selectHyzzPortalSuggestionLogVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertHyzzPortalSuggestionLog" parameterType="HyzzPortalSuggestionLog" useGeneratedKeys="true" keyProperty="id">
+        insert into hyzz_portal_suggestion_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null and orderNo != ''">order_no,</if>
+            <if test="operateName != null and operateName != ''">operate_name,</if>
+            <if test="operateResult != null">operate_result,</if>
+            <if test="remark != null">remark,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createByName != null">create_by_name,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+            <if test="operateName != null and operateName != ''">#{operateName},</if>
+            <if test="operateResult != null">#{operateResult},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createByName != null">#{createByName},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHyzzPortalSuggestionLog" parameterType="HyzzPortalSuggestionLog">
+        update hyzz_portal_suggestion_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderNo != null and orderNo != ''">order_no = #{orderNo},</if>
+            <if test="operateName != null and operateName != ''">operate_name = #{operateName},</if>
+            <if test="operateResult != null">operate_result = #{operateResult},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createByName != null">create_by_name = #{createByName},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteHyzzPortalSuggestionLogById" parameterType="Long">
+        delete from hyzz_portal_suggestion_log where id = #{id}
+    </delete>
+
+    <delete id="deleteHyzzPortalSuggestionLogByIds" parameterType="String">
+        delete from hyzz_portal_suggestion_log where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

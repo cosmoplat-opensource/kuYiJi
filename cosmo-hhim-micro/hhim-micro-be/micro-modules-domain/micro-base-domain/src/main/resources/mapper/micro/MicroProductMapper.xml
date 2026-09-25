@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroProductMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroProduct" id="MicroProductResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productName" column="product_name"/>
+        <result property="productDesc" column="product_desc"/>
+        <result property="productType" column="product_type"/>
+        <result property="productionMode" column="production_mode"/>
+        <result property="picture" column="picture"/>
+        <result property="unit" column="unit"/>
+        <result property="standards" column="standards"/>
+        <result property="remark" column="remark"/>
+        <result property="stockUpperLimit" column="stock_upper_limit"/>
+        <result property="stockLowerLimit" column="stock_lower_limit"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <sql id="selectMicroProductVo">
+        select id,
+               tenant_code,
+               product_code,
+               product_seq,
+               product_name,
+               product_desc,
+               product_type,
+               production_mode,
+               picture,
+               unit,
+               standards,
+               remark,
+               stock_upper_limit,
+               stock_lower_limit,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_product
+    </sql>
+
+    <select id="selectMicroProductList" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProduct" resultMap="MicroProductResult">
+        <include refid="selectMicroProductVo"/>
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="productCode != null  and productCode != ''">and product_code = #{productCode}</if>
+            <if test="productSeq != null  and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="productName != null  and productName != ''">and product_name = #{productName}</if>
+            <if test="productDesc != null  and productDesc != ''">and product_desc like concat('%', #{productDesc}, '%')</if>
+            <if test="productType != null  and productType != ''">and product_type = #{productType}</if>
+            <if test="productionMode != null  and productionMode != ''">and production_mode = #{productionMode}</if>
+            <if test="picture != null  and picture != ''">and picture = #{picture}</if>
+            <if test="unit != null  and unit != ''">and unit = #{unit}</if>
+            <if test="standards != null  and standards != ''">and standards = #{standards}</if>
+            <if test="stockUpperLimit != null">and stock_upper_limit = #{stockUpperLimit}</if>
+            <if test="stockLowerLimit != null">and stock_lower_limit = #{stockLowerLimit}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="key != null  and key != ''">
+                and ( product_name like concat('%', #{key}, '%')
+                or product_code like concat('%', #{key}, '%') )
+            </if>
+        </where>
+        ORDER BY last_upd_date DESC, id DESC
+    </select>
+
+    <select id="selectMicroProductById" parameterType="Long" resultMap="MicroProductResult">
+        <include refid="selectMicroProductVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectMicroProductByProductSeq" parameterType="java.lang.String" resultMap="MicroProductResult">
+        <include refid="selectMicroProductVo"/>
+        where product_seq = #{productSeq}
+    </select>
+
+    <select id="selectMicroProductByProductCode" parameterType="java.lang.String" resultMap="MicroProductResult">
+        <include refid="selectMicroProductVo"/>
+        where product_code = #{productCode}
+    </select>
+
+    <select id="selectMicroProductByName" resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroProductSelectEntity">
+        select
+        id as itemId,
+        product_name as itemName,
+        product_code as itemCode,
+        product_seq as itemSeq,
+        unit as itemUnit,
+        CAST(product_name as char character set gbk) as sortName
+        from micro_product
+        where 1=1
+        <if test="key != null  and key != ''">
+            and( product_name like concat('%', #{key}, '%')
+            or product_code like concat('%', #{key}, '%')
+            )
+        </if>
+        ORDER BY sortName,
+        last_upd_date DESC
+        <if test="mixed==false">
+            limit 40
+        </if>
+    </select>
+    <select id="selectMicroProductByNameAndTech" resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        SELECT
+        mp.product_name AS itemName,
+        mp.product_code AS itemCode,
+        mp.product_seq AS itemSeq,
+        CAST(mp.product_name as char character set gbk) as sortName
+        FROM
+        micro_product mp
+        INNER JOIN micro_technology mt ON mp.id = mt.product_id AND mp.tenant_code = mt.tenant_code
+        where 1=1
+        <if test="key != null  and key != ''">
+            and( mp.product_name like concat('%', #{key}, '%')
+            or mp.product_code like concat('%', #{key}, '%')
+            )
+        </if>
+        ORDER BY sortName,
+        last_upd_date DESC
+    </select>
+    <select id="selectProductSeqAndCode" resultType="java.lang.String">
+        SELECT product_seq as item
+        FROM micro_product
+        UNION
+        SELECT product_code as item
+        FROM micro_product
+    </select>
+    <select id="selectExistMicroProductList" resultMap="MicroProductResult">
+        <include refid="selectMicroProductVo"/>
+        where
+        (product_code = #{productCode}
+        <if test="id != null  and id != ''">
+            or id = #{id}
+        </if>
+        )
+    </select>
+    <select id="selectTotalProductCount" resultType="java.lang.Long">
+        select count(1)
+        from micro_product
+    </select>
+    <select id="selectMasterProductWarnList" resultMap="MicroProductResult">
+        SELECT mp.id,
+               mp.product_seq,
+               mp.product_code,
+               mp.product_name,
+               mp.product_desc,
+               mp.product_type,
+               mp.production_mode,
+               mp.picture,
+               mp.unit,
+               mp.standards,
+               mp.remark,
+               mu.nick_name AS created_by,
+               mp.created_date
+        FROM micro_product mp
+                 LEFT JOIN micro_user mu ON
+                    mp.tenant_code = mu.tenant_code
+                AND mp.created_by = mu.id
+        WHERE mp.created_type = '0'
+          AND NOT EXISTS (SELECT mws.product_seq
+                          FROM micro_work_submit mws
+                          WHERE mp.product_seq = mws.product_seq
+                            AND mp.tenant_code = mws.tenant_code
+                          UNION
+                          SELECT mps.product_seq
+                          FROM micro_process_storage mps
+                          WHERE mp.product_seq = mps.product_seq
+                            AND mp.tenant_code = mps.tenant_code
+                            AND mps.ng_num != 0
+                            and mps.pass_num != 0
+                          UNION
+                          SELECT mcr.product_seq
+                          FROM micro_complete_report mcr
+                          WHERE mcr.tenant_code = mp.tenant_code
+                            AND mcr.product_seq = mp.product_seq
+                          UNION
+                          SELECT mfps.product_seq
+                          FROM micro_finished_product_storage mfps
+                          WHERE mfps.tenant_code = mp.tenant_code
+                            AND mfps.product_seq = mp.product_seq
+                          UNION
+                          SELECT mmwo.product_seq
+                          FROM micro_manufacture_work_order mmwo
+                          WHERE mmwo.tenant_code = mp.tenant_code
+                            AND mmwo.product_seq = mp.product_seq)
+    </select>
+
+    <select id="selectFilterProductBySeqList" resultType="java.lang.String">
+        SELECT concat_ws(',', product_seq, product_code, product_name) AS joinStr
+        FROM micro_product mp
+        <where>
+            <if test="list != null and list.size() &gt; 0 ">
+                mp.product_seq in
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="selectMicroProductListByItems" resultMap="MicroProductResult">
+        SELECT
+        mp.*
+        FROM
+        micro_product mp
+        <where>
+            <if test="productSeqs != null and productSeqs.size() &gt; 0 ">
+                and mp.product_seq in
+                <foreach collection="productSeqs" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="productCodes != null and productCodes.size() &gt; 0 ">
+                and mp.product_code in
+                <foreach collection="productCodes" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="productIds != null and productIds.size() &gt; 0 ">
+                and mp.id in
+                <foreach collection="productIds" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+
+    </select>
+    <insert id="insertMicroProduct" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProduct" useGeneratedKeys="true"
+            keyProperty="id">
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into micro_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="productCode != null and productCode != ''">product_code,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="productName != null and productName != ''">product_name,</if>
+            <if test="productDesc != null and productDesc != ''">product_desc,</if>
+            <if test="productType != null and productType != ''">product_type,</if>
+            <if test="productionMode != null and productionMode != ''">production_mode,</if>
+            <if test="picture != null">picture,</if>
+            <if test="unit != null and unit != ''">unit,</if>
+            <if test="standards != null and standards != ''">standards,</if>
+            <if test="remark != null">remark,</if>
+            <if test="stockUpperLimit != null">stock_upper_limit,</if>
+            <if test="stockLowerLimit != null">stock_lower_limit,</if>
+            <if test="createdType != null and createdType != ''">created_type,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="productCode != null and productCode != ''">#{productCode},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="productName != null and productName != ''">#{productName},</if>
+            <if test="productDesc != null and productDesc != ''">#{productDesc},</if>
+            <if test="productType != null and productType != ''">#{productType},</if>
+            <if test="productionMode != null and productionMode != ''">#{productionMode},</if>
+            <if test="picture != null">#{picture},</if>
+            <if test="unit != null and unit != ''">#{unit},</if>
+            <if test="standards != null and standards != ''">#{standards},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="stockUpperLimit != null">#{stockUpperLimit},</if>
+            <if test="stockLowerLimit != null">#{stockLowerLimit},</if>
+            <if test="createdType != null and createdType != ''">#{createdType},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertMicroProductBatch">
+        insert into micro_product
+        (tenant_code,
+        product_code,
+        product_seq,
+        product_name,
+        product_desc,
+        product_type,
+        production_mode,
+        picture,
+        unit,
+        standards,
+        remark,
+        stock_upper_limit,
+        stock_lower_limit,
+        created_by,
+        created_date,
+        last_upd_by,
+        last_upd_date) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.tenantCode},
+            #{item.productCode},
+            #{item.productSeq},
+            #{item.productName},
+            #{item.productDesc},
+            #{item.productType},
+            #{item.productionMode},
+            #{item.picture},
+            #{item.unit},
+            #{item.standards},
+            #{item.remark},
+            #{item.stockUpperLimit},
+            #{item.stockLowerLimit},
+            #{item.createdBy},
+            #{item.createdDate},
+            #{item.lastUpdBy},
+            #{item.lastUpdDate})
+        </foreach>
+    </insert>
+
+    <update id="updateMicroProduct" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProduct">
+        update micro_product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            product_code = #{productCode},
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            product_name = #{productName},
+            product_desc = #{productDesc},
+            product_type = #{productType},
+            production_mode = #{productionMode},
+            picture = #{picture},
+            unit = #{unit},
+            <if test="standards != null and standards != ''">standards = #{standards},</if>
+            remark = #{remark},
+            <if test="stockUpperLimit != null">stock_upper_limit = #{stockUpperLimit},</if>
+            <if test="stockLowerLimit != null">stock_lower_limit = #{stockLowerLimit},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroProductById" parameterType="Long">
+        delete
+        from micro_product
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroProductByIds" parameterType="String">
+        delete from micro_product where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

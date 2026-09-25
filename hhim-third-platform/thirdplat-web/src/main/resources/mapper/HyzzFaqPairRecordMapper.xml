@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzFaqPairRecordMapper">
+
+    <resultMap type="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzFaqPairRecordEntity"
+               id="HyzzFaqPairRecordEntityResult">
+        <result property="id" column="id"/>
+        <result property="question" column="question"/>
+        <result property="answer" column="answer"/>
+        <result property="roleCode" column="role_code"/>
+        <result property="weight" column="weight"/>
+        <result property="answerType" column="answer_type"/>
+        <result property="customerSign" column="customer_sign"/>
+        <result property="createdDate" column="created_date"/>
+        <collection property="indexList" select="selectIndexList" column="id"/>
+    </resultMap>
+
+    <sql id="selectHyzzFaqPairRecordEntityVo">
+        select id,
+               question,
+               answer,
+               role_code,
+               weight,
+               answer_type,
+               customer_code,
+               customer_sign,
+               created_date
+        from hyzz_faq_pair_record
+    </sql>
+
+    <select id="selectHyzzFaqPairRecordEntityList"
+            parameterType="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzFaqPairRecordEntity"
+            resultMap="HyzzFaqPairRecordEntityResult">
+        <include refid="selectHyzzFaqPairRecordEntityVo"/>
+        <where>
+            <if test="question != null  and question != ''">and question like concat('%', #{question}, '%')</if>
+            <if test="answer != null  and answer != ''">and answer like concat('%', #{answer}, '%')</if>
+            <if test="roleCode != null  and roleCode != ''">and role_code = #{roleCode}</if>
+            <if test="weight != null ">and weight = #{weight}</if>
+            <if test="answerType != null  and answerType != ''">and answer_type = #{answerType}</if>
+            <if test="customerSign != null ">and customer_sign = #{customerSign}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+        </where>
+    </select>
+
+    <select id="selectIndexList" resultType="java.lang.String">
+        select a.`index`
+        from hyzz_inverse_index a
+        where a.object_id = #{id}
+    </select>
+    <select id="selectHyzzFaqPairRecordEntityById" parameterType="Long" resultMap="HyzzFaqPairRecordEntityResult">
+        <include refid="selectHyzzFaqPairRecordEntityVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectFaqListByRoleAndIndex"
+            resultMap="HyzzFaqPairRecordEntityResult">
+        select * from
+        (
+        SELECT
+        MAX(hfpr.id) as id,
+        hfpr.question as question,
+        MAX(hfpr.answer) as answer,
+        MAX(hfpr.role_code) as role_code,
+        MAX(hfpr.weight) as weight,
+        MAX(hfpr.answer_type) as answer_type,
+        MAX(hfpr.customer_code) as customer_code,
+        MAX(hfpr.customer_sign) as customer_sign,
+        MAX(hfpr.created_date) as created_date
+        FROM
+        hyzz_faq_pair_record hfpr
+        INNER JOIN hyzz_inverse_index hii ON
+        hfpr.id = hii.object_id
+        WHERE hii.index_source = #{entity.indexSource}
+        <if test="entity.indexList != null and entity.indexList.size() &gt; 0 ">
+            and hii.`index` in
+            <foreach collection="entity.indexList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entity.roleCodeList != null and entity.roleCodeList.size() &gt; 0 ">
+            and hfpr.role_code in
+            <foreach collection="entity.roleCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY hfpr.question
+        ) as t
+        ORDER BY t.weight DESC ,t.created_date DESC
+    </select>
+    <select id="filterFaqIndex" resultType="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzInverseIndexEntity">
+        SELECT
+        hii.`index`,
+        MAX(hii.weight) as weight
+        FROM
+        hyzz_faq_pair_record hfpr
+        INNER JOIN hyzz_inverse_index hii ON
+        hfpr.id = hii.object_id
+        WHERE hii.index_source = #{entity.indexSource}
+        <if test="entity.indexList != null and entity.indexList.size() &gt; 0 ">
+            and hii.`index` in
+            <foreach collection="entity.indexList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entity.roleCodeList != null and entity.roleCodeList.size() &gt; 0 ">
+            and hfpr.role_code in
+            <foreach collection="entity.roleCodeList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        group by hii.`index`
+    </select>
+
+    <insert id="insertHyzzFaqPairRecordEntity"
+            parameterType="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzFaqPairRecordEntity"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into hyzz_faq_pair_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="question != null and question != ''">question,</if>
+            <if test="answer != null and answer != ''">answer,</if>
+            <if test="roleCode != null">role_code,</if>
+            <if test="weight != null">weight,</if>
+            <if test="answerType != null and answerType != ''">answer_type,</if>
+            <if test="customerSign != null">customer_sign,</if>
+            <if test="createdDate != null">created_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="question != null and question != ''">#{question},</if>
+            <if test="answer != null and answer != ''">#{answer},</if>
+            <if test="roleCode != null">#{roleCode},</if>
+            <if test="weight != null">#{weight},</if>
+            <if test="answerType != null and answerType != ''">#{answerType},</if>
+            <if test="customerSign != null">#{customerSign},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updateHyzzFaqPairRecordEntity"
+            parameterType="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzFaqPairRecordEntity">
+        update hyzz_faq_pair_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="question != null and question != ''">question = #{question},</if>
+            <if test="answer != null and answer != ''">answer = #{answer},</if>
+            <if test="roleCode != null">role_code = #{roleCode},</if>
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="answerType != null and answerType != ''">answer_type = #{answerType},</if>
+            <if test="customerSign != null">customer_sign = #{customerSign},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteHyzzFaqPairRecordEntityById" parameterType="Long">
+        delete
+        from hyzz_faq_pair_record
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteHyzzFaqPairRecordEntityByIds" parameterType="String">
+        delete from hyzz_faq_pair_record where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

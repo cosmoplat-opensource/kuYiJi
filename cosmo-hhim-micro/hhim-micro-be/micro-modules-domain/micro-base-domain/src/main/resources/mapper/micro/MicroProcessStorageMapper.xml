@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.process.MicroProcessStorageMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorage" id="MicroProcessStorageResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="productId" column="product_id"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productName" column="product_name"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productUnit" column="product_unit"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="processCode" column="process_code"/>
+        <result property="processName" column="process_name"/>
+        <result property="isLastProcess" column="is_last_process"/>
+        <result property="passNum" column="pass_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="isFirstProcess" column="is_first_process"/>
+    </resultMap>
+
+    <sql id="selectMicroProcessStorageVo">
+        select id,
+               tenant_code,
+               product_seq,
+               process_seq,
+               pass_num,
+               ng_num,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_process_storage
+    </sql>
+
+    <select id="selectMicroProcessStorageList" parameterType="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorageDto"
+            resultMap="MicroProcessStorageResult">
+        select s.id,
+        s.tenant_code,
+        s.product_seq,
+        d.product_code,
+        d.product_name,
+        d.unit as product_unit,
+        s.process_seq,
+        p.process_code,
+        p.process_name,
+        s.pass_num,
+        s.ng_num,
+        s.created_by,
+        s.created_date,
+        s.last_upd_by,
+        s.last_upd_date
+        from micro_process_storage s
+        left join micro_process_common p on s.tenant_code = p.tenant_code and s.process_seq = p.process_seq
+        left join micro_product d on s.tenant_code = d.tenant_code and s.product_seq = d.product_seq
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and s.tenant_code = #{tenantCode}</if>
+            <if test="productSeq != null  and productSeq != ''">and s.product_seq = #{productSeq}</if>
+            <if test="processSeq != null  and processSeq != ''">and s.process_seq = #{processSeq}</if>
+            <if test="passNum != null ">and s.pass_num = #{passNum}</if>
+            <if test="ngNum != null ">and s.ng_num = #{ngNum}</if>
+            <if test="createdBy != null  and createdBy != ''">and s.created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and s.created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and s.last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and s.last_upd_date = #{lastUpdDate}</if>
+            <if test="processNameOrCode != null and processNameOrCode != ''">
+                and (
+                p.process_code like concat('%', #{processNameOrCode}, '%')
+                or
+                p.process_name like concat('%', #{processNameOrCode}, '%')
+                )
+            </if>
+        </where>
+        order by s.last_upd_date desc
+    </select>
+
+
+    <select id="selectAllMicroProcessStorageList" resultType="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorageExportModelResult">
+        select d.product_code productCode,
+               d.product_name productName,
+               p.process_code processCode,
+               p.process_name processName,
+               s.pass_num     passNum,
+               s.ng_num       ngNum
+        from micro_process_storage s
+                 left join micro_process_common p on s.tenant_code = p.tenant_code and s.process_seq = p.process_seq
+                 left join micro_product d on s.tenant_code = d.tenant_code and s.product_seq = d.product_seq
+        order by s.last_upd_date desc
+    </select>
+
+    <select id="selectMicroProcessStorageById" parameterType="Long" resultMap="MicroProcessStorageResult">
+        <include refid="selectMicroProcessStorageVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectMicroProcessStorageListBySeq" resultMap="MicroProcessStorageResult">
+        SELECT
+        max( s.id ) AS id,
+        max( s.tenant_code ) AS tenant_code,
+        max( s.product_seq ) AS product_seq,
+        max( d.id) AS product_id,
+        max( d.product_code ) AS product_code,
+        max( d.product_name ) AS product_name,
+        max( d.unit ) AS product_unit,
+        max( s.process_seq ) AS process_seq,
+        max( p.process_code ) AS process_code,
+        max( p.process_name ) AS process_name,
+        IFNULL( MIN( mws.is_last_process ), 1 ) AS is_last_process,
+        IFNULL( MIN( mws.is_first_process ), 1 ) AS is_first_process,
+        max( s.pass_num ) AS pass_num,
+        max( s.ng_num ) AS ng_num,
+        max( s.created_by ) AS created_by,
+        max( s.created_date ) AS created_date,
+        max( s.last_upd_by ) AS last_upd_by,
+        max( s.last_upd_date ) AS last_upd_date
+        FROM
+        micro_process_storage s
+        LEFT JOIN micro_process_common p ON s.tenant_code = p.tenant_code
+        AND s.process_seq = p.process_seq
+        LEFT JOIN micro_work_submit mws ON s.tenant_code = mws.tenant_code
+        AND mws.operate_process_seq = s.process_seq AND mws.product_seq = s.product_seq
+        LEFT JOIN micro_product d ON s.tenant_code = d.tenant_code
+        AND s.product_seq = d.product_seq
+        WHERE 1=1
+        <if test="seqKey != null  and seqKey != ''">
+            and (
+            s.process_seq = #{seqKey}
+            or
+            s.product_seq = #{seqKey}
+            )
+        </if>
+        <if test="productSeq != null  and seqKey != ''">
+           and s.product_seq = #{productSeq}
+        </if>
+        <if test="processSeq != null  and processSeq != ''">
+           and s.process_seq = #{processSeq}
+        </if>
+        GROUP BY
+        s.product_seq,
+        s.process_seq
+        ORDER BY
+        s.last_upd_date DESC
+    </select>
+
+    <select id="selectMicroProcessStorageListByProduct" resultMap="MicroProcessStorageResult">
+        SELECT
+        mps.product_seq,
+        mp.product_name,
+        mp.product_code,
+        ifnull(sum(pass_num),0) as pass_num,
+        ifnull(sum(ng_num), 0) as ng_num,
+        mp.unit as product_unit
+        FROM micro_process_storage mps
+        LEFT JOIN micro_product mp on mps.product_seq = mp.product_seq and mps.tenant_code = mp.tenant_code
+        <where>
+            <choose>
+                <when test="productSeq != null and productSeq != ''">
+                    and mp.product_seq = #{productSeq}
+                </when>
+                <when test="productNameOrCode != null and productNameOrCode != ''">
+                    and (
+                    mp.product_code like concat('%',#{productNameOrCode},'%')
+                    or
+                    mp.product_name like concat('%',#{productNameOrCode},'%')
+                    )
+                </when>
+            </choose>
+
+        </where>
+        GROUP BY product_seq
+        ORDER BY ifnull(sum(pass_num),0) + ifnull(sum(ng_num), 0) desc
+    </select>
+
+    <insert id="insertMicroProcessStorage" parameterType="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorage" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into micro_process_storage
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            tenant_code,
+            product_seq,
+            process_seq,
+            <if test="passNum != null ">pass_num,</if>
+            <if test="ngNum != null ">ng_num,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{tenantCode},
+            #{productSeq},
+            #{processSeq},
+            <if test="passNum != null ">#{passNum},</if>
+            <if test="ngNum != null ">#{ngNum},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+        </trim>
+        ON DUPLICATE KEY UPDATE last_upd_by = #{lastUpdBy} , pass_num = #{passNum} , ng_num = #{ngNum}
+    </insert>
+
+    <insert id="insertMicroProductBatch">
+        insert into micro_process_storage
+        (tenant_code,
+        process_seq,
+        product_seq,
+        pass_num,
+        ng_num,
+        created_by,
+        created_date,
+        last_upd_by,
+        last_upd_date) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.tenantCode},
+            #{item.processSeq},
+            #{item.productSeq},
+            #{item.passNum},
+            #{item.ngNum},
+            #{item.createdBy},
+            #{item.createdDate},
+            #{item.lastUpdBy},
+            #{item.lastUpdDate})
+        </foreach>
+    </insert>
+
+    <update id="updateMicroProcessStorage" parameterType="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorage">
+        update micro_process_storage
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="processSeq != null and processSeq != ''">process_seq = #{processSeq},</if>
+            <if test="passNum != null ">pass_num = #{passNum},</if>
+            <if test="ngNum != null ">ng_num = #{ngNum},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateMicroProcessStorageBatch">
+        update micro_process_storage
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="pass_num =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.passNum != null">
+                        when id=#{item.id} then #{item.passNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="ng_num =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.ngNum != null">
+                        when id=#{item.id} then #{item.ngNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="last_upd_by =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.lastUpdBy != null or lastUpdBy != '' ">
+                        when id=#{item.id} then #{item.lastUpdBy}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="last_upd_date =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.lastUpdDate != null">
+                        when id=#{item.id} then #{item.lastUpdDate}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <delete id="deleteMicroProcessStorageById" parameterType="Long">
+        delete
+        from micro_process_storage
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroProcessStorageByIds" parameterType="String">
+        delete from micro_process_storage where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAllMicroProcessStorage">
+        delete
+        from micro_process_storage
+    </delete>
+    <select id="getProductAndProcessWarningMetrics" resultType="java.util.Map">
+        SELECT concat(mws.product_seq, '_', mws.operate_process_seq)                          AS SEQ_KEY,
+               round(ifnull(sum(mws.pass_num) / (sum(mws.pass_num) + sum(mws.ng_num)), 0), 4) AS PASS_RATE,
+               (sum(mws.pass_num) + sum(mws.ng_num)) / count(DISTINCT mws.submit_day)         AS AVG_PRODUCTION_CAPACITY
+        FROM micro_work_submit mws
+        WHERE mws.submit_status = 0 and mws.submit_type = '1'
+          and mws.submit_day &lt;= DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY)
+        group by mws.product_seq,
+                 mws.operate_process_seq
+    </select>
+    <select id="selectNegativeStockList" resultMap="MicroProcessStorageResult">
+        SELECT mps.id,
+               mps.tenant_code,
+               mps.product_seq,
+               mpc.process_code,
+               mpc.process_name,
+               mps.process_seq,
+               mp.product_code,
+               mp.product_name,
+               mp.unit      as product_unit,
+               mps.pass_num,
+               mps.ng_num,
+               mu.nick_name AS created_by,
+               mps.created_date
+        FROM micro_process_storage mps
+                 LEFT JOIN micro_product mp ON mp.tenant_code = mps.tenant_code AND mps.product_seq = mp.product_seq
+                 LEFT JOIN micro_process_common mpc ON mps.tenant_code = mpc.tenant_code AND mps.process_seq = mpc.process_seq
+                 LEFT JOIN micro_user mu ON mps.tenant_code = mu.tenant_code AND mps.created_by = mu.id
+        WHERE
+        <![CDATA[ mps.pass_num < 0
+        ]]>
+    </select>
+    <select id="selectNgList" resultMap="MicroProcessStorageResult">
+        SELECT mps.id,
+               mps.tenant_code,
+               mps.product_seq,
+               mpc.process_code,
+               mpc.process_name,
+               mps.process_seq,
+               mp.product_code,
+               mp.product_name,
+               mp.unit      as product_unit,
+               mps.pass_num,
+               mps.ng_num,
+               mu.nick_name AS created_by,
+               mps.created_date
+        FROM micro_process_storage mps
+                 LEFT JOIN micro_product mp ON
+                    mp.tenant_code = mps.tenant_code
+                AND mps.product_seq = mp.product_seq
+                 LEFT JOIN micro_process_common mpc ON
+                    mps.tenant_code = mpc.tenant_code
+                AND mps.process_seq = mpc.process_seq
+                 LEFT JOIN micro_user mu ON
+                    mps.tenant_code = mu.tenant_code
+                AND mps.created_by = mu.id
+        WHERE
+    <![CDATA[
+            mps.pass_num > 0
+          AND mps.ng_num > 0
+          AND mps.ng_num * 2 > mps.pass_num
+        ]]>
+    </select>
+
+    <select id="selectStorageByProductAndProcess" resultType="com.cosmo.hhim.micro.base.domain.entity.storage.StorageForProductAndProcess">
+        SELECT concat(mps.product_seq, '_', mps.process_seq) AS seqKey,
+               mps.pass_num                                  as passNum,
+               mps.ng_num                                    as ngNum
+        FROM micro_process_storage mps
+        GROUP BY mps.product_seq,
+                 mps.process_seq
+    </select>
+    <select id="selectStorageHealth" resultType="java.util.Map">
+        SELECT count(m.id)                     AS total,
+               sum(IF(t.id IS NOT NULL, 1, 0)) AS ngNum
+        FROM micro_process_storage m
+                 LEFT JOIN (SELECT id
+                            FROM micro_process_storage mps
+                            WHERE
+          <![CDATA[ mps.pass_num > 0
+                              AND mps.ng_num > 0
+                              AND mps.ng_num * 2 > mps.pass_num ]]>
+         UNION
+                            SELECT id
+                            FROM micro_process_storage mps
+                            WHERE
+         <![CDATA[  mps.pass_num < 0 ]]>
+
+        ) AS t ON m.id = t.id
+    </select>
+    <select id="selectStorageByProductAndProcessList" resultMap="MicroProcessStorageResult">
+        SELECT
+        mps.*
+        FROM
+        micro_process_storage mps
+        <where>
+            <if test="list != null">
+                (mps.product_seq,mps.process_seq) in
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    (#{item.productSeq},#{item.processSeq})
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <update id="updateProcessStorageByProductAndProcess" parameterType="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorage">
+        update
+        micro_process_storage
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="passNum != null ">pass_num = #{passNum},</if>
+            <if test="ngNum != null ">ng_num = #{ngNum},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where
+        product_seq =#{productSeq}
+        and process_seq =#{processSeq}
+    </update>
+
+    <select id="selectProcessStorageByProductAndProcess" resultMap="MicroProcessStorageResult">
+        <include refid="selectMicroProcessStorageVo"/>
+        where product_seq = #{productSeq} and process_seq = #{processSeq}
+    </select>
+    <select id="selectReProductByProductIds"
+            resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        SELECT mp.id as itemId,
+        mp.product_seq as itemSeq,
+        mp.product_code as itemCode,
+        mp.product_name as itemName
+        FROM micro_process_storage mps
+        INNER JOIN micro_product mp
+        ON mps.tenant_code = mp.tenant_code AND mps.product_seq = mp.product_seq
+        WHERE mps.pass_num != 0
+        AND mps.ng_num != 0
+        AND mp.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectReStorageByProductIds" resultType="java.lang.Long">
+        SELECT
+        mps.id
+        FROM
+        micro_process_storage mps
+        JOIN micro_product mp ON
+        mp.tenant_code = mps.tenant_code
+        AND mp.product_seq = mps.product_seq
+        WHERE mp.id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND mps.pass_num = 0
+        AND mps.ng_num = 0
+    </select>
+    <select id="selectReStorageHistByProductIds" resultType="java.lang.Long">
+        SELECT
+        mpsh.id
+        FROM
+        micro_process_storage_history mpsh
+        JOIN micro_product mp ON
+        mp.tenant_code = mpsh.tenant_code
+        AND mp.product_seq = mpsh.product_seq
+        WHERE mp.id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectReProcessByProcessIds"
+            resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        select
+        mpc.process_seq as itemSeq,
+        mpc.process_name as itemName,
+        mpc.process_code as itemCode,
+        mpc.id as itemId
+        from micro_process_storage mps
+        inner join micro_process_common mpc on mpc.tenant_code = mps.tenant_code and mpc.process_seq =mps.process_seq
+        where
+        mps.pass_num != 0
+        AND mps.ng_num != 0
+        AND mpc.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectReStorageByProcessIds" resultType="java.lang.Long">
+        SELECT
+        mps.id
+        FROM
+        micro_process_common mpc
+        JOIN micro_process_storage mps ON mpc.tenant_code = mps.tenant_code
+        AND mpc.process_seq = mps.process_seq
+        AND mps.pass_num = 0
+        AND mps.ng_num = 0
+        WHERE
+        mpc.id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectReStorageHistByProcessIds" resultType="java.lang.Long">
+        SELECT
+        mpsh.id
+        FROM
+        micro_process_common mpc
+        JOIN micro_process_storage_history mpsh ON mpc.tenant_code = mpsh.tenant_code
+        AND mpc.process_seq = mpsh.process_seq
+        WHERE
+        mpc.id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

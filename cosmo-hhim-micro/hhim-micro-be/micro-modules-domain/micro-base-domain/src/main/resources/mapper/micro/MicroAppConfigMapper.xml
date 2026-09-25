@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroAppConfigMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroAppConfig" id="MicroAppConfigResult">
+        <result property="id"                  column="id"/>
+        <result property="appCode"             column="app_code"/>
+        <result property="appSign"             column="app_sign"/>
+        <result property="customerProductType"  column="customer_product_type"/>
+        <result property="configJson"          column="config_json"/>
+        <result property="status"              column="status"/>
+        <result property="createdAt"           column="created_at"/>
+        <result property="updatedAt"           column="updated_at"/>
+    </resultMap>
+
+    <sql id="selectMicroAppConfigVo">
+        select id, app_code, app_sign, customer_product_type, config_json, status, created_at, updated_at
+        from micro_app_config
+    </sql>
+
+    <select id="selectByAppCode" resultMap="MicroAppConfigResult">
+        <include refid="selectMicroAppConfigVo"/>
+        where app_code = #{appCode} and status = 1
+        limit 1
+    </select>
+
+    <select id="selectList" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroAppConfig" resultMap="MicroAppConfigResult">
+        <include refid="selectMicroAppConfigVo"/>
+        <where>
+            <if test="appCode != null and appCode != ''">and app_code = #{appCode}</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroAppConfig">
+        insert into micro_app_config (app_code, app_sign, customer_product_type, config_json, status, created_at, updated_at)
+        values (#{appCode}, #{appSign}, #{customerProductType}, #{configJson}, #{status}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateById" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroAppConfig">
+        update micro_app_config
+        <set>
+            <if test="appSign != null">app_sign = #{appSign},</if>
+            <if test="customerProductType != null">customer_product_type = #{customerProductType},</if>
+            <if test="configJson != null">config_json = #{configJson},</if>
+            <if test="status != null">status = #{status},</if>
+            updated_at = #{updatedAt}
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

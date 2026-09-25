@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.task.AsyncImportExportTaskMapper">
+    
+    <resultMap type="AsyncImportExportTask" id="AsyncImportExportTaskResult">
+        <result property="taskId"    column="task_id"    />
+        <result property="taskName"    column="task_name"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="userName"    column="user_name"    />
+        <result property="reqParam"    column="req_param"   />
+        <result property="taskStatus"    column="task_status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="dealTime"    column="deal_time"    />
+        <result property="finishTime"    column="finish_time"    />
+        <result property="url"    column="url"    />
+        <result property="taskCode"    column="task_code"    />
+        <result property="taskType"    column="task_type"    />
+        <result property="mqKeys"    column="mq_keys"    />
+        <result property="sysCode"    column="sys_code"    />
+        <result property="msg"    column="msg"    />
+        <result property="exceptionMsg"    column="exception_msg"    />
+        <result property="successData"    column="success_data"    />
+    </resultMap>
+
+    <sql id="selectAsyncImportExportTaskVo">
+        select task_id, task_name, tenant_code, user_name, req_param, task_status, create_time, deal_time, finish_time, url,
+               task_code, task_type,mq_keys,sys_code,exception_msg,msg,success_data from async_import_export_task
+    </sql>
+
+    <update id="updateAsyncImportExportTask" >
+        update async_import_export_task
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="taskName != null">task_name = #{taskName},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="reqParam != null">req_param = #{reqParam},</if>
+            task_status = #{taskStatus},
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="dealTime != null">deal_time = #{dealTime},</if>
+            <if test="finishTime != null">finish_time = #{finishTime},</if>
+            <if test="url != null">url = #{url},</if>
+            <if test="taskType != null">task_type = #{taskType},</if>
+            <if test="mqKeys != null">mq_keys = #{mqKeys},</if>
+            <if test="sysCode != null">sys_code = #{sysCode},</if>
+            <if test="msg != null">msg = #{msg},</if>
+            <if test="exceptionMsg != null">exception_msg = #{exceptionMsg},</if>
+            <if test="successData != null">success_data = #{successData},</if>
+        </trim>
+            where task_status in (0, 1, 2, 3) and task_code = #{taskCode}
+    </update>
+
+</mapper>

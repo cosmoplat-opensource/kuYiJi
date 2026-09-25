@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.bom.MicroProductBomImportedTempMapper">
+    
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.bom.MicroProductBomImportedTemp" id="MicroProductBomImportedTempResult">
+        <result property="id"    column="id"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="productName"    column="product_name"    />
+        <result property="hierarchy"    column="hierarchy"    />
+        <result property="componentQuantity"    column="component_quantity"    />
+        <result property="remark"    column="remark"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+    </resultMap>
+
+    <sql id="selectMicroProductBomImportedTempVo">
+        select id, product_code, product_name, hierarchy, component_quantity, remark, created_by, created_date, last_upd_by, last_upd_date from micro_product_bom_imported_temp
+    </sql>
+
+    <select id="selectMicroProductBomImportedTempList" parameterType="com.cosmo.hhim.micro.base.domain.entity.bom.MicroProductBomImportedTemp" resultMap="MicroProductBomImportedTempResult">
+        <include refid="selectMicroProductBomImportedTempVo"/>
+        <where>  
+            <if test="productCode != null  and productCode != ''"> and product_code = #{productCode}</if>
+            <if test="productName != null  and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
+            <if test="hierarchy != null "> and hierarchy = #{hierarchy}</if>
+            <if test="componentQuantity != null "> and component_quantity = #{componentQuantity}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and last_upd_date = #{lastUpdDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectMicroProductBomImportedTempById" parameterType="Long" resultMap="MicroProductBomImportedTempResult">
+        <include refid="selectMicroProductBomImportedTempVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMicroProductBomImportedTemp" parameterType="com.cosmo.hhim.micro.base.domain.entity.bom.MicroProductBomImportedTemp" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_product_bom_imported_temp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productCode != null and productCode != ''">product_code,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="hierarchy != null">hierarchy,</if>
+            <if test="componentQuantity != null">component_quantity,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productCode != null and productCode != ''">#{productCode},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="hierarchy != null">#{hierarchy},</if>
+            <if test="componentQuantity != null">#{componentQuantity},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroProductBomImportedTemp" parameterType="com.cosmo.hhim.micro.base.domain.entity.bom.MicroProductBomImportedTemp">
+        update micro_product_bom_imported_temp
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productCode != null and productCode != ''">product_code = #{productCode},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="hierarchy != null">hierarchy = #{hierarchy},</if>
+            <if test="componentQuantity != null">component_quantity = #{componentQuantity},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroProductBomImportedTempById" parameterType="Long">
+        delete from micro_product_bom_imported_temp where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroProductBomImportedTempByIds" parameterType="String">
+        delete from micro_product_bom_imported_temp where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

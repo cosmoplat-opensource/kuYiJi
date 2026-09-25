@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.integration.domain.mapper.MicroUserEventTrackingMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.integration.domain.entity.MicroUserEventTrackingEntity"
+               id="MicroUserEventTrackingResult">
+        <result property="id" column="id"/>
+        <result property="eventCode" column="event_code"/>
+        <result property="eventName" column="event_name"/>
+        <result property="eventType" column="event_type"/>
+        <result property="eventContent" column="event_content"/>
+        <result property="duration" column="duration"/>
+        <result property="weight" column="weight"/>
+        <result property="userType" column="user_type"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="tenantName" column="tenant_name"/>
+        <result property="eventSource" column="event_source"/>
+        <result property="phonenumber" column="phonenumber"/>
+        <result property="userIp" column="user_ip"/>
+        <result property="userLocation" column="user_location"/>
+        <result property="userAgent" column="user_agent"/>
+        <result property="currentPage" column="current_page"/>
+        <result property="referPage" column="refer_page"/>
+        <result property="createdDay" column="created_day"/>
+        <result property="createdMonth" column="created_month"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="applicationSign" column="application_sign"/>
+    </resultMap>
+
+    <sql id="selectMicroUserEventTrackingVo">
+        select id,
+               event_code,
+               event_name,
+               event_type,
+               event_content,
+               duration,
+               weight,
+               user_type,
+               tenant_code,
+               tenant_name,
+               event_source,
+               phonenumber,
+               user_ip,
+               user_location,
+               user_agent,
+               current_page,
+               refer_page,
+               created_day,
+               created_month,
+               created_date,
+               application_sign
+        from micro_user_event_tracking
+    </sql>
+
+    <select id="selectMicroUserEventTrackingList"
+            parameterType="com.cosmo.hhim.micro.integration.domain.entity.MicroUserEventTrackingEntity"
+            resultMap="MicroUserEventTrackingResult">
+        <include refid="selectMicroUserEventTrackingVo"/>
+        <where>
+            <if test="eventCode != null  and eventCode != ''">and event_code = #{eventCode}</if>
+            <if test="eventName != null  and eventName != ''">and event_name like concat('%', #{eventName}, '%')</if>
+            <if test="eventType != null  and eventType != ''">and event_type = #{eventType}</if>
+            <if test="eventContent != null  and eventContent != ''">and event_content = #{eventContent}</if>
+            <if test="duration != null ">and duration = #{duration}</if>
+            <if test="weight != null ">and weight = #{weight}</if>
+            <if test="userType != null  and userType != ''">and user_type = #{userType}</if>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="tenantName != null  and tenantName != ''">and tenant_name like concat('%', #{tenantName}, '%')
+            </if>
+            <if test="eventSource != null  and eventSource != ''">and event_source = #{eventSource}</if>
+            <if test="phonenumber != null">and phonenumber = #{phonenumber}</if>
+            <if test="userIp != null  and userIp != ''">and user_ip = #{userIp}</if>
+            <if test="userLocation != null  and userLocation != ''">and user_location = #{userLocation}</if>
+            <if test="userAgent != null  and userAgent != ''">and user_agent = #{userAgent}</if>
+            <if test="currentPage != null  and currentPage != ''">and current_page = #{currentPage}</if>
+            <if test="referPage != null  and referPage != ''">and refer_page = #{referPage}</if>
+            <if test="createdDay != null ">and created_day = #{createdDay}</if>
+            <if test="createdMonth != null ">and created_month = #{createdMonth}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="applicationSign != null  and applicationSign != ''">and application_sign = #{applicationSign}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroUserEventTrackingById" parameterType="Long" resultMap="MicroUserEventTrackingResult">
+        <include refid="selectMicroUserEventTrackingVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectUsingTimesByRefCondition"
+            resultMap="MicroUserEventTrackingResult">
+        SELECT
+        muet.*
+        FROM micro_user_event_tracking muet
+        INNER JOIN micro_user mu
+        ON muet.tenant_code = mu.tenant_code AND muet.phonenumber=mu.phonenumber AND mu.id = #{entity.userId}
+        <where>
+            <if test="entity.conditionEntity.eventType != null  and entity.conditionEntity.eventType != ''">
+                AND muet.event_type = #{entity.conditionEntity.eventType}
+            </if>
+            <if test="entity.conditionEntity.eventSource != null  and entity.conditionEntity.eventSource != ''">
+                AND muet.event_source = #{entity.conditionEntity.eventSource}
+            </if>
+            <if test="entity.conditionEntity.createdDay != null ">
+                and muet.created_day > #{entity.conditionEntity.createdDay}
+            </if>
+            <if test="entity.pageList != null and entity.pageList.size() &gt; 0 ">
+                AND muet.refer_page IN
+                <foreach collection="entity.pageList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="selectUsingTimesByCurrentCondition"
+            resultMap="MicroUserEventTrackingResult">
+        SELECT
+        muet.*
+        FROM micro_user_event_tracking muet
+        INNER JOIN micro_user mu
+        ON muet.tenant_code = mu.tenant_code AND muet.phonenumber=mu.phonenumber AND mu.id = #{entity.userId}
+        <where>
+            <if test="entity.conditionEntity.eventType != null  and entity.conditionEntity.eventType != ''">
+                AND muet.event_type = #{entity.conditionEntity.eventType}
+            </if>
+            <if test="entity.conditionEntity.eventSource != null  and entity.conditionEntity.eventSource != ''">
+                AND muet.event_source = #{entity.conditionEntity.eventSource}
+            </if>
+            <if test="entity.conditionEntity.createdDay != null ">
+                and muet.created_day > #{entity.conditionEntity.createdDay}
+            </if>
+            <if test="entity.pageList != null and entity.pageList.size() &gt; 0 ">
+                AND muet.current_page IN
+                <foreach collection="entity.pageList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="selectTrackingListByConditionList"
+            resultMap="MicroUserEventTrackingResult">
+        SELECT
+        muet.*
+        FROM micro_user_event_tracking muet
+        INNER JOIN micro_user mu
+        ON muet.tenant_code = mu.tenant_code AND muet.phonenumber=mu.phonenumber AND mu.id = #{entity.userId}
+        <where>
+            <if test="entity.conditionEntity.eventType != null  and entity.conditionEntity.eventType != ''">
+                AND muet.event_type = #{entity.conditionEntity.eventType}
+            </if>
+            <if test="entity.conditionEntity.applicationSign != null   and entity.conditionEntity.applicationSign != '' ">
+                AND muet.application_sign = #{entity.conditionEntity.applicationSign}
+            </if>
+            <if test="entity.eventCodeList != null and entity.eventCodeList.size() &gt; 0 ">
+                AND muet.event_code IN
+                <foreach collection="entity.eventCodeList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="entity.eventContentList != null and entity.eventContentList.size() &gt; 0 ">
+                AND muet.event_content IN
+                <foreach collection="entity.eventContentList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="entity.conditionEntity.createdDay != null ">
+                AND muet.created_date > #{entity.conditionEntity.createdDate}
+            </if>
+        </where>
+        ORDER BY muet.id
+    </select>
+
+    <insert id="insertMicroUserEventTracking"
+            parameterType="com.cosmo.hhim.micro.integration.domain.entity.MicroUserEventTrackingEntity"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into micro_user_event_tracking
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="eventCode != null and eventCode != ''">event_code,</if>
+            <if test="eventName != null and eventName != ''">event_name,</if>
+            <if test="eventType != null and eventType != ''">event_type,</if>
+            <if test="eventContent != null">event_content,</if>
+            <if test="duration != null">duration,</if>
+            <if test="weight != null">weight,</if>
+            <if test="userType != null and userType != ''">user_type,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="tenantName != null">tenant_name,</if>
+            <if test="eventSource != null and eventSource != ''">event_source,</if>
+            <if test="phonenumber != null">phonenumber,</if>
+            <if test="userIp != null and userIp != ''">user_ip,</if>
+            <if test="userLocation != null and userLocation != ''">user_location,</if>
+            <if test="userAgent != null and userAgent != ''">user_agent,</if>
+            <if test="currentPage != null">current_page,</if>
+            <if test="referPage != null">refer_page,</if>
+            <if test="createdDay != null">created_day,</if>
+            <if test="createdMonth != null">created_month,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="applicationSign != null and applicationSign != ''">application_sign,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="eventCode != null and eventCode != ''">#{eventCode},</if>
+            <if test="eventName != null and eventName != ''">#{eventName},</if>
+            <if test="eventType != null and eventType != ''">#{eventType},</if>
+            <if test="eventContent != null">#{eventContent},</if>
+            <if test="duration != null">#{duration},</if>
+            <if test="weight != null">#{weight},</if>
+            <if test="userType != null and userType != ''">#{userType},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="tenantName != null">#{tenantName},</if>
+            <if test="eventSource != null and eventSource != ''">#{eventSource},</if>
+            <if test="phonenumber != null">#{phonenumber},</if>
+            <if test="userIp != null and userIp != ''">#{userIp},</if>
+            <if test="userLocation != null and userLocation != ''">#{userLocation},</if>
+            <if test="userAgent != null and userAgent != ''">#{userAgent},</if>
+            <if test="currentPage != null">#{currentPage},</if>
+            <if test="referPage != null">#{referPage},</if>
+            <if test="createdDay != null">#{createdDay},</if>
+            <if test="createdMonth != null">#{createdMonth},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="applicationSign != null and applicationSign != ''">#{applicationSign},</if>
+        </trim>
+    </insert>
+    <insert id="insertMicroUserEventTrackingBatch">
+        INSERT INTO micro_user_event_tracking
+        (event_code,
+        event_name,
+        event_type,
+        event_content,
+        event_source,
+        duration,
+        weight,
+        user_type,
+        tenant_code,
+        tenant_name,
+        phonenumber,
+        user_ip,
+        user_location,
+        user_agent,
+        current_page,
+        refer_page,
+        created_day,
+        created_month,
+        application_sign) VALUES
+        <foreach collection="list" separator="," item="item">
+            (#{item.eventCode},
+            #{item.eventName},
+            #{item.eventType},
+            #{item.eventContent},
+            #{item.eventSource},
+            #{item.duration},
+            #{item.weight},
+            #{item.userType},
+            #{item.tenantCode},
+            #{item.tenantName},
+            #{item.phonenumber},
+            #{item.userIp},
+            #{item.userLocation},
+            #{item.userAgent},
+            #{item.currentPage},
+            #{item.referPage},
+            #{item.createdDay},
+            #{item.createdMonth},
+            #{item.applicationSign})
+        </foreach>
+
+    </insert>
+
+    <update id="updateMicroUserEventTracking"
+            parameterType="com.cosmo.hhim.micro.integration.domain.entity.MicroUserEventTrackingEntity">
+        update micro_user_event_tracking
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="eventCode != null and eventCode != ''">event_code = #{eventCode},</if>
+            <if test="eventName != null and eventName != ''">event_name = #{eventName},</if>
+            <if test="eventType != null and eventType != ''">event_type = #{eventType},</if>
+            <if test="eventContent != null">event_content = #{eventContent},</if>
+            <if test="duration != null">duration = #{duration},</if>
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="userType != null and userType != ''">user_type = #{userType},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="tenantName != null">tenant_name = #{tenantName},</if>
+            <if test="eventSource != null and eventSource != ''">event_source = #{eventSource},</if>
+            <if test="phonenumber != null">phonenumber = #{phonenumber},</if>
+            <if test="userIp != null  and userIp != ''">user_ip = #{userIp},</if>
+            <if test="userLocation != null  and userLocation != ''">user_location = #{userLocation},</if>
+            <if test="userAgent != null  and userAgent != ''">user_agent = #{userAgent},</if>
+            <if test="currentPage != null">current_page = #{currentPage},</if>
+            <if test="referPage != null">refer_page = #{referPage},</if>
+            <if test="createdDay != null">created_day = #{createdDay},</if>
+            <if test="createdMonth != null">created_month = #{createdMonth},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="applicationSign != null and applicationSign != ''">application_sign = #{applicationSign},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroUserEventTrackingById" parameterType="Long">
+        delete
+        from micro_user_event_tracking
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroUserEventTrackingByIds" parameterType="String">
+        delete from micro_user_event_tracking where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

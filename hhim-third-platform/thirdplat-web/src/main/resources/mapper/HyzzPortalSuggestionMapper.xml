@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzPortalSuggestionMapper">
+
+    <resultMap type="HyzzPortalSuggestion" id="HyzzPortalSuggestionResult">
+        <result property="id"    column="id"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="type"    column="type"    />
+        <result property="status"    column="status"    />
+        <result property="content"    column="content"    />
+        <result property="dealWay"    column="deal_way"    />
+        <result property="dealResult"    column="deal_result"    />
+        <result property="dealTime"    column="deal_time"    />
+        <result property="finishBy"    column="finish_by"    />
+        <result property="finishTime"    column="finish_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="contactPhone"    column="contact_phone"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createByName"    column="create_by_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="tenantName"    column="tenant_name"    />
+        <result property="sourcePlat"    column="source_plat"    />
+        <result property="autoDeal" column="auto_deal"/>
+    </resultMap>
+
+    <resultMap type="HyzzPortalSuggestion" id="HyzzPortalSuggestionFileResult">
+        <result property="id"    column="id"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="type"    column="type"    />
+        <result property="status"    column="status"    />
+        <result property="content"    column="content"    />
+        <result property="dealWay"    column="deal_way"    />
+        <result property="dealResult"    column="deal_result"    />
+        <result property="dealTime"    column="deal_time"    />
+        <result property="finishBy"    column="finish_by"    />
+        <result property="finishTime"    column="finish_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="contactPhone"    column="contact_phone"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createByName"    column="create_by_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="tenantName"    column="tenant_name"    />
+        <result property="sourcePlat"    column="source_plat"    />
+        <result property="sourcePlat"    column="source_plat"    />
+        <result property="autoDeal" column="auto_deal"/>
+        <collection property="hyzzFiles" select="getHyzzFilesById" column="id"/>
+    </resultMap>
+
+    <sql id="selectHyzzPortalSuggestionVo">
+        select id, order_no, type, status, content, deal_way, deal_result, deal_time, finish_by, finish_time, remark, contact_phone, active_flag, create_by, create_by_name, create_time, update_by, update_time, tenant_code, tenant_name, source_plat from hyzz_portal_suggestion
+    </sql>
+
+    <select id="getHyzzFilesById" resultType="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzFiles">
+        select
+               file_table_name as fileTableName,
+               file_table_id as fileTableId,
+               file_name as fileName,
+               file_path as filePath,
+               file_type as fileType,
+               file_size as fileSize
+        from hyzz_files
+        where file_table_name='hyzz_portal_suggestion' and file_table_id=#{id}
+    </select>
+
+    <select id="selectHyzzPortalSuggestionList" parameterType="HyzzPortalSuggestion" resultMap="HyzzPortalSuggestionFileResult">
+        <include refid="selectHyzzPortalSuggestionVo"/>
+        <where>
+            <if test="orderNo != null  and orderNo != ''"> and order_no = #{orderNo}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="dealWay != null  and dealWay != ''"> and deal_way = #{dealWay}</if>
+            <if test="dealResult != null  and dealResult != ''">and deal_result = #{dealResult}</if>
+            <if test="dealTime != null ">and deal_time = #{dealTime}</if>
+            <if test="finishBy != null  and finishBy != ''">and finish_by = #{finishBy}</if>
+            <if test="finishTime != null ">and finish_time = #{finishTime}</if>
+            <if test="contactPhone != null  and contactPhone != ''">and contact_phone = #{contactPhone}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and active_flag = #{activeFlag}</if>
+            <if test="createBy != null  and createBy != ''">and create_by = #{createBy}</if>
+            <if test="createByName != null  and createByName != ''">and create_by_name like concat('%', #{createByName},
+                '%')
+            </if>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="tenantName != null  and tenantName != ''">and tenant_name like concat('%', #{tenantName}, '%')
+            </if>
+            <if test="sourcePlat != null  and sourcePlat != ''">and source_plat = #{sourcePlat}</if>
+            <if test="autoDeal != null ">and auto_deal = #{autoDeal}</if>
+        </where>
+        order by create_time desc, id desc
+    </select>
+
+    <select id="selectHyzzPortalSuggestionById" parameterType="Long" resultMap="HyzzPortalSuggestionResult">
+        <include refid="selectHyzzPortalSuggestionVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectQAList" resultType="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzFaqHistoryEntity">
+        SELECT
+            t.*
+        FROM
+            (
+                SELECT
+                hps.id,
+                hps.content AS question,
+                '' AS answer,
+                hps.create_time AS sortDate,
+                '' AS refId
+            FROM
+                hyzz_portal_suggestion hps
+            <where>
+                <if test="createBy != null  and createBy != ''">and create_by = #{createBy}</if>
+                <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+                <if test="sourcePlat != null  and sourcePlat != ''">and source_plat = #{sourcePlat}</if>
+            </where>
+        UNION
+            SELECT
+                '' AS id,
+                hps.content AS question,
+                hps.deal_result AS answer,
+                hps.finish_time AS sortDate,
+                hps.id AS refId
+            FROM
+                hyzz_portal_suggestion hps
+            WHERE hps.status = '30'
+                <if test="createBy != null  and createBy != ''">and create_by = #{createBy}</if>
+                <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+                <if test="sourcePlat != null  and sourcePlat != ''">and source_plat = #{sourcePlat}</if>
+            ) AS t
+        ORDER BY
+            t.sortDate DESC
+    </select>
+
+    <insert id="insertHyzzPortalSuggestion" parameterType="HyzzPortalSuggestion" useGeneratedKeys="true" keyProperty="id">
+        insert into hyzz_portal_suggestion
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null">order_no,</if>
+            <if test="type != null and type != ''">type,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="content != null">content,</if>
+            <if test="dealWay != null">deal_way,</if>
+            <if test="dealResult != null">deal_result,</if>
+            <if test="dealTime != null">deal_time,</if>
+            <if test="finishBy != null">finish_by,</if>
+            <if test="finishTime != null">finish_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="contactPhone != null">contact_phone,</if>
+            <if test="activeFlag != null and activeFlag != ''">active_flag,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createByName != null">create_by_name,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="tenantName != null and tenantName != ''">tenant_name,</if>
+            <if test="sourcePlat != null and sourcePlat != ''">source_plat,</if>
+            <if test="autoDeal != null and autoDeal != ''">auto_deal,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderNo != null">#{orderNo},</if>
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="content != null">#{content},</if>
+            <if test="dealWay != null">#{dealWay},</if>
+            <if test="dealResult != null">#{dealResult},</if>
+            <if test="dealTime != null">#{dealTime},</if>
+            <if test="finishBy != null">#{finishBy},</if>
+            <if test="finishTime != null">#{finishTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="contactPhone != null">#{contactPhone},</if>
+            <if test="activeFlag != null and activeFlag != ''">#{activeFlag},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createByName != null">#{createByName},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="tenantName != null and tenantName != ''">#{tenantName},</if>
+            <if test="sourcePlat != null and sourcePlat != ''">#{sourcePlat},</if>
+            <if test="autoDeal != null and autoDeal != ''">#{autoDeal},</if>
+         </trim>
+    </insert>
+
+
+    <update id="updateHyzzPortalSuggestion" parameterType="HyzzPortalSuggestion">
+        update hyzz_portal_suggestion
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderNo != null">order_no = #{orderNo},</if>
+            <if test="type != null and type != ''">type = #{type},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="dealWay != null">deal_way = #{dealWay},</if>
+            <if test="dealResult != null">deal_result = #{dealResult},</if>
+            <if test="dealTime != null">deal_time = #{dealTime},</if>
+            <if test="finishBy != null">finish_by = #{finishBy},</if>
+            <if test="finishTime != null">finish_time = #{finishTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if test="activeFlag != null and activeFlag != ''">active_flag = #{activeFlag},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createByName != null">create_by_name = #{createByName},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="tenantName != null and tenantName != ''">tenant_name = #{tenantName},</if>
+            <if test="sourcePlat != null and sourcePlat != ''">source_plat = #{sourcePlat},</if>
+            <if test="autoDeal != null and autoDeal != ''">auto_deal = #{autoDeal},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteHyzzPortalSuggestionById" parameterType="Long">
+        delete from hyzz_portal_suggestion where id = #{id}
+    </delete>
+
+    <delete id="deleteHyzzPortalSuggestionByIds" parameterType="String">
+        delete from hyzz_portal_suggestion where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

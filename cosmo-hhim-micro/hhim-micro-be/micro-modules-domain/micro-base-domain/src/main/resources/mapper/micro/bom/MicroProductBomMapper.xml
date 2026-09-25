@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.bom.MicroProductBomMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.bom.MicroProductBom" id="MicroProductBomResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productType" column="product_type"/>
+        <result property="productionMode" column="production_mode"/>
+        <result property="productNumber" column="product_number"/>
+        <result property="parentProductSeq" column="parent_product_seq"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="ifChildren" column="if_children"/>
+        <result property="bomType" column="bom_type"/>
+        <result property="remark" column="remark"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="techCode" column="tech_code"/>
+        <result property="techName" column="tech_name"/>
+        <result property="techType" column="tech_type"/>
+        <result property="unit" column="unit"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productName"    column="product_name"    />
+        <result property="sonNum"    column="son_num"    />
+
+    </resultMap>
+
+    <sql id="selectMicroProductBomVo">
+        select mpb.id,
+               mpb.tenant_code,
+               mpb.product_seq,
+               mpb.product_type,
+               mpb.production_mode,
+               mpb.product_number,
+               mpb.parent_product_seq,
+               mpb.parent_id,
+               mpb.if_children,
+               mpb.bom_type,
+               mpb.remark,
+               mpb.created_by,
+               mpb.created_date,
+               mpb.last_upd_by,
+               mpb.last_upd_date,
+               mpb.active_flag,
+               mp.unit,
+               mp.product_name,
+               mp.product_code
+        from micro_product_bom mpb
+        left join micro_product mp on mp.product_seq=mpb.product_seq
+    </sql>
+
+    <sql id="selectMicroProductBomVoFirst">
+        select mpb.id,
+               mpb.tenant_code,
+               mpb.product_seq,
+               mpb.product_type,
+               mpb.production_mode,
+               (mpb.product_number * #{productNumber}) as product_number,
+               mpb.parent_product_seq,
+               mpb.parent_id,
+               mpb.if_children,
+               mpb.bom_type,
+               mpb.remark,
+               mpb.created_by,
+               mpb.created_date,
+               mpb.last_upd_by,
+               mpb.last_upd_date,
+               mpb.active_flag,
+               mt.tech_code,
+               mt.tech_name,
+               mt.tech_type,
+               mp.unit,
+               mp.product_name,
+               mp.product_code
+        from micro_product_bom mpb
+        left join micro_technology mt on mt.product_seq=mpb.product_seq
+        left join micro_product mp on mp.product_seq=mpb.product_seq
+    </sql>
+
+    <sql id="selectMicroProductBomVoSecond">
+        select mpb.id,
+               mpb.tenant_code,
+               mpb.product_seq,
+               mpb.product_type,
+               mpb.production_mode,
+               mpb.product_number as product_number,
+               mpb.parent_product_seq,
+               mpb.parent_id,
+               mpb.if_children,
+               mpb.bom_type,
+               mpb.remark,
+               mpb.created_by,
+               mpb.created_date,
+               mpb.last_upd_by,
+               mpb.last_upd_date,
+               mpb.active_flag,
+               mp.product_name,
+               mp.product_code,
+               mp.unit
+        from micro_product_bom mpb
+                 left join micro_product mp on mp.product_seq = mpb.product_seq
+    </sql>
+
+    <select id="selectMicroProductBomList" parameterType="com.cosmo.hhim.micro.base.domain.entity.bom.MicroProductBom"
+            resultMap="MicroProductBomResult">
+        <include refid="selectMicroProductBomVoSecond"/>
+        <where>
+            <if test="productSeq != null  and productSeq != ''">and mpb.product_seq = #{productSeq}</if>
+            <if test="productName != null  and productName != ''">
+                and (mp.product_name like concat('%', #{productName}, '%')
+                OR mp.product_code like concat('%', #{productName}, '%')
+                )
+            </if>
+            <if test="productType != null  and productType != ''">and mpb.product_type = #{productType}</if>
+            <if test="productionMode != null  and productionMode != ''">and mpb.production_mode = #{productionMode}</if>
+            <if test="productNumber != null ">and mpb.product_number = #{productNumber}</if>
+            <if test="parentProductSeq != null  and parentProductSeq != ''">and mpb.parent_product_seq = #{parentProductSeq}</if>
+            <if test="parentId != null ">and mpb.parent_id = #{parentId}</if>
+            <if test="ifChildren != null  and ifChildren != ''">and mpb.if_children = #{ifChildren}</if>
+            <if test="bomType != null  and bomType != ''">and mpb.bom_type = #{bomType}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and mpb.active_flag = #{activeFlag}</if>
+        </where>
+        order by mpb.created_date desc
+    </select>
+
+    <select id="selectMicroProductBomById" parameterType="Long" resultMap="MicroProductBomResult">
+        <include refid="selectMicroProductBomVo"/>
+        where mpb.id = #{id}
+    </select>
+
+    <insert id="insertMicroProductBom" parameterType="com.cosmo.hhim.micro.base.domain.entity.bom.MicroProductBom" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into micro_product_bom
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="productType != null and productType != ''">product_type,</if>
+            <if test="productionMode != null">production_mode,</if>
+            <if test="productNumber != null">product_number,</if>
+            <if test="parentProductSeq != null">parent_product_seq,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="ifChildren != null">if_children,</if>
+            <if test="bomType != null">bom_type,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="activeFlag != null">active_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="productType != null and productType != ''">#{productType},</if>
+            <if test="productionMode != null">#{productionMode},</if>
+            <if test="productNumber != null">#{productNumber},</if>
+            <if test="parentProductSeq != null">#{parentProductSeq},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="ifChildren != null">#{ifChildren},</if>
+            <if test="bomType != null">#{bomType},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+         </trim>
+    </insert>
+
+    <insert id ="insertMicroProductBomList" parameterType="java.util.List" >
+        insert into micro_product_bom (
+            tenant_code,
+            product_seq,
+            product_type,
+            production_mode,
+            product_number,
+            parent_product_seq,
+            parent_id,
+            if_children,
+            bom_type,
+            remark,
+            created_by,
+            created_date,
+            active_flag,
+            last_upd_by,
+            last_upd_date
+        )
+        values
+        <foreach collection ="list" item="bom" index= "index" separator =",">
+            (
+            #{bom.tenantCode},
+            #{bom.productSeq},
+            #{bom.productType},
+            #{bom.productionMode},
+            #{bom.productNumber},
+            #{bom.parentProductSeq},
+            #{bom.parentId},
+            #{bom.ifChildren},
+            #{bom.bomType},
+            #{bom.remark},
+            #{bom.createdBy},
+            sysdate(),
+            #{bom.activeFlag},
+            #{bom.lastUpdBy},
+            sysdate()
+            )
+        </foreach >
+    </insert >
+
+
+    <update id="updateSonMicroProductBom" parameterType="map">
+        update micro_product_bom
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ifChildren != null and techId !='' ">
+                IF_CHILDREN =#{ifChildren},
+            </if>
+        </trim>
+        where id in (
+           select temp.id from (select id from micro_product_bom where product_seq=#{productSeq} and PARENT_ID !=0) temp
+        )
+    </update>
+
+    <select id="getIfChildren"  resultType="int">
+        SELECT
+            count(b1.id)
+        FROM
+            micro_product_bom b
+            left join micro_product_bom b1 on b1.parent_id=b.id
+        where b.product_seq=#{productSeq} and b.parent_id=0
+    </select>
+
+    <update id="updateMicroProductBom" parameterType="com.cosmo.hhim.micro.base.domain.entity.bom.MicroProductBom">
+        update micro_product_bom
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="productType != null and productType != ''">product_type = #{productType},</if>
+            <if test="productionMode != null">production_mode = #{productionMode},</if>
+            <if test="productNumber != null">product_number = #{productNumber},</if>
+            <if test="parentProductSeq != null">parent_product_seq = #{parentProductSeq},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="ifChildren != null">if_children = #{ifChildren},</if>
+            <if test="bomType != null">bom_type = #{bomType},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateBomByProductSeq" parameterType="com.cosmo.hhim.micro.base.domain.entity.bom.MicroProductBom">
+        update micro_product_bom
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productType != null and productType != ''">product_type = #{productType},</if>
+            <if test="productionMode != null">production_mode = #{productionMode},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where product_seq = #{productSeq}
+    </update>
+
+    <update id="updateMicroProductBomList">
+        update micro_product_bom
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="product_number =case" suffix="end,">
+                <foreach collection="bomList" item="i" index="index">
+                    when id=#{i.id} then #{i.productNumber}
+                </foreach>
+            </trim>
+            <trim prefix="last_upd_by =case" suffix="end,">
+                <foreach collection="bomList" item="i" index="index">
+                    when id=#{i.id} then #{i.lastUpdBy}
+                </foreach>
+            </trim>
+            last_upd_date = sysdate()
+        </trim>
+        where
+        <foreach collection="bomList" separator="or" item="i" index="index" >
+            id=#{i.id}
+        </foreach>
+    </update>
+
+    <delete id="deleteMicroProductBomById" parameterType="Long">
+        delete from micro_product_bom where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroProductBomByParentId" parameterType="Long">
+        delete
+        from micro_product_bom
+        where id = #{id}
+           or parent_id = #{id}
+    </delete>
+
+
+    <delete id="deleteMicroProductBomByIds" parameterType="String">
+        delete from micro_product_bom where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteMicroProductBomByProductSeq">
+        delete from micro_product_bom
+        <if test="productSeqList != null and productSeqList.size() > 0">
+            where product_seq in
+            <foreach collection="productSeqList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </delete>
+
+    <select id="getMicroProductBomByProductSeq" parameterType="string" resultMap="MicroProductBomResult">
+        <include refid="selectMicroProductBomVo"/>
+        where mpb.product_seq = #{productSeq} AND mpb.bom_type = #{bomType} and mpb.parent_id='0'
+    </select>
+
+    <select id="getMicroProductBomByParentId"
+            parameterType="com.cosmo.hhim.micro.base.domain.entity.bom.MicroProductBom"
+            resultMap="MicroProductBomResult">
+        <include refid="selectMicroProductBomVoFirst"/>
+        where mpb.parent_id = #{parentId}
+        <if test=" productType !='' and productType !=null">
+            and mpb.product_type != #{productType}
+        </if>
+    </select>
+    <select id="selectMicroProductBomListByProducts" resultMap="MicroProductBomResult">
+        <include refid="selectMicroProductBomVoSecond"/>
+        <if test="condition !=null">
+            <where>
+                <if test="condition.productSeq != null  and condition.productSeq != ''">and mpb.product_seq = #{condition.productSeq}</if>
+                <if test="condition.productName != null  and condition.productName != ''">and mp.product_name = #{condition.productName}</if>
+                <if test="condition.productType != null  and condition.productType != ''">and mpb.product_type = #{condition.productType}</if>
+                <if test="condition.productionMode != null  and condition.productionMode != ''">and mpb.production_mode =
+                    #{condition.productionMode}
+                </if>
+                <if test="condition.productNumber != null ">and mpb.product_number = #{condition.productNumber}</if>
+                <if test="condition.parentProductSeq != null  and condition.parentProductSeq != ''">and mpb.parent_product_seq =
+                    #{condition.parentProductSeq}
+                </if>
+                <if test="condition.parentId != null ">and mpb.parent_id = #{condition.parentId}</if>
+                <if test="condition.ifChildren != null  and condition.ifChildren != ''">and mpb.if_children = #{condition.ifChildren}</if>
+                <if test="condition.bomType != null  and condition.bomType != ''">and mpb.bom_type = #{condition.bomType}</if>
+                <if test="condition.activeFlag != null  and condition.activeFlag != ''">and mpb.active_flag = #{condition.activeFlag}</if>
+                <if test="productSeqList != null and productSeqList.size() &gt; 0 ">
+                    and mpb.product_seq in
+                    <foreach collection="productSeqList" item="item" open="(" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+            </where>
+        </if>
+    </select>
+
+    <select id="getAllParentProductSeqList" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT
+            GROUP_CONCAT( DISTINCT T1._ids )
+        FROM
+            (
+            SELECT
+                @productSeqs AS _ids,
+                (
+                SELECT
+                    @productSeqs := GROUP_CONCAT( parent_product_seq )
+                FROM
+                    micro_product_bom
+                WHERE
+                    FIND_IN_SET( product_seq, _ids )
+                    AND parent_product_seq != '0'
+                ) AS parent_id
+            FROM
+                micro_product_bom h,
+                ( SELECT @productSeqs := #{product_seq} ) vars
+            WHERE
+            @productSeqs IS NOT NULL
+            ) T1
+    </select>
+
+    <select id="selectFirstParentBomNodeList" resultType="java.lang.String">
+        select
+            distinct parent_product_seq
+        from micro_product_bom
+        <where>
+            parent_product_seq != '0'
+            <if test="productSeqList != null and productSeqList.size() > 0">
+                and product_seq in
+                <foreach collection="productSeqList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

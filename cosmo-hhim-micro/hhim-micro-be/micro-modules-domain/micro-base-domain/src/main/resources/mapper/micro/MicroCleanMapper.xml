@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroCleanMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmit" id="MicroWorkSubmitResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="preProcessSeq" column="pre_process_seq"/>
+        <result property="operateProcessSeq" column="operate_process_seq"/>
+        <result property="preProcessGroup" column="pre_process_group"/>
+        <result property="operateProcessGroup" column="operate_process_group"/>
+        <result property="isLastProcess" column="is_last_process"/>
+        <result property="passNum" column="pass_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="submitUser" column="submit_user"/>
+        <result property="submitDay" column="submit_day"/>
+        <result property="submitStatus" column="submit_status"/>
+        <result property="submitNo" column="submit_no"/>
+        <result property="remark" column="remark"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="checkUser" column="check_user"/>
+        <result property="checkDate" column="check_date"/>
+        <result property="checkPassNum" column="check_pass_num"/>
+        <result property="checkNgNum" column="check_ng_num"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="dataStatus" column="data_status"/>
+        <result property="expiredRecordFlag" column="expired_record_flag"/>
+        <result property="submitPictures" column="submit_pictures"/>
+        <result property="isFirstProcess" column="is_first_process"/>
+    </resultMap>
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitHistory" id="MicroWorkSubmitHistoryResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="preProcessSeq" column="pre_process_seq"/>
+        <result property="preProcessCode" column="pre_process_code"/>
+        <result property="preProcessName" column="pre_process_name"/>
+        <result property="preProcessGroup" column="pre_process_group"/>
+        <result property="operateProcessSeq" column="operate_process_seq"/>
+        <result property="operateProcessCode" column="operate_process_code"/>
+        <result property="operateProcessName" column="operate_process_name"/>
+        <result property="operateProcessGroup" column="operate_process_group"/>
+        <result property="isLastProcess" column="is_last_process"/>
+        <result property="passNum" column="pass_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="submitUser" column="submit_user"/>
+        <result property="submitDay" column="submit_day"/>
+        <result property="submitStatus" column="submit_status"/>
+        <result property="submitNo" column="submit_no"/>
+        <result property="remark" column="remark"/>
+        <result property="dataStatus" column="data_status"/>
+        <result property="operateNode" column="operate_node"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="submitPictures" column="submit_pictures"/>
+        <result property="isFirstProcess" column="is_first_process"/>
+    </resultMap>
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorage" id="MicroProcessStorageResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productName" column="product_name"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productUnit" column="product_unit"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="processCode" column="process_code"/>
+        <result property="processName" column="process_name"/>
+        <result property="isLastProcess" column="is_last_process"/>
+        <result property="passNum" column="pass_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="isFirstProcess" column="is_first_process"/>
+    </resultMap>
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorageHistory" id="MicroProcessStorageHistoryResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productName" column="product_name"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="processCode" column="process_code"/>
+        <result property="processName" column="process_name"/>
+        <result property="operateNode" column="operate_node"/>
+        <result property="passFromNum" column="pass_from_num"/>
+        <result property="passToNum" column="pass_to_num"/>
+        <result property="ngFromNum" column="ng_from_num"/>
+        <result property="ngToNum" column="ng_to_num"/>
+        <result property="remark" column="remark"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="productUnit" column="unit"/>
+    </resultMap>
+
+    <sql id="selectMicroWorkSubmitVo">
+        select id,
+               tenant_code,
+               product_seq,
+               pre_process_seq,
+               operate_process_seq,
+               pre_process_group,
+               operate_process_group,
+               is_last_process,
+               pass_num,
+               ng_num,
+               submit_user,
+               submit_day,
+               submit_status,
+               submit_no,
+               remark,
+               created_by,
+               created_date,
+               check_user,
+               check_date,
+               check_pass_num,
+               check_ng_num,
+               last_upd_by,
+               last_upd_date,
+               data_status,
+               expired_record_flag,
+               submit_pictures,
+               is_first_process
+        from micro_work_submit
+    </sql>
+
+    <sql id="selectMicroWorkSubmitHistoryVo">
+        select id,
+               tenant_code,
+               product_seq,
+               product_code,
+               product_name,
+               pre_process_seq,
+               pre_process_code,
+               pre_process_name,
+               pre_process_group,
+               operate_process_seq,
+               operate_process_code,
+               operate_process_name,
+               operate_process_group,
+               is_last_process,
+               pass_num,
+               ng_num,
+               submit_user,
+               submit_day,
+               submit_status,
+               submit_no,
+               remark,
+               data_status,
+               operate_node,
+               submit_pictures,
+               created_by,
+               created_date,
+               is_first_process
+        from micro_work_submit_history
+    </sql>
+
+    <sql id="selectMicroProcessStorageVo">
+        select id,
+               tenant_code,
+               product_seq,
+               process_seq,
+               pass_num,
+               ng_num,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_process_storage
+    </sql>
+
+
+    <sql id="selectMicroProcessStorageHistoryVo">
+        select id,
+               tenant_code,
+               product_code,
+               product_seq,
+               product_name,
+               process_seq,
+               process_code,
+               process_name,
+               operate_node,
+               pass_from_num,
+               pass_to_num,
+               ng_from_num,
+               ng_to_num,
+               remark,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_process_storage_history
+    </sql>
+
+    <select id="obtainedDuplicatedProduct" resultType="com.cosmo.hhim.micro.base.domain.entity.clean.DuplicatedProduct">
+        SELECT product_name               as productName,
+               GROUP_CONCAT(product_seq)  as duplicatedProductSeq,
+               GROUP_CONCAT(product_code) as duplicatedProductCode
+        FROM micro_product
+        GROUP BY product_name
+        HAVING count(1) > 1
+    </select>
+
+    <select id="obtainedWorkSubmitListByProductSeq" parameterType="String"
+            resultMap="MicroWorkSubmitResult">
+        <include refid="selectMicroWorkSubmitVo"></include>
+        <where>
+            <if test="list != null">
+                product_seq in
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by id asc
+    </select>
+
+    <select id="obtainedWorkSubmitHistoryListByProductSeq" parameterType="String" resultMap="MicroWorkSubmitHistoryResult">
+        <include refid="selectMicroWorkSubmitHistoryVo"></include>
+        <where>
+            <if test="list != null">
+                product_seq in
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by id asc
+    </select>
+
+    <select id="obtainedProcessStorageListByProductSeq" parameterType="String" resultMap="MicroProcessStorageResult">
+        <include refid="selectMicroProcessStorageVo"></include>
+        <where>
+            <if test="list != null">
+                product_seq in
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by id asc
+    </select>
+
+    <select id="obtainedProcessStorageHistoryListByProductSeq" parameterType="String" resultMap="MicroProcessStorageHistoryResult">
+        <include refid="selectMicroProcessStorageHistoryVo"></include>
+        <where>
+            <if test="list != null">
+                product_seq in
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by id asc
+    </select>
+
+    <delete id="deleteMicroProductByProductSeqList" parameterType="String">
+        delete from micro_product where product_seq in
+        <foreach item="productSeq" collection="array" open="(" separator="," close=")">
+            #{productSeq}
+        </foreach>
+    </delete>
+
+    <update id="updateMicroWorkSubmitBatch">
+        update micro_work_submit
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="product_seq =case" suffix="end,">
+                <foreach collection="microWorkSubmits" item="item" index="index">
+                    when id=#{item.id} then #{item.productSeq}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="microWorkSubmits" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <update id="updateMicroWorkSubmitHistory">
+        update micro_work_submit_history
+        <set>
+            <if test="productSeq != null and productSeq != ''">
+                product_seq = #{productSeq},
+            </if>
+            <if test="productCode != null and productCode != ''">
+                product_code = #{productCode},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateMicroProcessStorageHistory" parameterType="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorageHistory">
+        update micro_process_storage_history
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productCode != null and productCode != ''">product_code = #{productCode},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="passFromNum != null">pass_from_num = #{passFromNum},</if>
+            <if test="passToNum != null">pass_to_num = #{passToNum},</if>
+            <if test="ngFromNum != null">ng_from_num = #{ngFromNum},</if>
+            <if test="ngToNum != null">ng_to_num = #{ngToNum},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateMicroProcessStorageBatch">
+        update micro_process_storage
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="product_seq =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.productSeq != null">
+                        when id=#{item.id} then #{item.productSeq}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="pass_num =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.passNum != null">
+                        when id=#{item.id} then #{item.passNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="ng_num =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.ngNum != null">
+                        when id=#{item.id} then #{item.ngNum}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <delete id="deleteMicroProcessStorageByIds" parameterType="String">
+        delete from micro_process_storage where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

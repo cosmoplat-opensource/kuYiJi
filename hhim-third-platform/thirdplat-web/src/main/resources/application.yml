@@ -1,0 +1,111 @@
+# ============================================================
+# application.yml — 框架级通用配置（所有环境共享）
+# ============================================================
+
+server:
+  port: 8899
+
+hhim:
+  envgroup: local
+
+spring:
+  application:
+    name: hhim-third-platform
+  profiles:
+    active: local
+  servlet:
+    multipart:
+      max-file-size: 20MB
+  cloud:
+    nacos:
+      server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+      username: ${NACOS_USERNAME:please_set_nacos_username}
+      password: ${NACOS_PASSWORD:please_set_nacos_password}
+      discovery:
+        # 开源部署默认禁用服务注册（未部署 Nacos，Feign 走 url 直连）
+        enabled: false
+        namespace: ${NACOS_NAMESPACE:NS04001}
+        group: ${hhim.envgroup}
+  main:
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude:
+
+# MyBatis
+mybatis:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  type-aliases-package: com.cosmo.hhim.thirdplat.web.domain,com.cosmo.hhim.thirdplat.api.operation.domain,com.cosmo.hhim.thirdplat.api.wechatmp.domain,com.cosmo.hhim.thirdplat.api.wechatminiapp.domain
+  # camelCase 版本 — DataSourceConfig 使用 @Value 注入，不支持 kebab-case 松散绑定
+  typeAliasesPackage: com.cosmo.hhim.thirdplat.web.domain,com.cosmo.hhim.thirdplat.api.operation.domain,com.cosmo.hhim.thirdplat.api.wechatmp.domain,com.cosmo.hhim.thirdplat.api.wechatminiapp.domain
+  mapperLocations: classpath:/mapper/*Mapper.xml
+  # 禁用租户行注入 — 当前项目所有表均无 tenant_code 列
+  tenantLineEnabled: false
+
+# Forest 框架配置（密钥变量见 application-local.yml）
+forest:
+  bean-id: thirdplatRestConfiguration
+  backend: okhttp3
+  max-connections: 1000
+  max-route-connections: 500
+  timeout: 3000
+  connect-timeout: 3000
+  retry-count: 0
+  ssl-protocol: SSLv3
+  logEnabled: true
+  log-request: true
+  log-response-status: false
+  log-response-content: false
+
+# Feign 配置
+feign:
+  sentinel:
+    enabled: false
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+  client:
+    config:
+      default:
+        connectTimeout: 30000
+        readTimeout: 30000
+  compression:
+    request:
+      enabled: false
+    response:
+      enabled: false
+  hystrix:
+    enabled: false
+
+# Hystrix 断路器
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+      circuitBreaker:
+        sleepWindowInMilliseconds: 30000
+        requestVolumeThreshold: 20
+        errorThresholdPercentage: 50
+
+# 监控端点（收敛：仅暴露健康检查与信息，避免 heapdump/env 等敏感端点）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+
+# Ribbon 负载均衡
+hhim-portal-system:
+  ribbon:
+    NFLoadBalancerRuleClassName: com.alibaba.cloud.nacos.ribbon.NacosRule
+
+# 日志
+logging:
+  config: classpath:logback-plumelog.xml
+  level:
+    druid.sql: error
+    com.cosmo.hhim: info
+    com.alibaba.nacos: error

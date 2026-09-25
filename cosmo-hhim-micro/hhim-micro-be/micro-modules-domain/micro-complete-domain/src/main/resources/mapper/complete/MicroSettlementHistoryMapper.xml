@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.complete.domain.mapper.MicroSettlementHistoryMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementHistoryEntity" id="MicroSettlementHistoryDTOResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="submitId" column="submit_id"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="employeeName" column="employee_name"/>
+        <result property="employeeUserName" column="employee_user_name"/>
+        <result property="adjustedNum" column="adjusted_num"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="productUnit" column="product_unit"/>
+        <result property="operateProcessSeq" column="operate_process_seq"/>
+        <result property="operateProcessCode" column="operate_process_code"/>
+        <result property="operateProcessName" column="operate_process_name"/>
+        <result property="remark" column="remark"/>
+        <result property="version" column="version"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdByName" column="created_by_name"/>
+        <result property="createdDate" column="created_date"/>
+    </resultMap>
+
+    <sql id="selectMicroSettlementHistoryDTOVo">
+        select id,
+               tenant_code,
+               submit_id,
+               employee_id,
+               adjusted_num,
+               product_seq,
+               product_code,
+               product_name,
+               operate_process_seq,
+               operate_process_code,
+               operate_process_name,
+               remark,
+               created_by,
+               created_date
+        from micro_settlement_history
+    </sql>
+
+    <select id="selectMicroSettlementHistoryList" parameterType="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementHistoryEntity"
+            resultMap="MicroSettlementHistoryDTOResult">
+        SELECT
+        msh.id,
+        msh.tenant_code,
+        msh.submit_id,
+        msh.employee_id,
+        IF(mu.nick_name IS NULL, mu.user_name,mu.nick_name) as employee_name,
+        mu.user_name as employee_user_name,
+        msh.adjusted_num,
+        msh.product_seq,
+        msh.product_code,
+        msh.product_name,
+        msh.product_unit,
+        msh.operate_process_seq,
+        msh.operate_process_code,
+        msh.operate_process_name,
+        msh.remark,
+        msh.created_by,
+        IF(mu2.nick_name IS NULL, mu2.user_name,mu2.nick_name) as created_by_name,
+        msh.created_date
+        FROM micro_settlement_history msh LEFT JOIN micro_user mu ON msh.tenant_code = mu.tenant_code AND msh.employee_id=mu.id
+        LEFT JOIN micro_user mu2 ON msh.tenant_code = mu2.tenant_code AND msh.created_by=mu2.id
+        <where>
+            <if test="entity.tenantCode != null  and entity.tenantCode != ''">and msh.tenant_code = #{entity.tenantCode}</if>
+            <if test="entity.submitId != null ">and msh.submit_id = #{entity.submitId}</if>
+            <if test="entity.employeeId != null ">and msh.employee_id = #{entity.employeeId}</if>
+            <if test="entity.adjustedNum != null ">and msh.adjusted_num = #{entity.adjustedNum}</if>
+            <if test="entity.productSeq != null  and entity.productSeq != ''">and msh.product_seq = #{entity.productSeq}</if>
+            <if test="entity.productCode != null  and entity.productCode != ''">and msh.product_code = #{entity.productCode}</if>
+            <if test="entity.productName != null  and entity.productName != ''">and msh.product_name like concat('%', #{entity.productName}, '%')</if>
+            <if test="entity.operateProcessSeq != null  and entity.operateProcessSeq != ''">and msh.operate_process_seq =
+                #{entity.operateProcessSeq}
+            </if>
+            <if test="entity.operateProcessCode != null  and entity.operateProcessCode != ''">and msh.operate_process_code =
+                #{entity.operateProcessCode}
+            </if>
+            <if test="entity.operateProcessName != null  and entity.operateProcessName != ''">and msh.operate_process_name like
+                concat('%',#{entity.operateProcessName},'%')
+            </if>
+            <if test="entity.createdBy != null  and entity.createdBy != ''">and msh.created_by = #{entity.createdBy}</if>
+        </where>
+        order by msh.created_date desc
+    </select>
+
+    <!--    <resultMap type="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementHistoryQueryEntity" id="HistoryGroupByUserResult">-->
+    <!--        <result property="employeeId" column="employeeId"/>-->
+    <!--        <result property="employeeName" column="employeeName"/>-->
+    <!--        <result property="employeeUserName" column="employeeUserName"/>-->
+    <!--        <collection property="detailList" select="selectHistorySub"-->
+    <!--                    column="{employeeId=employeeId,productSeq=productSeq,operateProcessSeq=operateProcessSeq}"/>-->
+    <!--    </resultMap>-->
+
+    <select id="selectHistoryListGroupByUser" resultType="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementHistoryQueryEntity">
+        SELECT
+        mu.id AS employeeId,
+        IF( mu.nick_name IS NULL, mu.user_name, nick_name ) AS employeeName,
+        mu.user_name AS employeeUserName
+        FROM
+        micro_settlement_history msh
+        INNER JOIN micro_user mu ON msh.tenant_code = mu.tenant_code
+        AND msh.employee_id = mu.id
+        WHERE
+        msh.remark IS NOT NULL
+        AND msh.remark !=''
+        <if test="entity.employeeId != null">and msh.employee_id = #{entity.employeeId}</if>
+        <if test="entity.productSeq != null and entity.productSeq != ''">and msh.product_seq = #{entity.productSeq}</if>
+        <if test="entity.operateProcessSeq != null and entity.operateProcessSeq != ''">and msh.operate_process_seq =
+            #{entity.operateProcessSeq}
+        </if>
+        <if test="searchKey != null  and searchKey != ''">
+            and ( mu.user_name like concat('%', #{searchKey}, '%')
+            or mu.nick_name like concat('%', #{searchKey}, '%') )
+        </if>
+        GROUP BY
+        mu.id
+        ORDER BY
+        mu.id
+    </select>
+    <select id="selectHistorySubListGroupByUser" resultType="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementHistoryQuerySubEntity">
+        SELECT
+        msh.employee_id as employeeId,
+        msh.product_seq AS productSeq,
+        MAX(mp.product_name) AS productName,
+        MAX(mp.product_code) AS productCode,
+        MAX(msh.product_unit) AS productUnit,
+        msh.operate_process_seq AS operateProcessSeq,
+        MAX(mpc.process_name) AS operateProcessName,
+        MAX(mpc.process_code) AS operateProcessCode,
+        ROUND(SUM(msh.adjusted_from_num-msh.adjusted_num),4) AS totalAdjustedNum
+        FROM micro_settlement_history msh
+        LEFT JOIN micro_process_common mpc ON
+        msh.tenant_code = mpc.tenant_code
+        AND msh.operate_process_seq = mpc.process_seq
+        LEFT JOIN micro_product mp ON
+        msh.tenant_code = mp.tenant_code
+        AND msh.product_seq = mp.product_seq
+        WHERE msh.remark IS NOT NULL
+        AND msh.remark != ''
+        <if test="employeeIds != null and employeeIds.size() &gt; 0 ">
+            and msh.employee_id in
+            <foreach collection="employeeIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="entity.productSeq != null and entity.productSeq != ''">and msh.product_seq = #{entity.productSeq}</if>
+        <if test="entity.operateProcessSeq != null and entity.operateProcessSeq != ''">and msh.operate_process_seq =
+            #{entity.operateProcessSeq}
+        </if>
+        GROUP BY msh.employee_id,msh.product_seq, msh.operate_process_seq
+        ORDER BY msh.employee_id,msh.product_seq, msh.operate_process_seq
+    </select>
+
+    <select id="selectMicroSettlementHistoryDetailList"
+            parameterType="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementHistoryEntity"
+            resultMap="MicroSettlementHistoryDTOResult">
+        SELECT msh.employee_id,
+        MAX(IF(mu.nick_name IS NULL, mu.user_name, mu.nick_name)) AS employee_name,
+        mu.user_name AS employee_user_name,
+        ROUND(SUM(msh.adjusted_num - msh.adjusted_from_num), 4) AS adjusted_num,
+        msh.product_seq,
+        MAX(msh.product_code) AS product_code,
+        MAX(msh.product_name) AS product_name,
+        MAX(msh.product_unit) AS product_unit,
+        msh.operate_process_seq,
+        MAX(msh.operate_process_code) AS operate_process_code,
+        MAX(msh.operate_process_name) AS operate_process_name,
+        MAX(msh.remark) AS remark,
+        MAX(msh.created_by) AS created_by,
+        MAX(IF(mu2.nick_name IS NULL, mu2.user_name, mu2.nick_name)) AS created_by_name,
+        MAX(msh.created_date) AS created_date
+        FROM micro_settlement_history msh LEFT JOIN micro_user mu ON msh.tenant_code = mu.tenant_code AND
+        msh.employee_id=mu.id
+        LEFT JOIN micro_user mu2 ON msh.tenant_code = mu2.tenant_code AND msh.created_by=mu2.id
+        where msh.remark is not null and msh.remark != ''
+        <if test="entity != null">
+            <if test="entity.tenantCode != null  and entity.tenantCode != ''">
+                and msh.tenant_code = #{entity.tenantCode}
+            </if>
+            <if test="entity.employeeId != null ">
+                and msh.employee_id = #{entity.employeeId}
+            </if>
+            <if test="entity.productSeq != null  and entity.productSeq != ''">
+                and msh.product_seq = #{entity.productSeq}
+            </if>
+            <if test="entity.operateProcessSeq != null  and entity.operateProcessSeq != ''">
+                and msh.operate_process_seq = #{entity.operateProcessSeq}
+            </if>
+            <if test="entity.createdDate != null ">
+                AND DATE_FORMAT(msh.created_date, '%y%m') = DATE_FORMAT(#{entity.createdDate}, '%y%m')
+            </if>
+        </if>
+        GROUP BY msh.employee_id, msh.product_seq, msh.operate_process_seq, msh.`version`
+        ORDER BY msh.version DESC
+    </select>
+
+
+    <insert id="insertMicroSettlementHistoryBatch">
+        INSERT INTO micro_settlement_history
+        (tenant_code,
+        submit_id,
+        employee_id,
+        adjusted_from_num,
+        adjusted_num,
+        product_seq,
+        product_code,
+        product_name,
+        product_unit,
+        operate_process_seq,
+        operate_process_code,
+        operate_process_name,
+        remark,
+        version,
+        created_by)
+        VALUES
+        <foreach collection="dataList" item="entity" index="index" separator=",">
+            (
+            #{entity.tenantCode},
+            #{entity.submitId},
+            #{entity.employeeId},
+            #{entity.adjustedFromNum},
+            #{entity.adjustedNum},
+            #{entity.productSeq},
+            #{entity.productCode},
+            #{entity.productName},
+            #{entity.productUnit},
+            #{entity.operateProcessSeq},
+            #{entity.operateProcessCode},
+            #{entity.operateProcessName},
+            #{entity.remark},
+            #{entity.version},
+            #{entity.createdBy}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteMicroSettlementHistoryById" parameterType="Long">
+        delete
+        from micro_settlement_history
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroSettlementHistoryBySubmitIds">
+        delete from micro_settlement_history where submit_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

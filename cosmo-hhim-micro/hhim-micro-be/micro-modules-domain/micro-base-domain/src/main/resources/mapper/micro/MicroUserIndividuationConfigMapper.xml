@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroUserIndividuationConfigMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroUserIndividuationConfig"
+               id="MicroUserIndividuationConfigResult">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="personalized" column="personalized"/>
+        <result property="statisticsBeginTime" column="statistics_begin_time"/>
+        <result property="createdDate" column="created_date"/>
+    </resultMap>
+
+    <sql id="selectMicroUserIndividuationConfigVo">
+        select id, user_id, tenant_code, personalized, statistics_begin_time, created_date
+        from micro_user_individuation_config
+    </sql>
+
+    <select id="selectMicroUserIndividuationConfigList"
+            parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroUserIndividuationConfig"
+            resultMap="MicroUserIndividuationConfigResult">
+        <include refid="selectMicroUserIndividuationConfigVo"/>
+        <where>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="personalized != null">and personalized = #{personalized}</if>
+            <if test="statisticsBeginTime != null ">and statistics_begin_time = #{statisticsBeginTime}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroUserIndividuationConfigById" parameterType="Long"
+            resultMap="MicroUserIndividuationConfigResult">
+        <include refid="selectMicroUserIndividuationConfigVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectOneByUserId"
+            resultMap="MicroUserIndividuationConfigResult">
+        <include refid="selectMicroUserIndividuationConfigVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <insert id="insertMicroUserIndividuationConfig"
+            parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroUserIndividuationConfig">
+        replace into micro_user_individuation_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="tenantCode != null">tenant_code,</if>
+            <if test="personalized != null">personalized,</if>
+            <if test="statisticsBeginTime != null">statistics_begin_time,</if>
+            <if test="createdDate != null">created_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="tenantCode != null">#{tenantCode},</if>
+            <if test="personalized != null">#{personalized},</if>
+            <if test="statisticsBeginTime != null">#{statisticsBeginTime},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroUserIndividuationConfig"
+            parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroUserIndividuationConfig">
+        update micro_user_individuation_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="tenantCode != null">tenant_code = #{tenantCode},</if>
+            <if test="personalized != null">personalized = #{personalized},</if>
+            <if test="statisticsBeginTime != null">statistics_begin_time = #{statisticsBeginTime},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="updateMicroUserIndividuationConfigByUser"
+            parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroUserIndividuationConfig">
+        update micro_user_individuation_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null">tenant_code = #{tenantCode},</if>
+            <if test="personalized != null">personalized = #{personalized},</if>
+            <if test="statisticsBeginTime != null">statistics_begin_time = #{statisticsBeginTime},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+        </trim>
+        where user_id = #{userId}
+    </update>
+
+    <delete id="deleteMicroUserIndividuationConfigById" parameterType="Long">
+        delete
+        from micro_user_individuation_config
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroUserIndividuationConfigByIds" parameterType="String">
+        delete from micro_user_individuation_config where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

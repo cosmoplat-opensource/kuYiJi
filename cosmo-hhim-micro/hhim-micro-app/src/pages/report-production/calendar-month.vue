@@ -1,0 +1,279 @@
+﻿<template>
+  <view class="calendar-month">
+    <view v-if="rowIndex > 1" class="calendar-month__wrapper">
+      <view v-for="(row, rowI) in rowIndex" :key="`row-${rowI}`" class="flex align-center">
+        <view
+          v-for="(col, colI) in 7"
+          :key="`col-${colI}`"
+          class="flex-1 text-center flex flex-col align-center"
+          @tap="handleDateSelect(row, col)"
+        >
+          <view class="item__wrapper" :class="formatDateColor(maps[`${row}-${col}`])">
+            <image src="/static/images/icon_cursor.svg" class="icon-top" v-if="maps[`${row}-${col}`]?.max" />
+            <text class="item__text" :class="{ 'color-0066ff': maps[`${row}-${col}`]?.label === '今天' }">{{
+              maps[`${row}-${col}`]?.label
+            }}</text>
+            <image src="/static/images/icon_cursor.svg" class="icon-bot" v-if="maps[`${row}-${col}`]?.min" />
+          </view>
+          <view class="item__value-area h-24 mt-4">
+            <view
+              :class="['icon-12 rounded-full mr-4', statisticType === '20' ? 'bg-ff4655' : 'bg-19AA8D']"
+              v-if="maps[`${row}-${col}`]?.count"
+            />
+            <view
+              class="item__value-area__text single w-m-60"
+              :class="formatDateColor(maps[`${row}-${col}`])"
+              v-if="maps[`${row}-${col}`]?.count"
+              >{{ maps[`${row}-${col}`]?.count || '' }}</view
+            >
+            <view v-else>
+              <view v-if="maps[`${row}-${col}`]?.before" class="border-1 border-b6c0c9 box icon-12 rounded-full"></view>
+              <view v-else></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup lang="ts">
+import dayjs from 'dayjs'
+import { computed, onMounted, ref, watch, reactive } from 'vue'
+import { _get } from '@/utils/common-request'
+import { $store } from '@/utils/common'
+
+const props = defineProps({
+  date: { type: String, default: '' },
+  calendarDetail: { type: Array, default: [] },
+  statisticType: { type: String, default: '' }
+})
+// 指定月份总天数
+const totalDays = ref(0)
+// 指定月份第一天是周几
+const start = ref(1)
+
+// 日历集合
+const maps = reactive({})
+
+function formatDateColor(item) {
+  if (!item) return ''
+  if (item.max) {
+    return 'yellow'
+  } else if (item.min) {
+    return 'grey'
+  } else {
+    return item.before ? 'color-999999' : 'color-b8b8b8'
+  }
+}
+
+// 行,列,日期格式优化
+const rowIndex = ref(1)
+// 当前年月（必须声明在 watch 之前：watch immediate 回调会同步执行 getList 访问该值，
+// 声明靠后会导致 H5 端 TDZ 报错"Cannot access 'checkYearMonth' before initialization"整页白屏）
+const checkYearMonth = computed(() => {
+  return dayjs().format('YYYY-MM')
+})
+watch(
+  () => props.date,
+  (val) => {
+    totalDays.value = dayjs(props.date).endOf('month').date()
+    start.value = dayjs(props.date).startOf('month').day()
+    dateInit()
+  },
+  { deep: true, immediate: true }
+)
+watch(
+  () => props.calendarDetail,
+  (val) => {
+    getList()
+  },
+  { deep: true, immediate: true }
+)
+function dateInit() {
+  Object.keys(maps).map((key) => {
+    delete maps[key]
+  })
+  rowIndex.value = 1
+  let colIndex = start.value + 1
+  for (let i = 1; i <= totalDays.value; i++) {
+    maps[`${rowIndex.value}-${colIndex}`] = { label: i, date: i, count: 0 }
+    if (colIndex === 7) {
+      colIndex = 1
+      rowIndex.value++
+    } else {
+      colIndex++
+    }
+  }
+}
+
+type TCalendarItem = {
+  statisticNumber: number
+  day: string
+}
+
+function getList() {
+  const nowDay = dayjs().date()
+  const data = props.calendarDetail
+  let max = 0
+  let maxDate = ''
+  let min = Number.MAX_SAFE_INTEGER
+  let minDate = ''
+  let num = 0
+  data.forEach((o) => {
+    if (o.statisticNumber) {
+      num++
+    }
+  })
+  data.forEach((item: TCalendarItem) => {
+    if (item.statisticNumber && item.statisticNumber > max) {
+      max = item.statisticNumber
+      maxDate = item.day
+    }
+    if (num > 1) {
+      //记工数大于1天的 ，最小记工数从有值的数据里取
+      if (item.statisticNumber && item.statisticNumber < min) {
+        min = item.statisticNumber
+        minDate = item.day
+      }
+    } else {
+      if ((item.statisticNumber || item.statisticNumber === 0) && item.statisticNumber < min) {
+        min = item.statisticNumber
+        minDate = item.day
+      }
+    }
+  })
+  for (const key in maps) {
+    const str = `${props.date}-${String(maps[key].label).padStart(2, '0')}`
+    const today = `${props.date}-${String(maps[key].date).padStart(2, '0')}`
+    if (dayjs(str).isBefore(dayjs())) {
+      maps[key].before = true
+    }
+
+    if (today === maxDate) {
+      maps[key].max = true
+    } else if (today === minDate) {
+      maps[key].min = true
+    } else {
+      maps[key].max = false
+      maps[key].min = false
+    }
+    let num = 0
+    data.forEach((item: TCalendarItem) => {
+      if (item.day === today) {
+        num = item.statisticNumber
+      }
+    })
+    maps[key].count = parseInt(`${num}` || '0')
+    if (checkYearMonth?.value === props.date && maps[key].label === nowDay) {
+      maps[key].label = '今天'
+    }
+  }
+}
+
+function handleDateSelect(row, col) {
+  let str = ''
+  if (maps[`${row}-${col}`].label === '今天') {
+    str = dayjs().format('YYYY-MM-DD')
+  } else {
+    str = `${props.date}-${String(maps[`${row}-${col}`].label).padStart(2, '0')}`
+  }
+  if (dayjs(str).isBefore(dayjs())) {
+    uni.$emit('topDateChange', str)
+    if (getCurrentPages().find((v) => v.route === 'pages/report-production/calendar-select')) {
+      uni.navigateBack()
+    }
+  } else {
+    uni.showToast({ title: '只能查看今天之前的记工记录', icon: 'none' })
+  }
+}
+</script>
+
+<style lang="scss">
+.calendar-month {
+  .display-date {
+    padding: px2vw(24) 0;
+    text-align: center;
+    font-weight: bold;
+    color: #000;
+    font-size: px2vw(28);
+    line-height: px2vw(28);
+  }
+  &__wrapper {
+    background-color: #ffffff;
+    border-radius: px2vw(16);
+    padding: px2vw(16) px2vw(32);
+  }
+  .item {
+    &__wrapper {
+      position: relative;
+      width: px2vw(64);
+      height: px2vw(64);
+      line-height: px2vw(64);
+      border-radius: 50%;
+      &:active {
+        background-color: #0066ff;
+        &.yellow {
+          background-color: #0066ff;
+        }
+        &.grey {
+          background-color: #0066ff;
+        }
+        .item__text {
+          color: #fff;
+        }
+      }
+      &.yellow {
+        background-color: #f4bb5b;
+        .item__text {
+          color: #fff;
+        }
+      }
+      &.blue {
+        background-color: #0066ff;
+      }
+      &.grey {
+        background-color: #b6c0c9;
+        .item__text {
+          color: #fff;
+        }
+      }
+      .icon-top {
+        width: px2vw(16);
+        height: px2vw(16);
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .icon-bot {
+        width: px2vw(16);
+        height: px2vw(16);
+        position: absolute;
+        top: px2vw(46);
+        left: 50%;
+        transform: translateX(-50%) rotate(180deg);
+      }
+    }
+    &__text {
+      font-size: px2vw(28);
+      line-height: px2vw(28);
+    }
+    &__value-area {
+      display: flex;
+      align-items: center;
+      &__text {
+        color: #b8b8b8;
+        font-size: px2vw(24);
+        line-height: px2vw(24);
+        &.yellow {
+          color: #e7a11a;
+        }
+        &.grey {
+          color: #5a6f82;
+        }
+      }
+    }
+  }
+}
+</style>

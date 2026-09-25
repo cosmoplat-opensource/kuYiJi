@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.process.MicroProcessCommonMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessCommon" id="MicroProcessCommonResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="processCode" column="process_code"/>
+        <result property="processName" column="process_name"/>
+        <result property="processDesc" column="process_desc"/>
+        <result property="processGroup" column="process_group"/>
+        <result property="remark" column="remark"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <sql id="selectMicroProcessCommonVo">
+        select id,
+               tenant_code,
+               process_seq,
+               process_code,
+               process_name,
+               process_desc,
+               process_group,
+               remark,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_process_common
+    </sql>
+
+    <select id="selectMicroProcessCommonList" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessCommon"
+            resultMap="MicroProcessCommonResult">
+        <include refid="selectMicroProcessCommonVo"/>
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="processSeq != null  and processSeq != ''">and process_seq = #{processSeq}</if>
+            <if test="processCode != null  and processCode != ''">and process_code = #{processCode}</if>
+            <if test="processName != null  and processName != ''">and process_name = #{processName}</if>
+            <if test="processDesc != null  and processDesc != ''">and process_desc = #{processDesc}</if>
+            <if test="processGroup != null  and processGroup != ''">and process_group = #{processGroup}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="key != null  and key != ''">
+                and ( process_name like concat('%', #{key}, '%')
+                or process_code like concat('%', #{key}, '%') )
+            </if>
+        </where>
+        ORDER BY last_upd_date DESC, id DESC
+    </select>
+
+    <select id="selectMicroProcessCommonById" parameterType="Long" resultMap="MicroProcessCommonResult">
+        <include refid="selectMicroProcessCommonVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectMicroProcessCommonByProcessSeq" parameterType="java.lang.String" resultMap="MicroProcessCommonResult">
+        <include refid="selectMicroProcessCommonVo"/>
+        where process_seq = #{processSeq}
+    </select>
+
+    <select id="selectMicroProcessCommonByProcessCode" parameterType="java.lang.String" resultMap="MicroProcessCommonResult">
+        <include refid="selectMicroProcessCommonVo"/>
+        where process_code = #{processCode}
+    </select>
+
+    <select id="selectMicroProcessCommonByProcessName" parameterType="java.lang.String" resultMap="MicroProcessCommonResult">
+        <include refid="selectMicroProcessCommonVo"/>
+        where process_name = #{processName}
+    </select>
+
+    <select id="selectMicroProcessByName" resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        select
+        process_name as itemName,
+        process_code as itemCode,
+        process_seq as itemSeq,
+        id as itemId,
+        CAST(process_name as char character set gbk) as sortName
+        from micro_process_common
+        where 1=1
+        <if test="key != null  and key != ''">
+            and( process_name like concat('%', #{key}, '%')
+            or process_code like concat('%', #{key}, '%')
+            )
+        </if>
+        ORDER BY sortName,
+        last_upd_date DESC
+    </select>
+    <select id="selectProcessSeqAndCode" resultType="java.lang.String">
+        SELECT process_seq as item
+        FROM micro_process_common
+        UNION
+        SELECT process_code as item
+        FROM micro_process_common
+    </select>
+    <select id="selectMicroProcessStockByName" resultType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessSelectEntity">
+        SELECT
+        mpc.process_name AS itemName,
+        mpc.process_code AS itemCode,
+        mpc.process_seq AS itemSeq,
+        (SELECT SUM(IFNULL(mps.pass_num,0)) FROM micro_process_storage mps WHERE mps.product_seq= #{productSeq} AND mps.process_seq =mpc.process_seq
+        AND mps.tenant_code = #{tenantCode}) AS totalStockNum,
+        (SELECT SUM(IFNULL(mws.pass_num,0)) FROM micro_work_submit mws WHERE mws.product_seq= #{productSeq} AND
+        mws.operate_process_seq=mpc.process_seq AND mws.tenant_code = #{tenantCode} AND mws.submit_status = 1)AS unapprovedNum,
+        CAST(mpc.process_name as char character set gbk) as sortName
+        FROM
+        micro_process_common mpc
+        WHERE 1=1
+        <if test="key != null  and key != ''">
+            AND( mpc.process_name like concat('%', #{key}, '%')
+            OR mpc.process_code like concat('%', #{key}, '%')
+            )
+        </if>
+        ORDER BY sortName,
+        mpc.last_upd_date DESC
+    </select>
+    <select id="selectExistMicroProcessCommonList" resultMap="MicroProcessCommonResult">
+        <include refid="selectMicroProcessCommonVo"/>
+        where
+        (process_name = #{processName}
+        <if test="processCode != null  and processCode != ''">
+            or process_code = #{processCode}
+        </if>
+        <if test="id != null  and id != ''">
+            or id = #{id}
+        </if>
+        )
+    </select>
+    <select id="selectExistByNames" resultMap="MicroProcessCommonResult">
+        <include refid="selectMicroProcessCommonVo"/>
+        where process_name in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectTotalProcessCount" resultType="java.lang.Long">
+        select count(1)
+        from micro_process_common
+    </select>
+    <select id="selectMasterProcessWarnList" resultMap="MicroProcessCommonResult">
+        SELECT a.id,
+        a.process_seq,
+        a.process_code,
+        a.process_name,
+        a.process_desc,
+        a.process_group,
+        a.remark,
+        a.nick_name AS created_by,
+        a.created_date
+        FROM (SELECT mpc.*,mu.nick_name
+        FROM micro_process_common mpc
+        LEFT JOIN micro_user mu ON mpc.tenant_code = mu.tenant_code
+        AND mpc.created_by = mu.id
+        WHERE mpc.created_type = '0'
+        <if test="list != null and list.size() &gt; 0 ">
+            and mpc.process_seq not in
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        ) as a
+    </select>
+    <select id="selectFilterProcessBySeqList" resultType="java.lang.String">
+        SELECT
+        concat_ws(',', process_seq, process_code, process_name) AS joinStr
+        FROM
+        micro_process_common mpc
+        <where>
+            <if test="list != null and list.size() &gt; 0 ">
+                mpc.process_seq in
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+
+    </select>
+    <select id="selectProcessByCodeList" resultType="java.lang.String">
+        SELECT
+        DISTINCT mpc.process_seq
+        FROM micro_work_submit mws
+        INNER JOIN micro_process_common mpc ON
+        mws.tenant_code = mpc.tenant_code
+        AND mws.operate_process_seq = mpc.process_seq
+        WHERE mws.submit_status = '0' and mws.submit_type = '1'
+        <if test="list != null and list.size() &gt; 0 ">
+            AND mpc.process_seq in
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        UNION
+        SELECT
+        DISTINCT mpc.process_code
+        FROM micro_work_submit mws
+        INNER JOIN micro_process_common mpc ON
+        mws.tenant_code = mpc.tenant_code
+        AND FIND_IN_SET(mpc.process_seq, mws.pre_process_seq)
+        WHERE mws.submit_status = '0' and submit_type = '1'
+        <if test="list != null and list.size() &gt; 0 ">
+            and mpc.process_seq in
+            <foreach collection="list" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectMicroProcessStockByIds"
+            resultType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessSelectEntity">
+        SELECT
+        mpc.process_name AS itemName
+        ,mpc.process_code AS itemCode
+        ,mpc.process_seq AS itemSeq
+        ,mpc.id AS itemId
+        <if test="productSeq != null and productSeq != ''">
+            ,(SELECT SUM(IFNULL(mps.pass_num,0)) FROM micro_process_storage mps WHERE mps.product_seq= #{productSeq} AND
+            mps.process_seq =mpc.process_seq
+            AND mps.tenant_code = #{tenantCode}) AS totalStockNum
+            ,(SELECT SUM(IFNULL(mws.pass_num,0)) FROM micro_work_submit mws WHERE mws.product_seq= #{productSeq} AND
+            mws.operate_process_seq=mpc.process_seq AND mws.tenant_code = #{tenantCode} AND mws.submit_status = 1)AS
+            unapprovedNum
+            ,CAST(mpc.process_name as char character set gbk) as sortName
+        </if>
+        FROM
+        micro_process_common mpc
+        WHERE mpc.id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        <if test="productSeq != null and productSeq != ''">
+            ORDER BY sortName,
+            mpc.last_upd_date DESC
+        </if>
+    </select>
+
+    <select id="selectSimpleProcessBySeqList" resultType="com.cosmo.hhim.micro.base.domain.entity.tech.SimpleProcessResult">
+        SELECT
+        mpc.process_seq as processSeq,
+        mpc.process_code as processCode,
+        mpc.process_name as processName
+        FROM
+        micro_process_common mpc
+        where
+        <if test="processSeqList != null">
+            mpc.process_seq in
+            <foreach item="processSeq" collection='processSeqList.split(",")' open="(" separator="," close=")">
+                #{processSeq}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectMicroProcessStock" resultType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessSelectEntity">
+        SELECT
+        mpc.process_name AS itemName,
+        mpc.process_code AS itemCode,
+        mpc.process_seq AS itemSeq,
+        (SELECT SUM(IFNULL(mps.pass_num,0)) FROM micro_process_storage mps WHERE mps.product_seq= #{productSeq} AND mps.process_seq =mpc.process_seq
+        AND mps.tenant_code = #{tenantCode}) AS totalStockNum,
+        (SELECT SUM(IFNULL(mws.pass_num,0)) FROM micro_work_submit mws WHERE mws.product_seq= #{productSeq} AND
+        mws.operate_process_seq=mpc.process_seq AND mws.tenant_code = #{tenantCode} AND mws.submit_status = 1)AS unapprovedNum,
+        CAST(mpc.process_name as char character set gbk) as sortName
+        FROM
+        micro_process_common mpc
+        WHERE 1=1
+        <if test="processList != null and processList.size() &gt; 0 ">
+            and mpc.process_seq in
+            <foreach collection="processList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY sortName,
+        mpc.last_upd_date DESC
+    </select>
+    <select id="selectMicroProcessBySeqs" resultType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessCommon">
+        select
+        mpc.process_seq as processSeq,
+        mpc.id ,
+        mpc.process_code as processCode,
+        mpc.process_name as processName
+        from micro_process_common mpc
+        <where>
+            <if test="processList != null and processList.size() &gt; 0 ">
+                mpc.process_seq in
+                <foreach collection="processList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertMicroProcessCommon" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessCommon" useGeneratedKeys="true"
+            keyProperty="id">
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into micro_process_common
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="processSeq != null and processSeq != ''">process_seq,</if>
+            <if test="processCode != null and processCode != ''">process_code,</if>
+            <if test="processName != null and processName != ''">process_name,</if>
+            <if test="processDesc != null">process_desc,</if>
+            <if test="processGroup != null">process_group,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createdType != null and createdType != ''">created_type,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="processSeq != null and processSeq != ''">#{processSeq},</if>
+            <if test="processCode != null and processCode != ''">#{processCode},</if>
+            <if test="processName != null and processName != ''">#{processName},</if>
+            <if test="processDesc != null">#{processDesc},</if>
+            <if test="processGroup != null">#{processGroup},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createdType != null and createdType != ''">#{createdType},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertMicroProcessCommonBatch">
+        insert into micro_process_common
+        (tenant_code,
+        process_seq,
+        process_code,
+        process_name,
+        created_by,
+        created_date,
+        last_upd_by,
+        last_upd_date) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.tenantCode},
+            #{item.processSeq},
+            #{item.processCode},
+            #{item.processName},
+            #{item.createdBy},
+            #{item.createdDate},
+            #{item.lastUpdBy},
+            #{item.lastUpdDate})
+        </foreach>
+    </insert>
+
+    <update id="updateMicroProcessCommon" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessCommon">
+        update micro_process_common
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="processSeq != null and processSeq != ''">process_seq = #{processSeq},</if>
+            process_code = #{processCode},
+            process_name = #{processName},
+            process_desc = #{processDesc},
+            <if test="processGroup != null">process_group = #{processGroup},</if>
+            remark = #{remark},
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroProcessCommonById" parameterType="Long">
+        delete
+        from micro_process_common
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroProcessCommonByIds" parameterType="String">
+        delete from micro_process_common where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

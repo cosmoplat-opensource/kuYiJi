@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzMicroMiniappConfigMapper">
+    
+    <resultMap type="com.cosmo.hhim.thridplat.api.wechatminiapp.domain.HyzzMicroMiniappConfig" id="HyzzMicroMiniappConfigResult">
+        <result property="id"    column="id"    />
+        <result property="appId"    column="app_id"    />
+        <result property="appSecret"    column="app_secret"    />
+        <result property="miniAppName"    column="mini_app_name"    />
+        <result property="applicationSign"    column="application_sign"    />
+        <result property="platformType"    column="platform_type"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectHyzzMicroMiniappConfigVo">
+        select id, app_id, app_secret, mini_app_name, application_sign, platform_type, deleted, remark, create_by, create_time, update_by, update_time from hyzz_micro_miniapp_config
+    </sql>
+
+    <select id="selectAllMicroMiniAppConfig" resultMap="HyzzMicroMiniappConfigResult">
+        <include refid="selectHyzzMicroMiniappConfigVo"/>
+        where deleted = '0'
+    </select>
+
+
+    <select id="selectMicroMiniAppConfigByCondition" resultMap="HyzzMicroMiniappConfigResult">
+        <include refid="selectHyzzMicroMiniappConfigVo"/>
+        <where>
+            deleted = '0'
+            <if test="applicationSign != null  and applicationSign != ''"> and application_sign = #{applicationSign}</if>
+            <if test="platformType != null  and platformType != ''"> and platform_type = #{platformType}</if>
+        </where>
+    </select>
+
+    <select id="selectHyzzMicroMiniappConfigList" parameterType="com.cosmo.hhim.thridplat.api.wechatminiapp.domain.HyzzMicroMiniappConfig" resultMap="HyzzMicroMiniappConfigResult">
+        <include refid="selectHyzzMicroMiniappConfigVo"/>
+        <where>  
+            <if test="appId != null  and appId != ''"> and app_id = #{appId}</if>
+            <if test="appSecret != null  and appSecret != ''"> and app_secret = #{appSecret}</if>
+            <if test="miniAppName != null  and miniAppName != ''"> and mini_app_name like concat('%', #{miniAppName}, '%')</if>
+            <if test="applicationSign != null  and applicationSign != ''"> and application_sign = #{applicationSign}</if>
+            <if test="platformType != null  and platformType != ''"> and platform_type = #{platformType}</if>
+            <if test="deleted != null  and deleted != ''"> and deleted = #{deleted}</if>
+        </where>
+    </select>
+    
+    <select id="selectHyzzMicroMiniappConfigById" parameterType="Long" resultMap="HyzzMicroMiniappConfigResult">
+        <include refid="selectHyzzMicroMiniappConfigVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertHyzzMicroMiniappConfig" parameterType="com.cosmo.hhim.thridplat.api.wechatminiapp.domain.HyzzMicroMiniappConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into hyzz_micro_miniapp_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="appId != null and appId != ''">app_id,</if>
+            <if test="appSecret != null and appSecret != ''">app_secret,</if>
+            <if test="miniAppName != null">mini_app_name,</if>
+            <if test="applicationSign != null and applicationSign != ''">application_sign,</if>
+            <if test="platformType != null and platformType != ''">platform_type,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="appId != null and appId != ''">#{appId},</if>
+            <if test="appSecret != null and appSecret != ''">#{appSecret},</if>
+            <if test="miniAppName != null">#{miniAppName},</if>
+            <if test="applicationSign != null and applicationSign != ''">#{applicationSign},</if>
+            <if test="platformType != null and platformType != ''">#{platformType},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHyzzMicroMiniappConfig" parameterType="com.cosmo.hhim.thridplat.api.wechatminiapp.domain.HyzzMicroMiniappConfig">
+        update hyzz_micro_miniapp_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="appId != null and appId != ''">app_id = #{appId},</if>
+            <if test="appSecret != null and appSecret != ''">app_secret = #{appSecret},</if>
+            <if test="miniAppName != null">mini_app_name = #{miniAppName},</if>
+            <if test="applicationSign != null and applicationSign != ''">application_sign = #{applicationSign},</if>
+            <if test="platformType != null and platformType != ''">platform_type = #{platformType},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteHyzzMicroMiniappConfigById" parameterType="Long">
+        delete from hyzz_micro_miniapp_config where id = #{id}
+    </delete>
+
+    <delete id="deleteHyzzMicroMiniappConfigByIds" parameterType="String">
+        delete from hyzz_micro_miniapp_config where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzCustomerMapper">
+
+    <resultMap type="HyzzCustomer" id="HyzzCustomerResult">
+        <result property="rowId" column="row_id"/>
+        <result property="customerCode" column="customer_code"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="customerShortName" column="customer_short_name"/>
+        <result property="tradeType" column="trade_type"/>
+        <result property="provinceId" column="province_id"/>
+        <result property="provinceName" column="province_name"/>
+        <result property="cityId" column="city_id"/>
+        <result property="cityName" column="city_name"/>
+        <result property="countyId" column="county_id"/>
+        <result property="countyName" column="county_name"/>
+        <result property="streetId" column="street_id"/>
+        <result property="streetName" column="street_name"/>
+        <result property="customerAddress" column="customer_address"/>
+        <result property="contactName" column="contact_name"/>
+        <result property="contactPhone" column="contact_phone"/>
+        <result property="mainBusiness" column="main_business"/>
+        <result property="remark" column="remark"/>
+        <result property="channelType" column="channel_type"/>
+        <result property="channelCode" column="channel_code"/>
+        <result property="channelName" column="channel_name"/>
+        <result property="customerStatus" column="customer_status"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="impowerType" column="impower_type"/>
+        <result property="databaseName" column="databaseName"/>
+        <result property="datasource" column="datasource"/>
+        <result property="ext1" column="ext1"/>
+        <result property="ext2" column="ext2"/>
+        <result property="logo" column="logo"/>
+        <result property="sendFlag" column="send_flag"/>
+        <result property="sendTime" column="send_time"/>
+        <result property="sender" column="sender"/>
+        <result property="scope" column="scope"/>
+        <result property="authUserNum" column="auth_user_num"/>
+        <result property="salesManager" column="sales_manager"/>
+        <result property="salesPhone" column="sales_phone"/>
+
+        <result property="createDbState" column="create_db_state"/>
+        <result property="createDbTime" column="create_db_time"/>
+        <result property="createDbBy" column="create_db_by"/>
+
+        <result property="createDbeException" column="create_db_exception"/>
+        <result property="vId" column="v_id"/>
+        <result property="useState" column="use_state"/>
+        <result property="playUser" column="play_user"/>
+        <result property="userName" column="user_name"/>
+        <result property="phoneNumber" column="phonenumber"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="useState" column="use_state"/>
+        <result property="accountType" column="account_type"/>
+        <result property="customerSource" column="customer_source"/>
+        <result property="password" column="password"/>
+        <result property="customerProductType" column="customer_product_type"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="userValidDate" column="valid_date"/>
+        <result property="useStatus" column="use_status"/>
+        <result property="inviteCode" column="invite_code"/>
+
+    </resultMap>
+
+
+    <resultMap type="CustomerUser" id="CustomerUserResult">
+        <result property="customerCode" column="customer_code"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="accountType" column="account_type"/>
+        <result property="userName" column="user_name"/>
+        <result property="nickName" column="nick_name"/>
+
+    </resultMap>
+
+    <sql id="selectHyzzCustomerVo">
+        select row_id,
+               customer_code,
+               customer_name,
+               customer_short_name,
+               trade_type,
+               province_id,
+               province_name,
+               city_id,
+               city_name,
+               county_id,
+               county_name,
+               street_id,
+               street_name,
+               customer_address,
+               contact_name,
+               contact_phone,
+               main_business,
+               remark,
+               channel_type,
+               channel_code,
+               channel_name,
+               customer_status,
+               active_flag,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               impower_type,
+               databaseName,
+               datasource,
+               ext1,
+               ext2,
+               logo,
+               send_flag,
+               send_time,
+               sender,
+               scope,
+               auth_user_num,
+               sales_manager,
+               sales_phone,
+               create_db_state,
+               create_db_time,
+               create_db_by,
+               create_db_exception,
+               v_id,
+               use_state,
+               invite_code
+        from hyzz_customer
+    </sql>
+
+    <sql id="selectHyzzCustomerVoByApi">
+        select
+            a.row_id,
+            a.customer_code,
+            a.customer_name,
+            a.customer_short_name,
+            a.trade_type,
+            a.province_id,
+            a.province_name,
+            a.city_id,
+            a.city_name,
+            a.county_id,
+            a.county_name,
+            a.street_id,
+            a.street_name,
+            a.customer_address,
+            a.contact_name,
+            a.contact_phone,
+            a.main_business,
+            a.remark,
+            a.channel_type,
+            a.channel_code,
+            a.channel_name,
+            a.customer_status,
+            a.active_flag,
+            a.create_by,
+            a.create_time,
+            a.impower_type,
+            a.databaseName,
+            a.datasource,
+            a.ext1,
+            a.ext2,
+            a.send_flag,
+            a.send_time,
+            a.sender,
+            a.v_id,
+            a.use_state,
+            b.play_user,
+            b.user_name,
+            b.nick_name,
+            b.phonenumber,
+            b.del_flag,
+            b.account_type,
+            b.password,
+            a.customer_source,
+            a.customer_product_type,
+            b.valid_date,
+            c.use_status
+        from hyzz_customer a
+            left join hyzz_customer_user b on a.customer_code = b.customer_code
+            left join hyzz_customer_application c on a.customer_code = c.customer_code
+    </sql>
+
+    <select id="selectHyzzCustomerByApi"  resultMap="HyzzCustomerResult">
+        <include refid="selectHyzzCustomerVoByApi"/>
+        where  1=1
+        <if test="userName != null  and userName != ''">
+            and b.user_name = #{userName}
+        </if>
+        <if test="mobile != null  and mobile != ''">
+            and  b.phonenumber = #{mobile}
+        </if>
+        <if test="productType != null">
+            and a.customer_product_type = #{productType}
+        </if>
+        <if test="productId != null and productId != ''">
+            and c.app_id = #{productId}
+        </if>
+    </select>
+
+    <select id="selectHyzzCustomerByNoParam" resultMap="HyzzCustomerResult">
+        select a.row_id,
+               a.customer_code,
+               a.customer_name,
+               a.customer_short_name,
+               a.trade_type,
+               a.province_id,
+               a.province_name,
+               a.city_id,
+               a.city_name,
+               a.county_id,
+               a.county_name,
+               a.street_id,
+               a.street_name,
+               a.customer_address,
+               a.contact_name,
+               a.contact_phone,
+               a.main_business,
+               a.remark,
+               a.channel_type,
+               a.channel_code,
+               a.channel_name,
+               a.customer_status,
+               a.active_flag,
+               a.create_by,
+               a.create_time,
+               a.impower_type,
+               a.databaseName,
+               a.datasource,
+               a.ext1,
+               a.ext2,
+               a.send_flag,
+               a.send_time,
+               a.sender,
+               a.v_id,
+               a.use_state
+        from hyzz_customer a
+        where  a.use_state =1
+          and a.create_db_state=2
+
+    </select>
+
+    <select id="selectDataByCustomerCode" parameterType="java.lang.String" resultType="HyzzCustomer">
+        select databaseName,
+               datasource,
+               customer_name       as customerName,
+               customer_short_name as customerShortName,
+               customer_code       as customerCode,
+                cuba_id as cubaId,
+               row_id rowId
+        from hyzz_customer
+        where customer_code = #{customerCode}
+          and use_state = 1
+    </select>
+
+    <select id="selectDataByCubaId" parameterType="java.lang.String" resultType="HyzzCustomer">
+        select databaseName,
+               datasource,
+               customer_name       as customerName,
+               customer_short_name as customerShortName,
+               customer_code       as customerCode
+        from hyzz_customer
+        where cuba_id = #{cubaId}
+          and use_state = 1
+    </select>
+
+    <select id="selectDataByCustomerName" parameterType="java.lang.String" resultType="HyzzCustomer">
+        select databaseName,
+        datasource,
+        customer_name       as customerName,
+        customer_short_name as customerShortName,
+        customer_code       as customerCode
+        from hyzz_customer
+        <where>
+            <if test="customerName != null  and customerName != ''">
+                and customer_name like concat('%', #{customerName}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findCustomUserByName" resultMap="CustomerUserResult">
+        select a.user_name,a.nick_name,a.account_type ,b.customer_name,b.customer_code
+        from hyzz_customer b,hyzz_customer_user a where a.customer_code=b.customer_code
+        and a.user_name in
+        <foreach item="item" collection="username" open="(" separator="," close=")">
+            replace(#{item},' ','')
+        </foreach>
+
+    </select>
+
+    <select id="queryIdentity" resultMap="HyzzCustomerResult">
+        SELECT
+        b.customer_code ,a.send_flag
+        FROM
+        hyzz_customer a,
+        hyzz_customer_user b
+        WHERE
+        a.customer_code = b.customer_code
+        <if test="userName != null  and userName != ''">
+            and b.user_name = #{userName}
+        </if>
+
+        <if test="phoneNumber != null  and phoneNumber != ''">
+            and  b.phonenumber = #{phoneNumber}
+        </if>
+
+    </select>
+    <select id="findUserByCustomer" resultType="com.cosmo.hhim.thirdplat.api.operation.domain.CustomerUser">
+        select a.user_name     as userName,
+               a.nick_name     as nickName,
+               a.account_type  as accountType,
+               b.customer_name as customerName,
+               b.customer_code as customerCode
+        from hyzz_customer b
+                 inner join hyzz_customer_user a on a.customer_code = b.customer_code
+        where b.active_flag = 1
+          and (
+            a.user_name like concat('%', #{userName}, '%')
+            or a.nick_name like concat('%', #{userName}, '%')
+            )
+          and b.customer_code = #{customerCode}
+    </select>
+
+    <select id="getCustomByUucUserId"  resultMap="HyzzCustomerResult">
+        <include refid="selectHyzzCustomerVoByApi"/>
+            where b.uuc_user_id = #{uucUserId}
+            and  a.customer_product_type=#{type}
+    </select>
+
+    <select id="selectCustomerAndUserInfo" resultMap="HyzzCustomerResult">
+        select
+            a.row_id,
+            a.customer_code,
+            a.customer_name,
+            a.customer_short_name,
+            a.trade_type,
+            a.province_id,
+            a.province_name,
+            a.city_id,
+            a.city_name,
+            a.county_id,
+            a.county_name,
+            a.street_id,
+            a.street_name,
+            a.customer_address,
+            a.contact_name,
+            a.contact_phone,
+            a.main_business,
+            a.remark,
+            a.channel_type,
+            a.channel_code,
+            a.channel_name,
+            a.customer_status,
+            a.active_flag,
+            a.create_by,
+            a.create_time,
+            a.impower_type,
+            a.databaseName,
+            a.datasource,
+            a.ext1,
+            a.ext2,
+            a.send_flag,
+            a.send_time,
+            a.sender,
+            a.v_id,
+            a.use_state,
+            b.play_user,
+            c.user_name,
+            c.nick_name,
+            c.phonenumber,
+            c.del_flag,
+            b.account_type,
+            c.password,
+            a.customer_source,
+            b.customer_product_type,
+            b.valid_date,
+            d.use_status
+        from hyzz_customer a
+            left join hyzz_customer_user_mapping b on b.customer_id = a.row_id
+            left join hyzz_customer_user c on c.user_id = b.user_id
+            left join hyzz_customer_application d on d.customer_code = a.customer_code
+        <where>
+            a.active_flag = 1 and
+            b.customer_product_type = #{productType}
+            <if test="username != null and username != ''">
+                and c.user_name = #{username}
+            </if>
+            <if test="phoneNumber != null and phoneNumber != ''">
+                and c.phonenumber = #{phoneNumber}
+            </if>
+            <if test="productId != null and productId != ''">
+                and d.app_id = #{productId}
+            </if>
+        </where>
+    </select>
+
+    <select id="findPcbaCustomer" resultMap="HyzzCustomerResult">
+        select * from hyzz_customer where channel_type='N' and industry_attribute=1
+    </select>
+
+    <select id="findByInviteCode" resultMap="HyzzCustomerResult">
+        <include refid="selectHyzzCustomerVo"/>
+        where  invite_code=#{inviteCode}
+        limit 1
+    </select>
+</mapper>

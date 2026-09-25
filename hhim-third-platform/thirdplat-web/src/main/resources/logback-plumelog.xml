@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <springProperty scope="context" name="plumelog.appName" source="spring.application.name"/>
+    <springProperty scope="context" name="plumelog.env" source="spring.profiles.active"/>
+    <springProperty scope="context" name="plumelog.kafkaHosts" source="plumelog.kafkaHosts"/>
+
+    <!-- 日志存放路径 -->
+    <property name="log.path" value="logs/hhim-third-platform"/>
+    <!-- 日志输出格式 -->
+    <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n"/>
+
+    <!-- 控制台输出 -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Mapper 层默认 info：避免生产环境打印 SQL 参数（可能含敏感数据），排查 SQL 时设置环境变量 LOG_LEVEL_MAPPER=debug -->
+    <logger name="com.cosmo.hhim.thirdplat.web.mapper" level="${LOG_LEVEL_MAPPER:-info}"/>
+    <!-- 系统模块日志级别控制  -->
+    <logger name="com.cosmo.hhim" level="info"/>
+    <!-- Spring日志级别控制  -->
+    <logger name="org.springframework" level="warn"/>
+
+    <!--系统操作日志-->
+    <springProfile name="dev,local">
+        <root level="info">
+            <appender-ref ref="console"/>
+        </root>
+    </springProfile>
+
+</configuration>

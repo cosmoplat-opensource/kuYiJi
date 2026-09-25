@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.ai.MicroAiDailyMapper">
+
+    <!-- 按日聚合（产量=已审合格数，与质量页"记工总数"同源口径）
+         having：过滤"有已审行但质检数为 0"的日子——否则 passRate 会算成 NULL/0，
+         出现"2026-09-03 良品率最低，为 0"这种假数 -->
+    <select id="selectDailySummary" resultType="java.util.Map">
+        select date_format(submit_day, '%Y-%m-%d') as submitDay,
+               sum(check_pass_num) as passNum,
+               sum(check_ng_num) as ngNum,
+               sum(check_pass_num + check_ng_num) as totalNum
+        from micro_work_submit
+        where submit_type = '1'
+          and submit_status = '0'
+          and submit_day between #{startDate} and #{endDate}
+          and tenant_code = #{tenantCode}
+        group by submitDay
+        having ifnull(sum(check_pass_num + check_ng_num), 0) > 0
+        order by submitDay asc
+    </select>
+
+    <!-- 报工汇总（全量=已审+未审；"报了多工/有活干吗"语义，与"产量(已审)"区分） -->
+    <select id="selectSubmitSummaryRaw" resultType="java.util.Map">
+        select ifnull(sum(pass_num), 0) as passNum,
+               ifnull(sum(ng_num), 0) as ngNum,
+               ifnull(sum(pass_num + ng_num), 0) as totalNum
+        from micro_work_submit
+        where submit_type = '1'
+          and submit_day between #{startDate} and #{endDate}
+          and tenant_code = #{tenantCode}
+    </select>
+
+    <!-- 按日报工聚合（全量口径含未审；"哪天报了多工"语义）：同样剔除全天 0 数的分组 -->
+    <select id="selectDailySummaryRaw" resultType="java.util.Map">
+        select date_format(submit_day, '%Y-%m-%d') as submitDay,
+               sum(pass_num) as passNum,
+               sum(ng_num) as ngNum,
+               sum(pass_num + ng_num) as totalNum
+        from micro_work_submit
+        where submit_type = '1'
+          and submit_day between #{startDate} and #{endDate}
+          and tenant_code = #{tenantCode}
+        group by submitDay
+        having ifnull(sum(pass_num + ng_num), 0) > 0
+        order by submitDay asc
+    </select>
+
+    <!-- 未审核报工汇总（已审为空时代替"暂无"话术：告知用户待审核量） -->
+    <select id="selectPendingSummary" resultType="java.util.Map">
+        select ifnull(sum(pass_num), 0) as passNum,
+               ifnull(sum(ng_num), 0) as ngNum,
+               ifnull(sum(pass_num + ng_num), 0) as totalNum
+        from micro_work_submit
+        where submit_type = '1' and submit_status &lt;&gt; '0'
+          and submit_day between #{startDate} and #{endDate}
+          and tenant_code = #{tenantCode}
+    </select>
+
+    <!-- 记工排名（全量口径=报工数，含未审核；"谁报工"语义） -->
+    <select id="selectWorkRankRaw" resultType="java.util.Map">
+        select mu.nick_name as nickName, mu.user_name as userName,
+               ifnull(sum(m.pass_num + m.ng_num), 0) as submitNum
+        from micro_work_submit m
+        left join micro_user mu on mu.id = m.submit_user and mu.tenant_code = m.tenant_code
+        where m.submit_type = '1'
+          and m.submit_day between #{startDate} and #{endDate}
+          and m.tenant_code = #{tenantCode}
+        group by m.submit_user
+        order by submitNum desc
+        limit 10
+    </select>
+
+    <!-- 工序良品率（已审口径，与良品率列表同源；nullif 防除零=避免"未审 check=0"引发 / by zero）
+         取舍必须与页面一致：既有接口用 BigDecimal.divide(..., 3, RoundingMode.DOWN)（截断 3 位），
+         此处用 truncate(...,3)。用 round(...,4) 会导致问数 95.7% / 页面 95.6% 的口径差。 -->
+    <select id="selectProcessPassRate" resultType="java.util.Map">
+        select mpc.process_name as processName, mpc.process_code as processCode,
+               sum(mws.check_pass_num) as checkPassNum,
+               sum(mws.check_ng_num) as checkNgNum,
+               truncate(sum(mws.check_pass_num) / nullif(sum(mws.check_pass_num + mws.check_ng_num), 0), 3) as passRate
+        from micro_work_submit mws
+        left join micro_process_common mpc
+          on mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+        left join micro_product mp
+          on mws.product_seq = mp.product_seq and mp.tenant_code = mws.tenant_code
+        left join micro_user mu on mu.id = mws.submit_user and mu.tenant_code = mws.tenant_code
+        where mws.submit_type = '1' and mws.submit_status = '0'
+          and mws.submit_day between #{startDate} and #{endDate}
+          and mws.tenant_code = #{tenantCode}
+          and (#{processNameOrCode} is null or #{processNameOrCode} = ''
+               or mpc.process_name = #{processNameOrCode} or mpc.process_code = #{processNameOrCode})
+          and (#{productNameOrCode} is null or #{productNameOrCode} = ''
+               or mp.product_name = #{productNameOrCode} or mp.product_code = #{productNameOrCode})
+          and (#{employeeName} is null or #{employeeName} = ''
+               or mu.nick_name = #{employeeName} or mu.user_name = #{employeeName})
+        group by mws.operate_process_seq
+        having ifnull(sum(mws.check_pass_num + mws.check_ng_num), 0) > 0
+        order by passRate asc
+    </select>
+
+    <!-- 员工良品率（已审口径，nullif 防除零；取舍同页面=截断 3 位）
+         having：排除"已审但 check 数为空/0"的分组——否则 passRate=NULL 会被投影成 0%，
+         造成"良品率最低 0%"这种假数（历史上 FLP-DN20 0% 即由此而来） -->
+    <select id="selectEmployeePassRate" resultType="java.util.Map">
+        select mu.nick_name as nickName, mu.user_name as userName,
+               sum(mws.check_pass_num) as checkPassNum,
+               sum(mws.check_ng_num) as checkNgNum,
+               truncate(sum(mws.check_pass_num) / nullif(sum(mws.check_pass_num + mws.check_ng_num), 0), 3) as passRate
+        from micro_work_submit mws
+        left join micro_user mu on mu.id = mws.submit_user and mu.tenant_code = mws.tenant_code
+        left join micro_product mp
+          on mws.product_seq = mp.product_seq and mp.tenant_code = mws.tenant_code
+        left join micro_process_common mpc
+          on mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+        where mws.submit_type = '1' and mws.submit_status = '0'
+          and mws.submit_day between #{startDate} and #{endDate}
+          and mws.tenant_code = #{tenantCode}
+          and (#{employeeName} is null or #{employeeName} = ''
+               or mu.nick_name = #{employeeName} or mu.user_name = #{employeeName})
+          and (#{productNameOrCode} is null or #{productNameOrCode} = ''
+               or mp.product_name = #{productNameOrCode} or mp.product_code = #{productNameOrCode})
+          and (#{processNameOrCode} is null or #{processNameOrCode} = ''
+               or mpc.process_name = #{processNameOrCode} or mpc.process_code = #{processNameOrCode})
+        group by mws.submit_user
+        having ifnull(sum(mws.check_pass_num + mws.check_ng_num), 0) > 0
+        order by passRate asc
+    </select>
+
+    <!-- 产品良品率（已审口径，与良品率列表同源）：passRate=check_pass/(check_pass+check_ng)，截断 3 位同页面
+         having 同上：无 check 数的分组不得参与"良品率最低"排名 -->
+    <select id="selectProductPassRate" resultType="java.util.Map">
+        select mp.product_name as productName,
+               mp.product_code as productCode,
+               sum(mws.check_pass_num) as checkPassNum,
+               sum(mws.check_ng_num) as checkNgNum,
+               truncate(sum(mws.check_pass_num) / nullif(sum(mws.check_pass_num + mws.check_ng_num), 0), 3) as passRate
+        from micro_work_submit mws
+        left join micro_product mp
+          on mws.product_seq = mp.product_seq and mp.tenant_code = mws.tenant_code
+        left join micro_process_common mpc
+          on mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+        left join micro_user mu on mu.id = mws.submit_user and mu.tenant_code = mws.tenant_code
+        where mws.submit_type = '1'
+          and mws.submit_status = '0'
+          and mws.submit_day between #{startDate} and #{endDate}
+          and mws.tenant_code = #{tenantCode}
+          and (#{productNameOrCode} is null or #{productNameOrCode} = ''
+               or mp.product_name = #{productNameOrCode} or mp.product_code = #{productNameOrCode})
+          and (#{processNameOrCode} is null or #{processNameOrCode} = ''
+               or mpc.process_name = #{processNameOrCode} or mpc.process_code = #{processNameOrCode})
+          and (#{employeeName} is null or #{employeeName} = ''
+               or mu.nick_name = #{employeeName} or mu.user_name = #{employeeName})
+        group by mws.product_seq
+        having ifnull(sum(mws.check_pass_num + mws.check_ng_num), 0) > 0
+        order by passRate asc
+    </select>
+
+    <!-- 最近一次已审报工日（空数据引导用；与查询口径一致：已审 + 不晚于今天） -->
+    <select id="selectLatestSubmitDay" resultType="java.lang.String">
+        select date_format(max(submit_day), '%Y-%m-%d')
+        from micro_work_submit
+        where submit_type = '1' and submit_status = '0' and tenant_code = #{tenantCode}
+          and submit_day &lt;= curdate()
+    </select>
+
+    <!-- 成品库存（租户隔离登记 SQL；替代既有 obtainedTotalStock 的跨租户/在制品口径问题） -->
+    <select id="selectFinishedStock" resultType="java.util.Map">
+        select ifnull(sum(num), 0) as finishedNum, count(*) as productCnt
+        from micro_finished_product_storage
+        where tenant_code = #{tenantCode} and num > 0
+    </select>
+
+    <!-- 产品维度成品库存排行（同 selectFinishedStock 口径：租户隔离 + num>0；"哪个产品库存最多"）
+         表上唯一键是 (product_seq, tenant_code)，GROUP BY 带上 tenant_code，
+         不依赖 ONLY_FULL_GROUP_BY 对"常量等值"的函数依赖推断 -->
+    <select id="selectFinishedStockByProduct" resultType="java.util.Map">
+        select product_name as productName, product_seq as productSeq,
+               ifnull(sum(num), 0) as finishedNum
+        from micro_finished_product_storage
+        where tenant_code = #{tenantCode} and num > 0
+        group by product_seq, tenant_code, product_name
+        order by finishedNum desc
+        limit 10
+    </select>
+
+    <!-- 近 30 天日均产能（已审 check 口径，与页面/问数统计口径一致） -->
+    <select id="selectAvgDailyCapacity" resultType="java.math.BigDecimal">
+        select ifnull(sum(check_pass_num + check_ng_num) / 30, 0)
+        from micro_work_submit
+        where submit_type = '1' and submit_status = '0'
+          and submit_day &gt;= date_sub(curdate(), interval 29 day)
+          and tenant_code = #{tenantCode}
+    </select>
+
+    <!-- 订单延期预警：预计完成日 = 今日 + 剩余数量 ÷ 日均产能 × 1.2；预计完成日 > 交付日 → 延期 -->
+    <select id="selectDeliveryRisk" resultType="java.util.Map">
+        select o.order_no as orderNo,
+               mp.product_name as productName,
+               mp.product_code as productCode,
+               o.plan_num as planNum,
+               o.finish_num as finishNum,
+               round(o.plan_num - o.finish_num, 0) as remainingNum,
+               date_format(o.delivery_date, '%Y-%m-%d') as deliveryDate,
+               ifnull(round((o.plan_num - o.finish_num) / nullif(#{dailyCap}, 0) * 1.2, 0), 0) as needDays,
+               date_add(curdate(),
+                        interval ifnull(round((o.plan_num - o.finish_num) / nullif(#{dailyCap}, 0) * 1.2, 0), 0) day) as predictDate,
+               datediff(date_add(curdate(),
+                        interval ifnull(round((o.plan_num - o.finish_num) / nullif(#{dailyCap}, 0) * 1.2, 0), 0) day),
+                        date_format(o.delivery_date, '%Y-%m-%d')) as riskDays
+        from micro_manufacture_order o
+        left join micro_product mp
+          on o.product_seq = mp.product_seq and mp.tenant_code = o.tenant_code
+        where o.tenant_code = #{tenantCode}
+          and o.order_status in ('10', '20', '30')
+          and o.plan_num > o.finish_num
+          and datediff(date_add(curdate(),
+                interval ifnull(round((o.plan_num - o.finish_num) / nullif(#{dailyCap}, 0) * 1.2, 0), 0) day),
+                date_format(o.delivery_date, '%Y-%m-%d')) > 0
+        order by o.delivery_date asc
+        limit 10
+    </select>
+
+    <!-- 近期交付（未延期）：预计完成日 ≤ 交付日 且 交期在 7 天内 -->
+    <select id="selectDeliverySoon" resultType="java.util.Map">
+        select o.order_no as orderNo,
+               mp.product_name as productName,
+               mp.product_code as productCode,
+               o.plan_num as planNum,
+               o.finish_num as finishNum,
+               round(o.plan_num - o.finish_num, 0) as remainingNum,
+               date_format(o.delivery_date, '%Y-%m-%d') as deliveryDate,
+               date_add(curdate(),
+                        interval ifnull(round((o.plan_num - o.finish_num) / nullif(#{dailyCap}, 0) * 1.2, 0), 0) day) as predictDate
+        from micro_manufacture_order o
+        left join micro_product mp
+          on o.product_seq = mp.product_seq and mp.tenant_code = o.tenant_code
+        where o.tenant_code = #{tenantCode}
+          and o.order_status in ('10', '20', '30')
+          and o.plan_num > o.finish_num
+          and datediff(date_add(curdate(),
+                interval ifnull(round((o.plan_num - o.finish_num) / nullif(#{dailyCap}, 0) * 1.2, 0), 0) day),
+                date_format(o.delivery_date, '%Y-%m-%d')) &lt;= 0
+          and datediff(date_format(o.delivery_date, '%Y-%m-%d'), curdate()) &lt;= 7
+        order by o.delivery_date asc
+        limit 10
+    </select>
+    <!-- ============================================================
+         AI 分析层（MiniAnalyst 取数）—— 全部走已审口径，与页面同源
+         ============================================================ -->
+
+    <!-- 指标 × 维度 × 期间：为"两期对比/归因"提供 分子(良品)/分母(质检总数)/样本量
+         维度由 #{dim} 决定（process/product/employee/day），另外三个实体槽位作为可选过滤，
+         支撑"攻丝工序为什么降"这类下钻（下钻 = 带上父维度的过滤再跑一次本查询）。
+         注意：只返回"至少有质检数"的分组由 Java 侧按 totalNum 处理，SQL 侧不裁剪以便暴露样本量。 -->
+    <select id="selectMetricByDimPeriod" resultType="java.util.Map">
+        select
+            (case #{dim}
+                  when 'process'  then mpc.process_name
+                  when 'product'  then mp.product_name
+                  when 'employee' then mu.nick_name
+                  when 'day'      then date_format(mws.submit_day, '%Y-%m-%d')
+                  else '全部' end) as groupName,
+            (case #{dim}
+                  when 'process'  then mws.operate_process_seq
+                  when 'product'  then mws.product_seq
+                  when 'employee' then mws.submit_user
+                  when 'day'      then date_format(mws.submit_day, '%Y-%m-%d')
+                  else 'all' end) as groupKey,
+            sum(mws.check_pass_num) as passNum,
+            sum(mws.check_ng_num) as ngNum,
+            sum(mws.check_pass_num + mws.check_ng_num) as totalNum,
+            count(*) as rowCnt
+        from micro_work_submit mws
+        left join micro_process_common mpc
+          on mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+        left join micro_product mp
+          on mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        left join micro_user mu on mu.id = mws.submit_user and mu.tenant_code = mws.tenant_code
+        where mws.submit_type = '1'
+          and mws.submit_status = '0'
+          and mws.submit_day between #{startDate} and #{endDate}
+          and mws.tenant_code = #{tenantCode}
+          and (#{productNameOrCode} is null or #{productNameOrCode} = ''
+               or mp.product_name = #{productNameOrCode} or mp.product_code = #{productNameOrCode})
+          and (#{processNameOrCode} is null or #{processNameOrCode} = ''
+               or mpc.process_name = #{processNameOrCode} or mpc.process_code = #{processNameOrCode})
+          and (#{employeeName} is null or #{employeeName} = ''
+               or mu.nick_name = #{employeeName} or mu.user_name = #{employeeName})
+        group by groupName, groupKey
+        order by groupKey
+    </select>
+
+    <!-- 不良类型 × 期间：为"不良集中在哪一类"提供数据（源表=质检记录 micro_quality_control_record）
+         注意：质检开关未开启时该表无数据 → 上层需如实告知"无不良类型数据"，不得当成 0 不良 -->
+    <select id="selectNgTypeByPeriod" resultType="java.util.Map">
+        select
+            ifnull(nullif(q.ng_type, ''), '未分类') as groupName,
+            ifnull(nullif(q.ng_type, ''), 'UNKNOWN') as groupKey,
+            sum(q.ng_num) as ngNum,
+            sum(q.pass_num) as passNum,
+            sum(q.pass_num + q.ng_num) as totalNum,
+            count(*) as rowCnt
+        from micro_quality_control_record q
+        left join micro_product mp
+          on q.product_seq = mp.product_seq and q.tenant_code = mp.tenant_code
+        left join micro_process_common mpc
+          on q.process_seq = mpc.process_seq and q.tenant_code = mpc.tenant_code
+        where q.tenant_code = #{tenantCode}
+          and ifnull(q.active_flag, '1') = '1'
+          and q.submit_date between #{startDate} and #{endDate}
+          and (#{productNameOrCode} is null or #{productNameOrCode} = ''
+               or mp.product_name = #{productNameOrCode} or mp.product_code = #{productNameOrCode})
+          and (#{processNameOrCode} is null or #{processNameOrCode} = ''
+               or mpc.process_name = #{processNameOrCode} or mpc.process_code = #{processNameOrCode})
+        group by groupName, groupKey
+        order by ngNum desc
+    </select>
+    <!-- 工序在制品（车间在制余额）：按产品汇总，与车间库存页面同源（micro_process_storage.pass_num） -->
+    <select id="selectProcessStockByProduct" resultType="java.util.Map">
+        select mp.product_name as productName,
+               mp.product_code as productCode,
+               ifnull(sum(mps.pass_num), 0) as wipNum
+        from micro_process_storage mps
+        left join micro_product mp on mp.tenant_code = mps.tenant_code and mp.product_seq = mps.product_seq
+        where mps.tenant_code = #{tenantCode}
+          and mps.pass_num &gt; 0
+        group by mps.product_seq, mp.product_name, mp.product_code
+        order by wipNum desc
+        limit 10
+    </select>
+
+    <!-- ============ 业务数据图（实例级：真实产品/工序/员工 + 真实发生的报工关系） ============ -->
+    <!-- 产品节点：报工数、良品率、成品库存、在制余额（全部实时统计） -->
+    <select id="selectDataGraphProducts" resultType="java.util.Map">
+        select mp.product_seq as nodeId,
+               mp.product_code as code,
+               mp.product_name as name,
+               count(w.id) as submitCnt,
+               ifnull(sum(w.check_pass_num), 0) as passNum,
+               ifnull(sum(w.check_ng_num), 0) as ngNum,
+               ifnull((select sum(f.num) from micro_finished_product_storage f
+                       where f.tenant_code = mp.tenant_code and f.product_seq = mp.product_seq and f.num &gt; 0), 0) as finishedNum,
+               ifnull((select sum(s.pass_num) from micro_process_storage s
+                       where s.tenant_code = mp.tenant_code and s.product_seq = mp.product_seq and s.pass_num &gt; 0), 0) as wipNum
+        from micro_product mp
+        left join micro_work_submit w on w.tenant_code = mp.tenant_code and w.product_seq = mp.product_seq
+             and w.submit_type = '1' and w.submit_status = '0'
+             and w.submit_day &gt;= #{startDate}
+        where mp.tenant_code = #{tenantCode}
+        group by mp.product_seq, mp.product_code, mp.product_name, mp.tenant_code
+        order by submitCnt desc, mp.product_seq
+    </select>
+
+    <!-- 工序节点：被报工次数、参与的产品数、良品率 -->
+    <select id="selectDataGraphProcesses" resultType="java.util.Map">
+        select mpc.process_seq as nodeId,
+               mpc.process_code as code,
+               mpc.process_name as name,
+               count(w.id) as submitCnt,
+               count(distinct w.product_seq) as productCnt,
+               ifnull(sum(w.check_pass_num), 0) as passNum,
+               ifnull(sum(w.check_ng_num), 0) as ngNum
+        from micro_process_common mpc
+        left join micro_work_submit w on w.tenant_code = mpc.tenant_code and w.operate_process_seq = mpc.process_seq
+             and w.submit_type = '1' and w.submit_status = '0'
+             and w.submit_day &gt;= #{startDate}
+        where mpc.tenant_code = #{tenantCode}
+        group by mpc.process_seq, mpc.process_code, mpc.process_name, mpc.tenant_code
+        order by submitCnt desc
+    </select>
+
+    <!-- 员工节点：报工总数、涉及产品/工序数 -->
+    <select id="selectDataGraphEmployees" resultType="java.util.Map">
+        select mu.id as nodeId,
+               mu.nick_name as name,
+               mu.user_name as account,
+               count(w.id) as submitCnt,
+               count(distinct w.product_seq) as productCnt,
+               count(distinct w.operate_process_seq) as processCnt,
+               ifnull(sum(w.check_pass_num), 0) as passNum,
+               ifnull(sum(w.check_ng_num), 0) as ngNum
+        from micro_user mu
+        left join micro_work_submit w on w.tenant_code = mu.tenant_code and w.submit_user = mu.id
+             and w.submit_type = '1' and w.submit_status = '0'
+             and w.submit_day &gt;= #{startDate}
+        where mu.tenant_code = #{tenantCode}
+        group by mu.id, mu.nick_name, mu.user_name, mu.tenant_code
+        order by submitCnt desc
+        limit 50
+    </select>
+
+    <!-- 真实发生的关系：产品 × 工序（该组合被报工了多少条、良品/不良多少） -->
+    <select id="selectDataGraphProductProcess" resultType="java.util.Map">
+        select w.product_seq as productSeq,
+               w.operate_process_seq as processSeq,
+               count(w.id) as submitCnt,
+               date_format(min(w.submit_day), '%Y-%m-%d') as firstDay,
+               ifnull(sum(w.check_pass_num), 0) as passNum,
+               ifnull(sum(w.check_ng_num), 0) as ngNum
+        from micro_work_submit w
+        where w.tenant_code = #{tenantCode}
+          and w.submit_type = '1' and w.submit_status = '0'
+          and w.submit_day &gt;= #{startDate}
+        group by w.product_seq, w.operate_process_seq
+        order by submitCnt desc
+    </select>
+
+    <!-- 真实发生的关系：员工 × 工序 -->
+    <select id="selectDataGraphEmployeeProcess" resultType="java.util.Map">
+        select w.submit_user as employeeId,
+               w.operate_process_seq as processSeq,
+               count(w.id) as submitCnt,
+               ifnull(sum(w.check_pass_num), 0) as passNum,
+               ifnull(sum(w.check_ng_num), 0) as ngNum
+        from micro_work_submit w
+        where w.tenant_code = #{tenantCode}
+          and w.submit_type = '1' and w.submit_status = '0'
+          and w.submit_day &gt;= #{startDate}
+        group by w.submit_user, w.operate_process_seq
+        order by submitCnt desc
+    </select>
+
+    <!-- 数据图的补充统计：字典规模 + 各环节数据量（用于"共N个/有数据M个"与"未产生数据"标注） -->
+    <select id="selectDataGraphCounts" resultType="java.util.Map">
+        select
+          (select count(*) from micro_product p where p.tenant_code = #{tenantCode}) as productDict,
+          (select count(*) from micro_process_common c where c.tenant_code = #{tenantCode}) as processDict,
+          (select count(*) from micro_user u where u.tenant_code = #{tenantCode}) as employeeDict,
+          (select count(distinct w.submit_user) from micro_work_submit w
+             where w.tenant_code = #{tenantCode} and w.submit_type = '1' and w.submit_status = '0') as employeeUsed,
+          (select count(*) from micro_quality_control_record q where q.tenant_code = #{tenantCode}) as qcCnt,
+          (select count(*) from micro_complete_report r where r.tenant_code = #{tenantCode}) as completeCnt,
+          (select ifnull(sum(s.pass_num), 0) from micro_process_storage s
+             where s.tenant_code = #{tenantCode} and s.pass_num &gt; 0) as wipNum,
+          (select ifnull(sum(f.num), 0) from micro_finished_product_storage f
+             where f.tenant_code = #{tenantCode} and f.num &gt; 0) as finishedNum
+    </select>
+
+    <!-- 表结构元数据（供 LLM 生成 SQL 的 schema 摘要）：只取白名单表的列信息，
+         敏感表/敏感列的过滤在 Java 侧按 safety 策略做（这里不裁剪，便于复用与测试） -->
+    <select id="selectTableColumns" resultType="java.util.Map">
+        select table_name as tableName,
+               column_name as columnName,
+               column_type as columnType,
+               column_comment as columnComment
+        from information_schema.columns
+        where table_schema = database()
+          and table_name in
+        <foreach collection="tables" item="t" open="(" separator="," close=")">#{t}</foreach>
+        order by table_name, ordinal_position
+    </select>
+    <!-- 执行"已过 SqlGuard 闸"的生成 SQL。
+         statementType=STATEMENT + ${sql}：SQL 已由 SqlGuard 做过语法/语句类型/白名单/敏感列校验，
+         并强制注入了租户条件与 LIMIT；此处只做执行，超时 5 秒（避免慢查询拖垮连接）。
+         ⚠️ 除本通道外任何地方都不得使用 ${} 拼接。 -->
+    <select id="execGuardedSql" resultType="java.util.Map" timeout="5" statementType="STATEMENT">
+        ${sql}
+    </select>
+
+    <!-- 生成 SQL 审计落库（谁在何时查了什么、闸结果、执行结果全留痕） -->
+    <insert id="insertSqlAudit">
+        insert into micro_ai_sql_audit
+            (tenant_code, session_id, message_id, user_id, question, question_hash, intent, purpose,
+             sql_text, sql_final, guard_ok, reject_reason, tables_json, columns_json,
+             tenant_injected, limit_rewritten, retry_count, exec_status, exec_error, row_count,
+             elapsed_ms, model, created_by, created_date)
+        values
+            (#{tenantCode}, #{sessionId}, #{messageId}, #{userId}, #{question}, #{questionHash}, #{intent}, #{purpose},
+             #{sqlText}, #{sqlFinal}, #{guardOk}, #{rejectReason}, #{tablesJson}, #{columnsJson},
+             #{tenantInjected}, #{limitRewritten}, #{retryCount}, #{execStatus}, #{execError}, #{rowCount},
+             #{elapsedMs}, #{model}, #{createdBy}, now())
+    </insert>
+
+</mapper>

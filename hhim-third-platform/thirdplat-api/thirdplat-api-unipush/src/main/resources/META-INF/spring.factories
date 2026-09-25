@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.thirdplat.api.unipush.factory.RemotePushFallbackFactory, \
+  com.cosmo.hhim.thirdplat.api.unipush.factory.RemoteCustomizedPushFallbackFactory, \
+  com.cosmo.hhim.thirdplat.api.unipush.factory.RemoteDeviceUserBindFallbackFactory

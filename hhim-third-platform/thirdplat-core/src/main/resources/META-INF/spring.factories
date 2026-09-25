@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.thirdplat.core.config.AutoConfig

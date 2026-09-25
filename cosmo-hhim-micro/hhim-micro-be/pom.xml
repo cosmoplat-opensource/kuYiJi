@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.cosmo.hhim.micro</groupId>
+    <artifactId>hhim-micro-be</artifactId>
+    <version>1.0</version>
+    <name>hhim-micro-be</name>
+    <description>微应用后端 - cosmo-hhim-open</description>
+
+    <organization>
+        <name>海尔卡奥斯物联科技有限公司</name>
+        <url>https://www.cosmoplat.com</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <parent>
+        <groupId>com.cosmo.hhim.parent</groupId>
+        <artifactId>hhim-parent</artifactId>
+        <version>1.0</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>micro-interface</module>
+        <module>micro-infrastructure</module>
+        <module>micro-application</module>
+        <module>micro-modules-domain</module>
+        <module>micro-modules-domain/micro-storage-domain</module>
+        <module>micro-modules-domain/micro-base-domain</module>
+    </modules>
+
+    <properties>
+        <micro-back.version>1.0</micro-back.version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

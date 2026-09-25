@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroUserPlatformReMapper">
+
+    <resultMap type="MicroUserPlatformRe" id="MicroUserPlatfromReResult">
+        <result property="id" column="id"/>
+        <result property="openId" column="open_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="applicationSign" column="application_sign"/>
+        <result property="platformType" column="platform_type"/>
+        <result property="remark" column="remark"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <sql id="selectMicroUserPlatfromReVo">
+        select id,
+               open_id,
+               user_id,
+               application_sign,
+               platform_type,
+               remark,
+               active_flag,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_user_platfrom_re
+    </sql>
+
+    <select id="selectMicroUserPlatfromReList" parameterType="MicroUserPlatformRe" resultMap="MicroUserPlatfromReResult">
+        <include refid="selectMicroUserPlatfromReVo"/>
+        <where>
+            <if test="openId != null  and openId != ''">and open_id = #{openId}</if>
+            <if test="userId != null ">and user_id = #{userId}</if>
+            <if test="platformType != null  and platformType != ''">and platform_type = #{platformType}</if>
+            <if test="applicationSign != null  and applicationSign != ''">and application_sign = #{applicationSign}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and active_flag = #{activeFlag}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+        </where>
+    </select>
+
+    <insert id="insertMicroUserPlatfromRe" parameterType="MicroUserPlatformRe" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_user_platfrom_re
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="openId != null and openId != ''">open_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="platformType != null and platformType != ''">platform_type,</if>
+            <if test="applicationSign != null and applicationSign != ''">application_sign,</if>
+            <if test="remark != null">remark,</if>
+            <if test="activeFlag != null and activeFlag != ''">active_flag,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="openId != null and openId != ''">#{openId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="platformType != null and platformType != ''">#{platformType},</if>
+            <if test="applicationSign != null and applicationSign != ''">#{applicationSign},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="activeFlag != null and activeFlag != ''">#{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroUserPlatfromRe" parameterType="MicroUserPlatformRe">
+        update micro_user_platfrom_re
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="openId != null and openId != ''">open_id = #{openId},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where user_id = #{userId} and platform_type = #{platformType}
+            and application_sign = #{applicationSign} and active_flag = '0'
+    </update>
+
+    <delete id="deleteMicroUserPlatfromReById" parameterType="Long">
+        delete
+        from micro_user_platfrom_re
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroUserPlatfromReByIds" parameterType="String">
+        delete from micro_user_platfrom_re where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteMicroUserPlatfromReByUserId" parameterType="java.lang.Long">
+        delete from micro_user_platfrom_re where user_id = #{userId}
+    </delete>
+</mapper>

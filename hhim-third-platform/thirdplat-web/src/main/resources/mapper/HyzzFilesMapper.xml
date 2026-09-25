@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzFilesMapper">
+
+    <resultMap type="HyzzFiles" id="HyzzFilesResult">
+        <result property="rowId"    column="row_id"    />
+        <result property="fileTableName"    column="file_table_name"    />
+        <result property="fileTableId"    column="file_table_id"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="filePath"    column="file_path"    />
+        <result property="remark"    column="remark"    />
+        <result property="fileType"    column="file_type"    />
+        <result property="fileSize"    column="file_size"    />
+        <result property="fileMins"    column="file_mins"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="ext1"    column="ext1"    />
+        <result property="ext2"    column="ext2"    />
+        <result property="ext3"    column="ext3"    />
+    </resultMap>
+
+    <sql id="selectHyzzFilesVo">
+        select row_id, file_table_name, file_table_id, file_name, file_path, remark, file_type, file_size, file_mins, active_flag, create_by, create_time, update_by, update_time, ext1, ext2, ext3 from hyzz_files
+    </sql>
+
+    <select id="selectHyzzFilesList" parameterType="HyzzFiles" resultMap="HyzzFilesResult">
+        <include refid="selectHyzzFilesVo"/>
+        <where>
+            <if test="fileTableName != null  and fileTableName != ''"> and file_table_name like concat('%', #{fileTableName}, '%')</if>
+            <if test="fileTableId != null  and fileTableId != ''"> and file_table_id = #{fileTableId}</if>
+            <if test="fileName != null  and fileName != ''"> and file_name like concat('%', #{fileName}, '%')</if>
+            <if test="filePath != null  and filePath != ''"> and file_path = #{filePath}</if>
+            <if test="fileType != null  and fileType != ''"> and file_type = #{fileType}</if>
+            <if test="fileSize != null  and fileSize != ''"> and file_size = #{fileSize}</if>
+            <if test="fileMins != null  and fileMins != ''"> and file_mins = #{fileMins}</if>
+            and active_flag = '1'
+            <if test="ext1 != null  and ext1 != ''"> and ext1 = #{ext1}</if>
+            <if test="ext2 != null  and ext2 != ''"> and ext2 = #{ext2}</if>
+            <if test="ext3 != null  and ext3 != ''"> and ext3 = #{ext3}</if>
+        </where>
+    </select>
+
+    <select id="selectHyzzFilesById" parameterType="Long" resultMap="HyzzFilesResult">
+        <include refid="selectHyzzFilesVo"/>
+        where row_id = #{rowId}
+    </select>
+    <select id="selectHyzzFilesListByTable" resultMap="HyzzFilesResult">
+        <include refid="selectHyzzFilesVo"/>
+        where file_table_name = #{tableName} order by row_id desc limit 1
+    </select>
+
+    <insert id="insertHyzzFiles" parameterType="HyzzFiles" useGeneratedKeys="true" keyProperty="rowId">
+        insert into hyzz_files
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fileTableName != null and fileTableName != ''">file_table_name,</if>
+            <if test="fileTableId != null and fileTableId != ''">file_table_id,</if>
+            <if test="fileName != null and fileName != ''">file_name,</if>
+            <if test="filePath != null and filePath != ''">file_path,</if>
+            <if test="remark != null">remark,</if>
+            <if test="fileType != null">file_type,</if>
+            <if test="fileSize != null">file_size,</if>
+            <if test="fileMins != null">file_mins,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="ext1 != null">ext1,</if>
+            <if test="ext2 != null">ext2,</if>
+            <if test="ext3 != null">ext3,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fileTableName != null and fileTableName != ''">#{fileTableName},</if>
+            <if test="fileTableId != null and fileTableId != ''">#{fileTableId},</if>
+            <if test="fileName != null and fileName != ''">#{fileName},</if>
+            <if test="filePath != null and filePath != ''">#{filePath},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="fileType != null">#{fileType},</if>
+            <if test="fileSize != null">#{fileSize},</if>
+            <if test="fileMins != null">#{fileMins},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="ext1 != null">#{ext1},</if>
+            <if test="ext2 != null">#{ext2},</if>
+            <if test="ext3 != null">#{ext3},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHyzzFiles" parameterType="HyzzFiles">
+        update hyzz_files
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="fileTableName != null and fileTableName != ''">file_table_name = #{fileTableName},</if>
+            <if test="fileTableId != null and fileTableId != ''">file_table_id = #{fileTableId},</if>
+            <if test="fileName != null and fileName != ''">file_name = #{fileName},</if>
+            <if test="filePath != null and filePath != ''">file_path = #{filePath},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="fileType != null">file_type = #{fileType},</if>
+            <if test="fileSize != null">file_size = #{fileSize},</if>
+            <if test="fileMins != null">file_mins = #{fileMins},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="ext1 != null">ext1 = #{ext1},</if>
+            <if test="ext2 != null">ext2 = #{ext2},</if>
+            <if test="ext3 != null">ext3 = #{ext3},</if>
+        </trim>
+        where row_id = #{rowId}
+    </update>
+
+    <delete id="deleteHyzzFilesById" parameterType="Long">
+        update hyzz_files set active_flag=0 where row_id = #{rowId}
+    </delete>
+
+    <delete id="deleteHyzzFilesByIds" parameterType="String">
+        update hyzz_files set active_flag=0  where row_id in
+        <foreach item="rowId" collection="array" open="(" separator="," close=")">
+            #{rowId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByTableNameAndId" parameterType="String">
+        update hyzz_files set active_flag=0
+        where file_table_name = #{fileTableName}
+          AND file_table_id = #{fileTableId}
+    </delete>
+</mapper>

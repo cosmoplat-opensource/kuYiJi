@@ -1,0 +1,14 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.common.redis.configure.RedisConfig,\
+  com.cosmo.hhim.common.redis.service.RedisLock,\
+  com.cosmo.hhim.common.redis.aspect.RedisLockAspect,\
+  com.cosmo.hhim.common.redis.service.RedisService,\
+  com.cosmo.hhim.common.redis.service.RedisCacheCustomer,\
+  com.cosmo.hhim.common.redis.distributedlock.utils.RedisLockHelper,\
+  com.cosmo.hhim.common.redis.distributedlock.interceptor.LockMethodInterceptor,\
+  com.cosmo.hhim.common.redis.distributedlock.interceptor.DefaultLockKeyGenerator,\
+  com.cosmo.hhim.common.redis.stream.RedisStreamProducer,\
+  com.cosmo.hhim.common.redis.stream.RedisStreamContainer
+
+
+  

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroFollowMapper">
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.follow.MicroFollowEntity" id="MicroFollowResult">
+        <result property="id" column="id"/>
+        <result property="selfId" column="self_id"/>
+        <result property="followId" column="follow_id"/>
+        <result property="followType" column="follow_type"/>
+        <result property="tenantCode" column="tenant_code"/>
+    </resultMap>
+
+    <sql id="selectMicroFollow">
+        select id, self_id, follow_id, follow_type, tenant_code
+        from micro_follow
+    </sql>
+
+    <insert id="insertFollow" parameterType="com.cosmo.hhim.micro.base.domain.entity.follow.MicroFollowEntity">
+        insert into micro_follow
+        (self_id,
+        follow_id,
+        follow_type,
+        tenant_code) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.selfId},
+            #{item.followId},
+            #{item.followType},
+            #{item.tenantCode}
+            )
+        </foreach>
+    </insert>
+    <delete id="deleteFollow">
+        delete from micro_follow
+        where self_id = #{selfId}
+        and follow_type = #{followType}
+        <if test="followIds != null and followIds.size() &gt; 0 ">
+            and follow_id in
+            <foreach collection="followIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </delete>
+    <select id="selectListBySelfId" resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        SELECT t.itemId,
+        t.itemCode,
+        t.itemName,
+        t.itemSeq
+        FROM micro_follow mf
+        inner join
+        (
+        <choose>
+            <when test=" 'EMPLOYEE' == followType">
+                select mu.id as itemId,
+                IF(mu.nick_name is null, mu.user_name,mu.nick_name) as itemName,
+                '' as itemSeq,
+                '' as itemCode,
+                mu.tenant_code
+                from micro_user mu
+            </when>
+            <when test=" 'PRODUCT' == followType">
+                select mp.id as itemId,
+                mp.product_name as itemName,
+                mp.product_seq as itemSeq,
+                mp.product_code as itemCode,
+                mp.tenant_code
+                from micro_product mp
+            </when>
+            <when test=" 'PROCESS' == followType">
+                select mpc.id as itemId,
+                mpc.process_name as itemName,
+                mpc.process_seq as itemSeq,
+                mpc.process_code as itemCode,
+                mpc.tenant_code
+                from micro_process_common mpc
+            </when>
+        </choose>
+        ) as t on t.tenant_code = t.tenant_code and mf.follow_id = t.itemId
+        where mf.follow_type =#{followType}
+        AND mf.self_id = #{selfId}
+        ORDER BY mf.id DESC
+    </select>
+
+</mapper>

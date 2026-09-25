@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.complete.domain.mapper.MicroCompleteReportMapper">
+    
+    <resultMap type="MicroCompleteReport" id="MicroCompleteReportResult">
+        <result property="id"    column="id"    />
+        <result property="reportNo"    column="report_no"    />
+        <result property="productSeq"    column="product_seq"    />
+        <result property="productName"    column="product_name"    />
+        <result property="completeNum"    column="complete_num"    />
+        <result property="state"    column="state"    />
+        <result property="workSubmitId"    column="work_submit_id"    />
+        <result property="completeTime"    column="complete_time"    />
+        <result property="completeUser"    column="complete_user"    />
+        <result property="sourceChannel"    column="source_channel"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+    </resultMap>
+
+    <sql id="selectMicroCompleteReportVo">
+        select id, report_no, product_seq, product_name, complete_num, state, work_submit_id, complete_time, complete_user, source_channel, active_flag, remark, created_by, created_date, last_upd_by, last_upd_date from micro_complete_report
+    </sql>
+
+    <select id="selectMicroCompleteReportList" parameterType="MicroCompleteReportParam"
+            resultType="MicroCompleteReportGroupResult">
+        select
+            report_no reportNo,
+            complete_time completeTime,
+            count(distinct product_seq) productCategoryTotalNum,
+            sum(complete_num) productTotalNum,
+            source_channel sourceChannel,
+            complete_user completeUser
+        from micro_complete_report
+        <where>
+            <if test="sourceChannel != null and sourceChannel != ''">
+                and source_channel =#{sourceChannel}
+            </if>
+            <if test="startDate != null">
+                and complete_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and complete_time &lt;= #{endDate}
+            </if>
+            and `state` in ('0', '2')
+        </where>
+        group by report_no
+        order by complete_time desc
+    </select>
+
+    <select id="selectMicroCompleteReportListGroupByProduct" parameterType="MicroCompleteReportProductSideParam" resultType="MicroCompleteReportProductGroupResult">
+        select
+            a.product_seq productSeq,
+            b.product_code productCode,
+            a.product_name productName,
+            sum(a.complete_num) completeTotalNum
+        from micro_complete_report a
+            left join micro_product b on a.product_seq = b.product_seq
+        <where>
+            <if test="sourceChannel != null and sourceChannel != ''">
+                and a.source_channel =#{sourceChannel}
+            </if>
+            <if test="startDate != null">
+                and a.complete_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and a.complete_time &lt;= #{endDate}
+            </if>
+            <if test="productCodeOrName != null and productCodeOrName!= ''">
+                and (b.product_code like concat('%', #{productCodeOrName}, '%') or b.product_name like concat('%', #{productCodeOrName}, '%'))
+            </if>
+            and a.`state` in ('0', '2')
+        </where>
+        group by a.product_seq
+    </select>
+
+
+    <select id="selectMicroCompleteReportForWorkOrderList" parameterType="MicroCompleteReportParam" resultType="MicroCompleteReportGroupPlanResult">
+        select
+            a.id workOrderId,
+            a.work_order_no workOrderNo,
+            a.order_no orderNo,
+            a.product_seq productSeq,
+            a.wshop_code wshopCode,
+            a.mline_code mlineCode,
+            a.plan_start_date planStartDate,
+            a.plan_end_date planEndDate,
+            a.produce_start_date produceStartDate,
+            a.produce_end_date produceEndDate,
+            b.complete_num completeNum,
+            b.complete_time completeTime,
+            b.complete_user completeUser,
+            b.id completeReportId
+        from micro_manufacture_work_order a
+            left join micro_complete_report b on a.id = b.work_submit_id
+        <where>
+            and a.active_flag = '1'
+            and b.`state` in ('0', '2')
+            <if test="sourceChannel != null and sourceChannel != ''">
+                and b.source_channel =#{sourceChannel}
+            </if>
+            <if test="startDate != null">
+                and b.complete_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and b.complete_time &lt;= #{endDate}
+            </if>
+            <if test="orderOrWorkNo != null and orderOrWorkNo != ''">
+                and (a.work_order_no like concat('%', #{orderOrWorkNo}, '%') or a.order_no like concat('%', #{orderOrWorkNo}, '%'))
+            </if>
+        </where>
+        order by b.complete_time desc
+    </select>
+
+    <select id="selectMicroCompleteReportNormalList" parameterType="MicroCompleteReportBasicParam" resultMap="MicroCompleteReportResult">
+        <include refid="selectMicroCompleteReportVo"/>
+        <where>
+            <if test="sourceChannel != null and sourceChannel != ''">
+                and source_channel =#{sourceChannel}
+            </if>
+            <if test="startDate != null">
+                and complete_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and complete_time &lt;= #{endDate}
+            </if>
+            <if test="productSeq != null and productSeq != ''">
+                and product_seq = #{productSeq}
+            </if>
+            and `state` in ('0', '2')
+        </where>
+        order by complete_time desc
+    </select>
+
+    <select id="selectMicroCompleteReportById" parameterType="java.lang.Long" resultMap="MicroCompleteReportResult">
+        <include refid="selectMicroCompleteReportVo"/>
+        where id = #{id}
+    </select>
+    
+    <select id="selectMicroCompleteReportByReportNo" parameterType="java.lang.String" resultMap="MicroCompleteReportResult">
+        <include refid="selectMicroCompleteReportVo"/>
+        where report_no = #{reportNo}
+    </select>
+
+    <select id="selectGroupMicroCompleteReportByReportNo" parameterType="java.lang.String"
+            resultType="com.cosmo.hhim.micro.complete.domain.entity.MicroCompleteReportDetailGroupInfo">
+        select
+            product_seq productSeq,
+            product_name productName,
+            sum(complete_num) completeTotalNum
+        from micro_complete_report
+        where report_no = #{reportNo}
+        group by product_seq
+        order by completeTotalNum desc
+    </select>
+        
+    <insert id="insertMicroCompleteReport" parameterType="MicroCompleteReport" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_complete_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reportNo != null and reportNo != ''">report_no,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="completeNum != null">complete_num,</if>
+            <if test="state != null and state != ''">state,</if>
+            <if test="workSubmitId != null">work_submit_id,</if>
+            <if test="completeTime != null">complete_time,</if>
+            <if test="completeUser != null">complete_user,</if>
+            <if test="sourceChannel != null">source_channel,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="reportNo != null and reportNo != ''">#{reportNo},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="completeNum != null">#{completeNum},</if>
+            <if test="state != null and state != ''">#{state},</if>
+            <if test="workSubmitId != null">#{workSubmitId},</if>
+            <if test="completeTime != null">#{completeTime},</if>
+            <if test="completeUser != null">#{completeUser},</if>
+            <if test="sourceChannel != null">#{sourceChannel},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroCompleteReport" parameterType="MicroCompleteReport">
+        update micro_complete_report
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="completeNum != null">complete_num = #{completeNum},</if>
+            <if test="state != null and state != ''">state = #{state},</if>
+            <if test="workSubmitId != null">work_submit_id = #{workSubmitId},</if>
+            <if test="completeTime != null">complete_time = #{completeTime},</if>
+            <if test="completeUser != null">complete_user = #{completeUser},</if>
+            <if test="sourceChannel != null">source_channel = #{sourceChannel},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where report_no = #{reportNo}
+    </update>
+
+    <update id="updateMicroCompleteReportById" parameterType="MicroCompleteReport">
+        update micro_complete_report
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="completeNum != null">complete_num = #{completeNum},</if>
+            <if test="state != null and state != ''">state = #{state},</if>
+            <if test="workSubmitId != null">work_submit_id = #{workSubmitId},</if>
+            <if test="completeTime != null">complete_time = #{completeTime},</if>
+            <if test="completeUser != null">complete_user = #{completeUser},</if>
+            <if test="sourceChannel != null">source_channel = #{sourceChannel},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="selectCompleteTotalNumGroupByDay" parameterType="com.cosmo.hhim.micro.complete.domain.entity.MicroCompleteReportStatisticsParam"
+            resultType="com.cosmo.hhim.micro.complete.domain.entity.MicroCompleteReportStatisticsDayResult">
+        select
+            DATE_FORMAT(complete_time,'%Y%m%d') statDate,
+            sum(complete_num) completeTotalNum
+        from micro_complete_report
+        where
+            source_channel = #{sourceChannel}
+            and complete_time &gt;= #{startDate}
+            and complete_time &lt;= #{endDate}
+            and `state` in ('0', '2')
+        group by statDate
+        order by statDate
+    </select>
+
+    <select id="selectCompleteReportsGpByProductAndReportNo" parameterType="com.cosmo.hhim.micro.complete.domain.entity.MicroCompleteReportStatisticsParam"
+            resultType="com.cosmo.hhim.micro.complete.domain.entity.MicroCompleteReportExportResult">
+        select
+            product_name productName,
+            product_seq productSeq,
+            sum(complete_num) completeTotalNum,
+            complete_time completeTime,
+            complete_user completeUser,
+            report_no reportNo
+        from micro_complete_report
+        where
+            source_channel = #{sourceChannel}
+            and complete_time &gt;= #{startDate}
+            and complete_time &lt;= #{endDate}
+            and `state` in ('0', '2')
+        group by
+            report_no, product_seq
+        order by completeTime desc
+    </select>
+
+    <select id="selectCompleteTotalNumGroupByProduct" parameterType="com.cosmo.hhim.micro.complete.domain.entity.MicroCompleteReportStatisticsParam"
+            resultType="com.cosmo.hhim.micro.complete.domain.entity.MicroCompleteReportStatisticsProductResult">
+        select product_seq productSeq,
+        product_name productName,
+        sum(complete_num) completeTotalNum,
+        group_concat(distinct report_no) reportNoArrayStr
+        from micro_complete_report
+        where
+        source_channel =#{sourceChannel}
+        <if test="startDate != null">
+            and complete_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and complete_time &lt;= #{endDate}
+        </if>
+        <choose>
+            <when test="onlyNormal==true">
+                and `state` ='0'
+            </when>
+            <otherwise>
+                and `state` in ('0', '2')
+            </otherwise>
+        </choose>
+        <if test="productSeq !=null and productSeq !=''">
+            and product_seq = #{productSeq}
+        </if>
+        group by product_seq
+        order by completeTotalNum desc
+    </select>
+    <select id="selectReProductByProductIds"
+            resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        SELECT mp.id as itemId,
+        mp.product_seq as itemSeq,
+        mp.product_code as itemCode,
+        mp.product_name as itemName
+        FROM micro_complete_report mcr
+        INNER JOIN micro_product mp
+        ON mcr.tenant_code = mp.tenant_code AND mcr.product_seq = mp.product_seq
+        WHERE
+        mp.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

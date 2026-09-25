@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.storage.domain.mapper.MicroFinishedProductStorageHistoryMapper">
+    
+    <resultMap type="MicroFinishedProductStorageHistory" id="MicroFinishedProductStorageHistoryResult">
+        <result property="id"    column="id"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="productSeq"    column="product_seq"    />
+        <result property="productName"    column="product_name"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="changeType"    column="change_type"    />
+        <result property="changeNum"    column="change_num"    />
+        <result property="finishChangeNum"    column="finish_change_num"    />
+        <result property="changeTime"    column="change_time"    />
+        <result property="changeUser"    column="change_user"    />
+        <result property="changeReason"    column="change_reason"    />
+        <result property="remark"    column="remark"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+    </resultMap>
+
+    <sql id="selectMicroFinishedProductStorageHistoryVo">
+        select id, product_seq, product_name, change_type, change_num, finish_change_num, change_time, change_user, change_reason, remark, created_by, created_date, last_upd_by, last_upd_date from micro_finished_product_storage_history
+    </sql>
+
+    <select id="selectMicroFinishedProductStorageHistoryList" parameterType="MicroFinishedProductStorageHistory" resultMap="MicroFinishedProductStorageHistoryResult">
+        <include refid="selectMicroFinishedProductStorageHistoryVo"/>
+        <where>  
+            <if test="productSeq != null  and productSeq != ''"> and product_seq = #{productSeq}</if>
+            <if test="productName != null  and productName != ''"> and product_name like concat('%', #{productName}, '%')</if>
+            <if test="changeType != null  and changeType != ''"> and change_type = #{changeType}</if>
+            <if test="changeNum != null "> and change_num = #{changeNum}</if>
+            <if test="finishChangeNum != null "> and finish_change_num = #{finishChangeNum}</if>
+            <if test="changeTime != null "> and change_time = #{changeTime}</if>
+            <if test="changeUser != null "> and change_user = #{changeUser}</if>
+            <if test="changeReason != null  and changeReason != ''"> and change_reason = #{changeReason}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and last_upd_date = #{lastUpdDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectMicroFinishedStorageChangeHistoryList" parameterType="com.cosmo.hhim.micro.storage.domain.entity.MicroFinishStorageChangeHistoryParam"
+            resultMap="MicroFinishedProductStorageHistoryResult">
+        <include refid="selectMicroFinishedProductStorageHistoryVo"/>
+        <where>
+            <if test="productSeq != null  and productSeq != ''">
+                and product_seq = #{productSeq}
+            </if>
+            <if test="startDate != null">
+                and change_time &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and change_time &lt;= #{endDate}
+            </if>
+            <if test="changeTypeList != null  and changeTypeList.size() > 0">
+                and change_type in
+                <foreach collection="changeTypeList" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by change_time
+    </select>
+    
+    <select id="selectMicroFinishedProductStorageHistoryById" parameterType="Long" resultMap="MicroFinishedProductStorageHistoryResult">
+        <include refid="selectMicroFinishedProductStorageHistoryVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMicroFinishedProductStorageHistory" parameterType="MicroFinishedProductStorageHistory" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_finished_product_storage_history
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="productName != null">product_name,</if>
+            <if test="changeType != null and changeType != ''">change_type,</if>
+            <if test="changeNum != null">change_num,</if>
+            <if test="finishChangeNum != null">finish_change_num,</if>
+            <if test="changeTime != null">change_time,</if>
+            <if test="changeUser != null">change_user,</if>
+            <if test="changeReason != null">change_reason,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="productName != null">#{productName},</if>
+            <if test="changeType != null and changeType != ''">#{changeType},</if>
+            <if test="changeNum != null">#{changeNum},</if>
+            <if test="finishChangeNum != null">#{finishChangeNum},</if>
+            <if test="changeTime != null">#{changeTime},</if>
+            <if test="changeUser != null">#{changeUser},</if>
+            <if test="changeReason != null">#{changeReason},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+         </trim>
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_finished_product_storage_history (
+         product_seq, product_name, change_type, change_num, finish_change_num, change_time, change_user, change_reason,
+         remark, created_by, created_date, last_upd_by, last_upd_date
+         ) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.productSeq},
+            #{item.productName},
+            #{item.changeType},
+            #{item.changeNum},
+            #{item.finishChangeNum},
+            #{item.changeTime},
+            #{item.changeUser},
+            #{item.changeReason},
+            #{item.remark},
+            #{item.createdBy},
+            now(),
+            null,
+            null
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateMicroFinishedProductStorageHistory" parameterType="MicroFinishedProductStorageHistory">
+        update micro_finished_product_storage_history
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="changeType != null and changeType != ''">change_type = #{changeType},</if>
+            <if test="changeNum != null">change_num = #{changeNum},</if>
+            <if test="finishChangeNum != null">finish_change_num = #{finishChangeNum},</if>
+            <if test="changeTime != null">change_time = #{changeTime},</if>
+            <if test="changeUser != null">change_user = #{changeUser},</if>
+            <if test="changeReason != null">change_reason = #{changeReason},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroFinishedProductStorageHistoryById" parameterType="Long">
+        delete from micro_finished_product_storage_history where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroFinishedProductStorageHistoryByIds" parameterType="String">
+        delete from micro_finished_product_storage_history where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroExperienceGuideNodeMapper">
+
+    <resultMap type="MicroExperienceGuideNode" id="MicroExperienceGuideNodeResult">
+        <result property="id" column="id"/>
+        <result property="nodeCode" column="node_code"/>
+        <result property="nodeName" column="node_name"/>
+        <result property="nodeGroupCode" column="node_group_code"/>
+        <result property="nodeSort" column="node_sort"/>
+        <result property="skipPage" column="skip_page"/>
+        <result property="elapsedTime" column="elapsed_time"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <sql id="selectMicroExperienceGuideNodeVo">
+        select id,
+               node_code,
+               node_name,
+               node_group_code,
+               node_sort,
+               skip_page,
+               elapsed_time,
+               status,
+               remark,
+               active_flag,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_experience_guide_node
+    </sql>
+
+    <select id="selectMicroExperienceGuideNodeList" parameterType="MicroExperienceGuideNode" resultMap="MicroExperienceGuideNodeResult">
+        <include refid="selectMicroExperienceGuideNodeVo"/>
+        <where>
+            active_flag = '0'
+            <if test="nodeCode != null  and nodeCode != ''">and node_code = #{nodeCode}</if>
+            <if test="nodeName != null  and nodeName != ''">and node_name like concat('%', #{nodeName}, '%')</if>
+            <if test="nodeGroupCode != null  and nodeGroupCode != ''">and node_group_code = #{nodeGroupCode}</if>
+            <if test="nodeSort != null ">and node_sort = #{nodeSort}</if>
+            <if test="skipPage != null  and skipPage != ''">and skip_page = #{skipPage}</if>
+            <if test="elapsedTime != null  and elapsedTime != ''">and elapsed_time = #{elapsedTime}</if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+        </where>
+        order by node_sort
+    </select>
+
+    <select id="selectMicroExperienceGuideNodeByCode" parameterType="java.lang.String" resultMap="MicroExperienceGuideNodeResult">
+        <include refid="selectMicroExperienceGuideNodeVo"/>
+        where node_code = #{nodeCode} and active_flag = '0'
+    </select>
+
+    <insert id="insertMicroExperienceGuideNode" parameterType="MicroExperienceGuideNode" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_experience_guide_node
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="nodeCode != null and nodeCode != ''">node_code,</if>
+            <if test="nodeName != null">node_name,</if>
+            <if test="nodeGroupCode != null and nodeGroupCode != ''">node_group_code,</if>
+            <if test="nodeSort != null">node_sort,</if>
+            <if test="skipPage != null">skip_page,</if>
+            <if test="elapsedTime != null">elapsed_time,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="activeFlag != null and activeFlag != ''">active_flag,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="nodeCode != null and nodeCode != ''">#{nodeCode},</if>
+            <if test="nodeName != null">#{nodeName},</if>
+            <if test="nodeGroupCode != null and nodeGroupCode != ''">#{nodeGroupCode},</if>
+            <if test="nodeSort != null">#{nodeSort},</if>
+            <if test="skipPage != null">#{skipPage},</if>
+            <if test="elapsedTime != null">#{elapsedTime},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="activeFlag != null and activeFlag != ''">#{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroExperienceGuideNode" parameterType="MicroExperienceGuideNode">
+        update micro_experience_guide_node
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="nodeName != null">node_name = #{nodeName},</if>
+            <if test="nodeGroupCode != null and nodeGroupCode != ''">node_group_code = #{nodeGroupCode},</if>
+            <if test="nodeSort != null">node_sort = #{nodeSort},</if>
+            <if test="skipPage != null">skip_page = #{skipPage},</if>
+            <if test="elapsedTime != null">elapsed_time = #{elapsedTime},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where node_code = #{nodeCode} and active_flag = '0'
+    </update>
+
+    <update id="updateMicroExperienceByGroup" parameterType="MicroExperienceGuideNode">
+        update micro_experience_guide_node
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="nodeName != null">node_name = #{nodeName},</if>
+            <if test="nodeSort != null">node_sort = #{nodeSort},</if>
+            <if test="skipPage != null">skip_page = #{skipPage},</if>
+            <if test="elapsedTime != null">elapsed_time = #{elapsedTime},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where node_group_code = #{nodeGroupCode} and active_flag = '0'
+    </update>
+
+    <delete id="deleteMicroExperienceGuideNodeById" parameterType="Long">
+        delete
+        from micro_experience_guide_node
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroExperienceGuideNodeByIds" parameterType="String">
+        delete from micro_experience_guide_node where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="dynamicDeleteData" parameterType="java.lang.String">
+        <!-- 动态删除语句静态化：仅允许删除白名单内的业务表，防止配置注入任意 SQL（表名无法用 #{} 参数化） -->
+        <choose>
+            <when test="_parameter == 'micro_process_storage'">DELETE FROM micro_process_storage</when>
+            <when test="_parameter == 'micro_process_storage_history'">DELETE FROM micro_process_storage_history</when>
+            <when test="_parameter == 'micro_recommend_hit'">DELETE FROM micro_recommend_hit</when>
+            <when test="_parameter == 'micro_work_submit'">DELETE FROM micro_work_submit</when>
+            <when test="_parameter == 'micro_work_submit_history'">DELETE FROM micro_work_submit_history</when>
+            <when test="_parameter == 'micro_tags'">DELETE FROM micro_tags</when>
+            <when test="_parameter == 'sys_logininfor'">DELETE FROM sys_logininfor</when>
+            <when test="_parameter == 'sys_oper_log'">DELETE FROM sys_oper_log</when>
+            <when test="_parameter == 'micro_technology'">DELETE FROM micro_technology</when>
+            <when test="_parameter == 'micro_technology_history'">DELETE FROM micro_technology_history</when>
+            <when test="_parameter == 'micro_complete_report'">DELETE FROM micro_complete_report</when>
+            <when test="_parameter == 'micro_finished_product_storage'">DELETE FROM micro_finished_product_storage</when>
+            <when test="_parameter == 'micro_finished_product_storage_history'">DELETE FROM micro_finished_product_storage_history</when>
+            <when test="_parameter == 'micro_settlement_report'">DELETE FROM micro_settlement_report</when>
+            <when test="_parameter == 'micro_settlement_history'">DELETE FROM micro_settlement_history</when>
+            <otherwise>SELECT 1 FROM DUAL WHERE 1 = 0</otherwise>
+        </choose>
+    </delete>
+</mapper>

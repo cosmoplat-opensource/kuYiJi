@@ -1,0 +1,6 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.thirdplat.api.wechatmp.factory.RemoteWxMenuFallbackFactory, \
+  com.cosmo.hhim.thirdplat.api.wechatmp.factory.RemoteWxBaseFallbackFactory, \
+  com.cosmo.hhim.thirdplat.api.wechatmp.factory.RemoteWxUserFallbackFactory, \
+  com.cosmo.hhim.thirdplat.api.wechatmp.factory.RemoteWxMsgTemplateFallbackFactory, \
+  com.cosmo.hhim.thirdplat.api.wechatmp.factory.RemoteWxWebPageFallbackFactory

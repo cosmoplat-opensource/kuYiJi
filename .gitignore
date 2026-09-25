@@ -1,0 +1,147 @@
+# ============================================
+# Cosmo HHIM Open - .gitignore
+# ============================================
+
+# ---------- 构建输出 ----------
+node_modules/
+dist/
+target/
+unpackage/
+gen/
+bin/
+tmp/
+build/
+coverage/
+*.class
+*.ctxt
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven 临时文件
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# ---------- 日志与临时文件 ----------
+logs/
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+hs_err_pid*
+replay_pid*
+
+# ---------- 本地配置 / 敏感信息 ----------
+local.properties
+.env
+.env.local
+.env.*.local
+
+# 真实部署的本地配置（含密码/密钥），仅忽略非 example 版本
+**/application-local.yml
+!**/application-local.yml.example
+
+# ---------- IDE ----------
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+.factorypath
+.buildpath
+.target
+.externalToolBuilders/
+*.launch
+*.pydevproject
+.cproject
+.autotools
+.tern-project
+.texlipse
+.springBeans
+.recommenders/
+.apt_generated/
+.apt_generated_test/
+.cache-main
+.scala_dependencies
+.worksheet
+.metadata
+
+# VSCode
+.vscode/
+
+# HBuilderX
+.hbuilderx/
+
+# CMake
+cmake-build-*/
+
+# ---------- 操作系统 ----------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# ---------- 内部资料（不开源） ----------
+doc/
+
+# ---------- 内部模块构建产物（根 reactor 从源码构建，不入库） ----------
+lib/
+
+# ---------- 内部工具缓存（团队约定） ----------
+.codegraph/
+openspec/
+.understand-anything/
+.claude/
+
+# ---------- 本地调试产物（不进仓库） ----------
+deploy/
+micro-interface-latest.jar
+thirdplat-latest.jar
+# 公司部署专用（镜像指向公司私服，开源仓库不包含）
+docker-compose.run.yml
+# 临时调试产物
+diff_*.txt

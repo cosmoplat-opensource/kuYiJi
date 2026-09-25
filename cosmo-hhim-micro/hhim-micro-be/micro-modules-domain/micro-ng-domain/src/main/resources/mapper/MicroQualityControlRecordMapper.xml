@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.ng.domain.mapper.MicroQualityControlRecordMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.ng.domain.entity.MicroQualityControlRecord" id="MicroQualityControlRecordResult">
+        <result property="id" column="id"/>
+        <result property="qualityControlRecordNo" column="quality_control_record_no"/>
+        <result property="submitId" column="submit_id"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="preProcessSeq" column="pre_process_seq"/>
+        <result property="ngType" column="ng_type"/>
+        <result property="passNum" column="pass_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="submitUser" column="submit_user"/>
+        <result property="submitDate" column="submit_date"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="remark" column="remark"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="qcNickName" column="qc_nick_name"/>
+    </resultMap>
+
+    <sql id="selectMicroQualityControlRecordVo">
+        select id, quality_control_record_no, submit_id, product_seq, process_seq, pre_process_seq, ng_type, pass_num, ng_num, submit_user, submit_date, created_by, created_date, remark, last_upd_by, last_upd_date, active_flag from micro_quality_control_record
+    </sql>
+
+    <select id="selectMicroQualityControlRecordList" parameterType="com.cosmo.hhim.micro.ng.domain.entity.MicroQualityControlRecord"
+            resultMap="MicroQualityControlRecordResult">
+        <include refid="selectMicroQualityControlRecordVo"/>
+        <where>
+            <if test="submitId != null ">and submit_id = #{submitId}</if>
+            <if test="qualityControlRecordNo != null and qualityControlRecordNo != '' ">and quality_control_record_no = #{qualityControlRecordNo}</if>
+            <if test="productSeq != null  and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="processSeq != null  and processSeq != ''">and process_seq = #{processSeq}</if>
+            <if test="preProcessSeq != null  and preProcessSeq != ''">and pre_process_seq = #{preProcessSeq}</if>
+            <if test="ngType != null  and ngType != ''">and ng_type = #{ngType}</if>
+            <if test="ngNum != null ">and ng_num = #{ngNum}</if>
+            <if test="submitUser != null ">and submit_user = #{submitUser}</if>
+            <if test="submitDate != null ">and submit_date = #{submitDate}</if>
+            <if test="createdBy != null ">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null ">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and active_flag = #{activeFlag}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroQualityControlRecordListByQualityControlRecordNos" resultMap="MicroQualityControlRecordResult">
+        <include refid="selectMicroQualityControlRecordVo"/>
+        <where>
+            active_flag = 1
+            <if test="list != null">
+                and quality_control_record_no in
+                <foreach collection="list" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectMicroQualityControlRecordBySubmitIdList" resultMap="MicroQualityControlRecordResult">
+        select
+            mqcr.id,
+            mqcr.quality_control_record_no,
+            mqcr.submit_id,
+            mqcr.product_seq,
+            mqcr.process_seq,
+            mqcr.pre_process_seq,
+            mqcr.ng_type,
+            mqcr.pass_num,
+            mqcr.ng_num,
+            mqcr.submit_user,
+            mqcr.submit_date,
+            mqcr.created_by,
+            mqcr.created_date,
+            mqcr.remark,
+            mqcr.last_upd_by,
+            mqcr.last_upd_date,
+            mqcr.active_flag,
+            mu.nick_name as qc_nick_name
+        from micro_quality_control_record mqcr
+        left join micro_user mu on mqcr.created_by = mu.id
+        <where>
+            mqcr.active_flag = 1
+            <if test="list != null">
+                and mqcr.submit_id in
+                <foreach collection="list" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by created_date desc
+    </select>
+
+    <select id="selectMicroQualityControlRecordById" parameterType="Long" resultMap="MicroQualityControlRecordResult">
+        <include refid="selectMicroQualityControlRecordVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMicroQualityControlRecord" parameterType="com.cosmo.hhim.micro.ng.domain.entity.MicroQualityControlRecord" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into micro_quality_control_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="qualityControlRecordNo != null">quality_control_record_no,</if>
+            <if test="submitId != null">submit_id,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="processSeq != null and processSeq != ''">process_seq,</if>
+            <if test="preProcessSeq != null">pre_process_seq,</if>
+            <if test="ngType != null and ngType != ''">ng_type,</if>
+            <if test="passNum != null">pass_num,</if>
+            <if test="ngNum != null">ng_num,</if>
+            <if test="submitUser != null">submit_user,</if>
+            <if test="submitDate != null">submit_date,</if>
+            <if test="createdBy != null">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="remark != null">remark,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="activeFlag != null">active_flag,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="qualityControlRecordNo != null">#{quality_control_record_no},</if>
+            <if test="submitId != null">#{submitId},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="processSeq != null and processSeq != ''">#{processSeq},</if>
+            <if test="preProcessSeq != null">#{preProcessSeq},</if>
+            <if test="ngType != null and ngType != ''">#{ngType},</if>
+            <if test="passNum != null">#{passNum},</if>
+            <if test="ngNum != null">#{ngNum},</if>
+            <if test="submitUser != null">#{submitUser},</if>
+            <if test="submitDate != null">#{submitDate},</if>
+            <if test="createdBy != null">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+        </trim>
+    </insert>
+
+    <insert id="batchInsertMicroQualityControlRecord">
+        insert into micro_quality_control_record
+        (quality_control_record_no,
+        submit_id,
+        product_seq,
+        pre_process_seq,
+        process_seq,
+        ng_type,
+        pass_num,
+        ng_num,
+        submit_user,
+        submit_date,
+        created_by,
+        created_date,
+        remark,
+        last_upd_by,
+        last_upd_date,
+        active_flag,
+        tenant_code) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.qualityControlRecordNo},
+            #{item.submitId},
+            #{item.productSeq},
+            #{item.preProcessSeq},
+            #{item.processSeq},
+            #{item.ngType},
+            #{item.passNum},
+            #{item.ngNum},
+            #{item.submitUser},
+            #{item.submitDate},
+            #{item.createdBy},
+            #{item.createdDate},
+            #{item.remark},
+            #{item.lastUpdBy},
+            #{item.lastUpdDate},
+            #{item.activeFlag},
+            #{item.tenantCode})
+        </foreach>
+    </insert>
+
+
+    <update id="updateMicroQualityControlRecord" parameterType="com.cosmo.hhim.micro.ng.domain.entity.MicroQualityControlRecord">
+        update micro_quality_control_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="qualityControlRecordNo != null and qualityControlRecordNo != ''">quality_control_record_no = #{qualityControlRecordNo},</if>
+            <if test="submitId != null">submit_id = #{submitId},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="processSeq != null and processSeq != ''">process_seq = #{processSeq},</if>
+            <if test="preProcessSeq != null">pre_process_seq = #{preProcessSeq},</if>
+            <if test="ngType != null and ngType != ''">ng_type = #{ngType},</if>
+            <if test="ngNum != null">ng_num = #{ngNum},</if>
+            <if test="submitUser != null">submit_user = #{submitUser},</if>
+            <if test="submitDate != null">submit_date = #{submitDate},</if>
+            <if test="createdBy != null">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroQualityControlRecordById" parameterType="Long">
+        delete from micro_quality_control_record where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroQualityControlRecordByIds" parameterType="String">
+        delete from micro_quality_control_record where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectNgTypeList" parameterType="com.cosmo.hhim.micro.ng.domain.entity.NgTypeQueryParam" resultType="string">
+        select
+            distinct ng_type as ngType
+        from micro_quality_control_record
+        <where>
+            <if test="key != null and key != ''">
+                and ng_type like concat('%', #{key}, '%')
+            </if>
+            <if test="productSeq != null and productSeq != ''">
+                and product_seq = #{productSeq}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectQualityControlHistoryInfoList" parameterType="com.cosmo.hhim.micro.ng.domain.entity.QualityControlHistoryQueryParam" resultType="com.cosmo.hhim.micro.ng.domain.entity.QualityControlHistoryInfo">
+        SELECT
+            mqcr.submit_id as submitId,
+            mqcr.quality_control_record_no as qualityControlRecordNo,
+            mu.nick_name as submitNickName,
+            mqcr.submit_date as submitDate,
+            mp.product_name as productName,
+            mp.product_code as productCode,
+            mp.unit as productUnit,
+            mpc.process_name as processName,
+            sum(mqcr.pass_num) as passNum,
+            sum(mqcr.ng_num) as ngNum,
+            mu2.nick_name as qcNickName,
+            mqcr.created_date as qcDate
+        FROM micro_quality_control_record mqcr
+        LEFT JOIN micro_product mp on mqcr.product_seq = mp.product_seq
+        LEFT JOIN micro_process_common mpc on mqcr.process_seq = mpc.process_seq
+        LEFT JOIN micro_user mu on mu.id = mqcr.submit_user
+        LEFT JOIN micro_user mu2 on mu2.id = mqcr.created_by
+        <where>
+            <if test="queryKey != null and queryKey != ''">
+                mp.product_code like concat('%', #{queryKey}, '%')
+                or mp.product_name like concat('%', #{queryKey}, '%')
+                or mpc.process_code like concat('%', #{queryKey}, '%')
+                or mpc.process_name like concat('%', #{queryKey}, '%')
+            </if>
+            <if test="startDate != null ">
+                <![CDATA[ and date_format(mqcr.created_date, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="endDate != null ">
+                <![CDATA[ and date_format(mqcr.created_date, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')  ]]>
+            </if>
+        </where>
+        GROUP BY quality_control_record_no
+        ORDER BY mqcr.created_date DESC
+    </select>
+    
+    <select id="selectDifferentNgType"  parameterType="com.cosmo.hhim.micro.ng.domain.entity.NgTypeStatisticQueryParam" resultType="com.cosmo.hhim.micro.ng.domain.entity.NgTypeStatisticInfo">
+        select
+            mqcr.ng_type as ngType,
+            sum(mqcr.ng_num) as ngNum
+        from micro_quality_control_record mqcr
+        left join micro_product mp on mp.product_seq = mqcr.product_seq
+        <where>
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_name like concat('%', #{productNameOrCode},'%') or mp.product_code like concat('%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="startDate != null ">
+                <![CDATA[ and date_format(mqcr.created_date, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="endDate != null ">
+                <![CDATA[ and date_format(mqcr.created_date, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')  ]]>
+            </if>
+        </where>
+        group by mqcr.ng_type
+        order by ngNum desc
+    </select>
+</mapper>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzCustomerApplicationMapper">
+    
+    <resultMap type="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzCustomerApplication" id="HyzzCustomerApplicationResult">
+        <result property="id"    column="id"    />
+        <result property="customerCode"    column="customer_code"    />
+        <result property="appId"    column="app_id"    />
+        <result property="appName"    column="app_name"    />
+        <result property="customerValidDate"    column="customer_valid_date"    />
+        <result property="customerProductType"    column="customer_product_type"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="useStatus"    column="use_status"    />
+    </resultMap>
+
+    <sql id="selectHyzzCustomerApplicationVo">
+        select id, customer_code, app_id, app_name, customer_valid_date, customer_product_type, create_time, update_time, use_status from hyzz_customer_application
+    </sql>
+
+    <select id="selectHyzzCustomerApplication" resultMap="HyzzCustomerApplicationResult">
+        <include refid="selectHyzzCustomerApplicationVo"/>
+        where customer_code = #{customerCode} and app_id = #{appId}
+    </select>
+
+    <select id="selectHyzzCustomerApplications" resultMap="HyzzCustomerApplicationResult">
+        <include refid="selectHyzzCustomerApplicationVo"/>
+        <where>
+            <if test="null != customerCode and '' != customerCode">
+                and customer_code = #{customerCode}
+            </if>
+            <if test="null != productType and '' != productType">
+                and customer_product_type = #{productType}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateUseStatusByAppIdAndCustomer">
+        update hyzz_customer_application
+            set use_status =#{useStatus}
+        where
+            customer_code = #{customerCode} and app_id = #{appId}
+    </update>
+</mapper>

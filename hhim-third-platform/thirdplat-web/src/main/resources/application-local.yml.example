@@ -1,0 +1,201 @@
+# ============================================================
+# application-local.yml.example — 配置示例
+# ============================================================
+# 使用方式：
+#   1. 复制本文件为 application-local.yml
+#   2. 把所有 please_set_xxx 替换为真实值（或通过环境变量注入）
+#   3. 也可以只保留占位符格式，启动时通过 -Dxxx=yyy 或 export xxx=yyy 注入
+# ============================================================
+
+# 是否本地化部署
+local: true
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      db0:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        # db0 = 三方对接库（hyzz_* 表）；Docker 部署时由 compose 注入 DB_HOST/DB_NAME（默认 im-portal）
+        url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:im-portal}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&allowMultiQueries=true
+        username: ${DB_USERNAME:please_set_db_username}
+        password: ${DB_PASSWORD:please_set_db_password}
+        initialSize: 5
+        minIdle: 5
+        maxActive: 10
+        maxWait: 2000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+      db1:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${DB1_HOST:localhost}:${DB1_PORT:3306}/${DB1_NAME:your_db_name}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&allowMultiQueries=true
+        username: ${DB1_USERNAME:please_set_db_username}
+        password: ${DB1_PASSWORD:please_set_db_password}
+
+  # Redis
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:please_set_redis_password}
+    timeout: 10s
+    lettuce:
+      pool:
+        min-idle: 0
+        max-idle: 8
+        max-active: 8
+    database: 1
+    multidb:
+      redisTemplatePrefix: im-redisTemplate-
+      databases: [0,1,2,3,4,5,6]
+      redisClientType: lettuce
+
+# Forest 环境变量（密钥/AppId 等敏感信息）
+
+
+# Forest 环境变量（密钥/AppId 等敏感信息）
+forest:
+  variables:
+    uniAppId: ${UNIPUSH_APP_ID:please_set_unipush_app_id}
+    uniAppKey: ${UNIPUSH_APP_KEY:please_set_unipush_app_key}
+    uniAppSecret: ${UNIPUSH_APP_SECRET:please_set_unipush_app_secret}
+    uniMasterSecret: ${UNIPUSH_MASTER_SECRET:please_set_unipush_master_secret}
+    uniAppPackage: ${UNIPUSH_APP_PACKAGE:io.cloud.testapp}
+    uniBaseUrl: ${UNIPUSH_BASE_URL:https://restapi.getui.com/v2/}
+    uniEncoding: UTF-8
+    uniContentType: application/json
+    wxmpBaseUrl: https://api.weixin.qq.com/
+    wxmpWebPageUrl: https://open.weixin.qq.com
+    wxmpEncoding: UTF-8
+    wxmpContentType: application/json
+    wxmpAppId: ${WXMP_APP_ID:please_set_wxmp_app_id}
+    wxmpAppSecret: ${WXMP_APP_SECRET:please_set_wxmp_app_secret}
+    wxmpServerToken: ${WXMP_SERVER_TOKEN:please_set_wxmp_server_token}
+    wxnoServerEncodeAesKey: ${WXNO_SERVER_AES_KEY:please_set_wxno_aes_key}
+    cosmoIOTUrl: ${COSMO_IOT_URL:https://your-iot-platform.com}
+    cosmoIOTEncoding: UTF-8
+    cosmoIOTContentType: application/json
+    wxminiappBaseUrl: https://api.weixin.qq.com/
+    wxminiappEncoding: UTF-8
+    wxminiContentType: application/json
+    cosmoSQMUrl: ${COSMO_SQM_URL:https://your-sqm-platform.com}
+    cosmoSQMEncoding: UTF-8
+    cosmoSQMContentType: application/json
+    cosmoSQMFormContentType: application/x-www-form-urlencoded
+    sqmClientId: ${SQM_CLIENT_ID:please_set_sqm_client_id}
+    sqmClientSecret: ${SQM_CLIENT_SECRET:please_set_sqm_client_secret}
+    sqmGrantType: client_credentials
+
+# JWT
+jwt:
+  secretKey: ${JWT_SECRET:please_set_jwt_secret_at_least_32_chars}
+  timeout: 604800
+
+# MinIO
+minio:
+  url: ${MINIO_URL:https://your-minio-domain.com}
+  accessKey: ${MINIO_ACCESS_KEY:please_set_minio_access_key}
+  secretKey: ${MINIO_SECRET_KEY:please_set_minio_secret_key}
+  bucketName: ${MINIO_BUCKET:please_set_minio_bucket}
+  microBucketName: ${MINIO_MICRO_BUCKET:please_set_minio_micro_bucket}
+
+# 监控应用
+monitor:
+  applications:
+    - pigx-upms-biz
+    - pigx-auth
+
+# 系统
+sys:
+  url: ${SYS_URL:https://your-domain.com}
+
+# 通知服务（飞书 webhook 等敏感 URL 通过环境变量注入）
+notify:
+  feishu:
+    prod-webhook: ${FEISHU_PROD_WEBHOOK:please_set_feishu_prod_webhook}
+    test-webhook: ${FEISHU_TEST_WEBHOOK:please_set_feishu_test_webhook}
+
+# Druid 监控页（/druid/*）：默认关闭，避免生产环境暴露 SQL 监控等敏感信息；需要时开启并配置强密码
+druid:
+  monitor:
+    enabled: ${DRUID_MONITOR_ENABLED:false}
+    username: ${DRUID_MONITOR_USERNAME:}
+    password: ${DRUID_MONITOR_PASSWORD:}
+
+# Swagger 接口文档（引入 hhim-common-swagger 模块时生效）：默认关闭，需要时开启
+swagger:
+  enabled: ${SWAGGER_ENABLED:false}
+
+# ============================================================
+# Sms4j 短信服务
+# ============================================================
+sms:
+  config-type: yaml
+
+  template-id-map:
+    LOGIN_CODE:    ${SMS_LOGIN_CODE:please_set_login_sms_template_id}
+    WEEK_REPORT:   ${SMS_WEEK_REPORT:please_set_week_sms_template_id}
+
+  blends:
+    cosmo:
+      supplier: cosmo
+      factory: com.cosmo.hhim.thirdplat.web.sms.cosmo.CosmoFactory
+      access-key-id: ${COSMO_SMS_ACCESS_KEY:please_set_cosmo_sms_access_key}
+      request-url: ${COSMO_SMS_URL:http://your-sms-gateway/v1/sms/sendsms}
+      template-id: ${COSMO_SMS_TEMPLATE:your_sms_template_id}
+
+    # 可选供应商：aliyun / tencent / huawei（Sms4j 内置 Blend）
+    # aliyun:
+    #   supplier: aliyun
+    #   access-key-id: ${SMS_ALIYUN_AK:}
+    #   access-key-secret: ${SMS_ALIYUN_SK:}
+    #   signature: ${SMS_SIGNATURE:}
+    #   template-id: ${SMS_TEMPLATE_DEFAULT:}
+
+sms-old:
+  url: ${SMS_OLD_URL:https://your-sms-gateway/v1/sms/sendsms}
+
+# ============================================================
+# 环境变量清单（请勿将明文密码提交到代码仓库）
+# ============================================================
+# DB_HOST             数据库地址
+# DB_PORT             数据库端口
+# DB_NAME             数据库名称
+# DB_USERNAME         数据库用户名
+# DB_PASSWORD         数据库密码
+# DB1_HOST            第二个数据库地址（hhim-common-datasource 硬编码 db0/db1）
+# DB1_PORT            第二个数据库端口
+# DB1_NAME            第二个数据库名称
+# DB1_USERNAME        第二个数据库用户名
+# DB1_PASSWORD        第二个数据库密码
+# REDIS_HOST          Redis 地址
+# REDIS_PORT          Redis 端口
+# REDIS_PASSWORD      Redis 密码
+# NACOS_USERNAME      Nacos 用户名
+# NACOS_PASSWORD      Nacos 密码
+# JWT_SECRET          JWT 密钥（至少 32 字符）
+# MINIO_URL           MinIO 服务地址
+# MINIO_ACCESS_KEY    MinIO AccessKey
+# MINIO_SECRET_KEY    MinIO SecretKey
+# MINIO_BUCKET        MinIO 桶名
+# MINIO_MICRO_BUCKET  MinIO 微应用桶名
+# UNIPUSH_APP_ID      个推 AppId
+# UNIPUSH_APP_KEY     个推 AppKey
+# UNIPUSH_APP_SECRET  个推 AppSecret
+# UNIPUSH_MASTER_SECRET 个推 MasterSecret
+# WXMP_APP_ID         微信公众号 AppId
+# WXMP_APP_SECRET     微信公众号 AppSecret
+# SQM_CLIENT_ID       SQM ClientId
+# SQM_CLIENT_SECRET   SQM ClientSecret
+# COSMO_SMS_ACCESS_KEY 卡奥斯短信网关 AccessKey
+# COSMO_SMS_URL       卡奥斯短信网关 URL
+# COSMO_SMS_TEMPLATE  卡奥斯短信网关模板 ID
+# SMS_LOGIN_CODE      登录验证码短信模板 ID
+# SMS_WEEK_REPORT     周报短信模板 ID
+# SYS_URL             系统 URL
+# FEISHU_PROD_WEBHOOK 飞书生产环境机器人 webhook（建议在飞书后台 rotate）
+# FEISHU_TEST_WEBHOOK 飞书测试环境机器人 webhook（建议在飞书后台 rotate）
+# DRUID_MONITOR_ENABLED  Druid 监控页开关（默认 false，开启需同时配置账号密码）
+# DRUID_MONITOR_USERNAME Druid 监控页账号
+# DRUID_MONITOR_PASSWORD Druid 监控页密码
+# SWAGGER_ENABLED       Swagger 接口文档开关（默认 false）

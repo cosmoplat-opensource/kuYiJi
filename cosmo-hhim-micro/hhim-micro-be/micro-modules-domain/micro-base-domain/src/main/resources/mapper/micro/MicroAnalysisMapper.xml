@@ -1,0 +1,627 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroAnalysisMapper">
+
+    <resultMap id="RecordForSubmitterResult" type="com.cosmo.hhim.micro.base.domain.entity.analysis.SubmitterRank">
+        <result property="nickName" column="nick_name"/>
+        <result property="userName" column="user_name"/>
+        <result property="submitNum" column="submit_num"/>
+        <result property="unit" column="unit"/>
+        <result property="avatar" column="avatar"/>
+    </resultMap>
+
+    <resultMap id="FinishedProductResult" type="com.cosmo.hhim.micro.base.domain.entity.analysis.FinishedProduct">
+        <result property="productCode" column="product_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productName" column="product_name"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="finishedNum" column="finished_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="unit" column="unit"/>
+        <result property="passNum" column="pass_num"/>
+        <result property="processName" column="process_name"/>
+    </resultMap>
+
+    <resultMap id="MicroProcessStorageResult" type="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorage">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productName" column="product_name"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productUnit" column="product_unit"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="processCode" column="process_code"/>
+        <result property="processName" column="process_name"/>
+        <result property="passNum" column="pass_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <resultMap id="MicroWorkSubmitProductCount" type="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitProductCount">
+        <result property="totalCounts" column="total_counts"/>
+        <result property="totalPassNum" column="total_pass_num"/>
+        <result property="totalNgNum" column="total_ng_num"/>
+        <result property="submitDay" column="submit_day"/>
+    </resultMap>
+
+    <resultMap id="AnalysisIndex" type="com.cosmo.hhim.micro.base.domain.entity.analysis.AnalysisIndex">
+        <result property="submitUserNum" column="submit_user_num"/>
+        <result property="productNum" column="product_num"/>
+    </resultMap>
+
+    <resultMap id="RecordForWorkerResult" type="com.cosmo.hhim.micro.base.domain.entity.analysis.RecordForWorker">
+        <result property="nickName" column="nick_name"/>
+        <result property="userName" column="user_name"/>
+        <result property="totalSubmitNum" column="total_num"/>
+    </resultMap>
+
+    <resultMap id="PassProductResult" type="com.cosmo.hhim.micro.base.domain.entity.analysis.PassProduct">
+        <result property="productSeq" column="product_seq"/>
+        <result property="productName" column="product_name"/>
+        <result property="productCode" column="product_code"/>
+        <collection property="passProductAndProcessList" ofType="com.cosmo.hhim.micro.base.domain.entity.analysis.PassProductAndProcess">
+            <result property="productSeq" column="product_seq"/>
+            <result property="productName" column="product_name"/>
+            <result property="productCode" column="product_code"/>
+            <result property="processSeq" column="process_seq"/>
+            <result property="processName" column="process_name"/>
+            <result property="passNum" column="pass_num"/>
+        </collection>
+    </resultMap>
+
+    <select id="getRecordRankForSubmitter" resultMap="RecordForSubmitterResult">
+        SELECT ifnull(sum(mws.check_pass_num + mws.check_ng_num), 0) as submit_num,
+               mu.nick_name,
+               mp.unit                                               as unit,
+               mu.user_name,
+               mu.avatar
+        FROM micro_work_submit mws
+                 LEFT JOIN micro_product mp on mws.product_seq = mp.product_seq
+                 LEFT JOIN micro_user mu on mu.id = mws.submit_user
+        <where>
+            mws.submit_status = '0'
+            <if test="startDate != null and endDate != null">
+                and mws.submit_day BETWEEN #{startDate} AND #{endDate}
+            </if>
+            <if test="submitType != null">
+                and mws.submit_type = #{submitType}
+            </if>
+        </where>
+        group by mws.created_by
+        ORDER BY submit_num desc
+    </select>
+
+    <select id="getFinishedProductStatistics" resultMap="FinishedProductResult">
+        SELECT mws.product_seq,
+               mp.product_code,
+               mp.product_name,
+               ifnull(sum(check_pass_num + check_ng_num), 0) as finished_num,
+               ifnull(sum(check_ng_num), 0)                  as ng_num,
+               ifnull(sum(check_pass_num), 0)                as pass_num,
+               mws.operate_process_seq                       as process_seq,
+               mpc.process_name,
+               mp.unit                                       as unit
+        FROM micro_work_submit mws
+                 LEFT JOIN micro_product mp on mp.product_seq = mws.product_seq
+                 LEFT JOIN micro_process_common mpc on mpc.process_seq = mws.operate_process_seq
+        WHERE mws.submit_status = '0'
+          and mws.submit_type = '1'
+          and mws.is_last_process = '0'
+          <if test="startDate != null and endDate != null">
+              and mws.submit_day BETWEEN #{startDate} AND #{endDate}
+          </if>
+        GROUP BY mws.product_seq
+        ORDER BY finished_num desc
+    </select>
+
+    <select id="getStorageRank" resultMap="MicroProcessStorageResult">
+        select
+        s.product_seq,
+        d.product_code,
+        d.product_name,
+        d.unit as product_unit,
+        s.process_seq,
+        p.process_code,
+        p.process_name,
+        s.pass_num,
+        s.ng_num
+        from micro_process_storage s
+        left join micro_process_common p on s.process_seq = p.process_seq
+        left join micro_product d on s.product_seq = d.product_seq
+        <where>
+            <if test="productSeq != null and productSeq != ''">
+                and s.product_seq = #{productSeq}
+            </if>
+        </where>
+        order by s.pass_num + s.ng_num desc
+    </select>
+
+    <select id="showTotalCount" resultMap="MicroWorkSubmitProductCount">
+        SELECT
+        IFNULL(sum(mws.check_pass_num),0) as total_pass_num,
+        IFNULL(sum(mws.check_ng_num), 0) as total_ng_num,
+        IFNULL(sum(mws.check_pass_num + check_ng_num),0) as total_counts
+        FROM micro_work_submit mws
+        LEFT JOIN micro_product mp on mws.product_seq = mp.product_seq
+        <where>
+            and submit_status = 0
+            and submit_type = '1'
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code = #{productNameOrCode} or mp.product_name = #{productNameOrCode})
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+    </select>
+
+    <select id="productionQualityTrend" parameterType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductionQualityAnalysisParam"
+            resultMap="MicroWorkSubmitProductCount">
+        SELECT
+        IFNULL(sum(check_pass_num),0) as total_pass_num,
+        IFNULL(sum(check_ng_num),0) as total_ng_num,
+        IFNULL(sum(check_pass_num + check_ng_num), 0) as total_counts,
+        <if test="type == 0">
+            DATE_FORMAT(submit_day, '%Y-%m') as submit_day
+        </if>
+        <if test="type == 1">
+            DATE_FORMAT(submit_day, '%Y-%m-%d') as submit_day
+        </if>
+        FROM micro_work_submit mws
+        LEFT JOIN micro_product mp on mws.product_seq = mp.product_seq and mp.tenant_code = mws.tenant_code
+        <where>
+            and submit_status = 0
+            <if test="submitType != null">
+                and submit_type = #{submitType}
+            </if>
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code = #{productNameOrCode} or mp.product_name = #{productNameOrCode})
+            </if>
+            <if test="startDate != null">
+                <if test="type == 0">
+                    and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m')
+                </if>
+                <if test="type == 1">
+                    and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')
+                </if>
+            </if>
+            <if test="endDate != null">
+                <if test="type == 0">
+                    and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m')
+                </if>
+                <if test="type == 1">
+                    and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')
+                </if>
+            </if>
+        </where>
+        <if test="type == 0">
+            GROUP BY DATE_FORMAT(submit_day, '%Y-%m')
+        </if>
+        <if test="type == 1">
+            GROUP BY DATE_FORMAT(submit_day, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <select id="obtainedTotalCountsForProductAndSubmitUser"
+            parameterType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductionQualityAnalysisParam" resultMap="AnalysisIndex">
+        SELECT count(DISTINCT (product_seq)) as product_num,
+               count(DISTINCT (created_by))  as submit_user_num
+        FROM micro_work_submit
+        WHERE submit_type = '1' and submit_day BETWEEN #{startDate} and #{endDate}
+    </select>
+
+    <select id="obtainedTotalProductCountsForSubmit" parameterType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductionQualityAnalysisParam"
+            resultType="decimal">
+        SELECT
+        IFNULL(SUM(pass_num + ng_num), 0) as totalNums
+        FROM micro_work_submit
+        <where>
+            and submit_type = '1'
+            <if test="startDate != null and endDate != null">
+                and submit_day BETWEEN #{startDate} and #{endDate}
+            </if>
+            <if test="submitStatus != null">
+                and submit_status = #{submitStatus}
+            </if>
+        </where>
+    </select>
+
+    <select id="obtainedTotalProductCountsForCheck" parameterType="com.cosmo.hhim.micro.base.domain.entity.analysis.ProductionQualityAnalysisParam"
+            resultMap="MicroWorkSubmitProductCount">
+        SELECT
+        IFNULL(SUM(check_pass_num + check_ng_num), 0) as total_counts,
+        IFNULL(sum(check_pass_num),0) as total_pass_num,
+        IFNULL(sum(check_ng_num),0) as total_ng_num
+        FROM micro_work_submit
+        <where>
+            submit_type = '1'
+            <if test="startDate != null and endDate != null">
+                and submit_day BETWEEN #{startDate} and #{endDate}
+            </if>
+            <if test="submitStatus != null">
+                and submit_status = #{submitStatus}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectNgProductList" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.NgProduct">
+        SELECT
+        mws.product_seq as productSeq,
+        mp.product_name as productName,
+        mp.product_code as productCode,
+        IFNULL(sum(mws.check_ng_num), 0) as totalNgNum,
+        mp.unit as productUnit
+        FROM micro_work_submit mws
+        INNER JOIN micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        <where>
+            mws.submit_type = '1'
+            and mws.submit_status = 0
+            and mws.check_ng_num > 0
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+        GROUP BY productSeq
+        ORDER BY totalNgNum desc
+    </select>
+
+    <select id="selectNgProductAndProcessList" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.NgProductAndProcess">
+        SELECT
+        mws.product_seq as productSeq,
+        mws.operate_process_seq as processSeq,
+        mp.product_name as productName,
+        mp.product_code as productCode,
+        mpc.process_name as processName,
+        IFNULL(sum(mws.check_ng_num), 0) as ngNum
+        FROM micro_work_submit mws
+        INNER JOIN micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        INNER JOIN micro_process_common mpc on mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+        <where>
+            mws.submit_type = '1'
+            and mws.submit_status = 0
+            and mws.check_ng_num > 0
+            <if test="productSeqList != null">
+                and mws.product_seq in
+                <foreach item="productSeq" collection='productSeqList.split(",")' open="(" separator="," close=")">
+                    #{productSeq}
+                </foreach>
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+        GROUP BY mws.product_seq, mws.operate_process_seq
+        ORDER BY mp.created_date desc
+    </select>
+
+    <select id="selectNgProductListByStock" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.NgProduct">
+        SELECT
+            a.product_seq AS productSeq,
+            a.product_name AS productName,
+            a.product_code AS productCode,
+            a.unit AS productUnit,
+            sum(a.ng_num) as totalNgNum
+        FROM
+        (
+            SELECT
+                mp.product_seq,
+                mp.product_name,
+                mp.product_code,
+                mp.unit,
+                mps.process_seq,
+                mps.ng_num
+            FROM
+            micro_process_storage mps
+            INNER JOIN micro_product mp ON mps.product_seq = mp.product_seq
+            AND mps.tenant_code = mp.tenant_code
+            <where>
+                mps.ng_num != 0
+                <if test="productNameOrCode != null and productNameOrCode != ''">
+                    and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+                </if>
+            </where>
+        ) a
+        GROUP BY
+        a.product_seq
+        ORDER BY totalNgNum desc
+    </select>
+
+    <select id="selectNgProductAndProcessListByStock" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.NgProductAndProcess">
+        SELECT mp.product_seq          as productSeq,
+               mps.process_seq         as processSeq,
+               mp.product_name         as productName,
+               mp.product_code         as productCode,
+               mpc.process_name        as processName,
+               mps.ng_num              as ngNum
+        FROM micro_process_storage mps
+                 INNER JOIN micro_product mp on mps.product_seq = mp.product_seq and mps.tenant_code = mp.tenant_code
+                 INNER JOIN micro_process_common mpc on mps.process_seq = mpc.process_seq and mps.tenant_code = mpc.tenant_code
+        WHERE mps.ng_num != 0
+        ORDER BY mps.ng_num DESC
+    </select>
+
+    <select id="selectPassProductList" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.PassProduct">
+        SELECT
+        mws.product_seq as productSeq,
+        mp.product_name as productName,
+        mp.product_code as productCode,
+        IFNULL(sum(check_pass_num), 0) as totalPassNum,
+        mp.unit as productUnit
+        FROM micro_work_submit mws
+        INNER JOIN micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        <where>
+            mws.submit_type = '1'
+            and mws.submit_status = 0
+            and mws.check_pass_num > 0
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+        GROUP BY mp.product_seq
+        ORDER BY totalPassNum desc
+    </select>
+
+    <select id="selectPassProductAndProcessList" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.PassProductAndProcess">
+        SELECT
+        mws.product_seq as productSeq,
+        mws.operate_process_seq as processSeq,
+        mp.product_name as productName,
+        mp.product_code as productCode,
+        mpc.process_name as processName,
+        IFNULL(sum(mws.check_pass_num), 0) as passNum
+        FROM micro_work_submit mws
+        INNER JOIN micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        INNER JOIN micro_process_common mpc on mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+        <where>
+            mws.submit_type = '1'
+            and mws.submit_status = 0
+            and mws.check_pass_num > 0
+            <if test="productSeqList != null">
+                and mws.product_seq in
+                <foreach item="productSeq" collection='productSeqList.split(",")' open="(" separator="," close=")">
+                    #{productSeq}
+                </foreach>
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+        GROUP BY mws.product_seq, mws.operate_process_seq
+        ORDER BY mp.created_date desc
+    </select>
+
+    <select id="selectPassProductListByStock" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.PassProduct">
+        SELECT
+            a.product_seq AS productSeq,
+            a.product_name AS productName,
+            a.product_code AS productCode,
+            a.unit AS productUnit,
+            sum(a.pass_num) as totalPassNum
+        FROM
+        (
+            SELECT
+                mp.product_seq,
+                mp.product_name,
+                mp.product_code,
+                mp.unit,
+                mps.process_seq,
+                mps.pass_num
+            FROM
+            micro_process_storage mps
+            INNER JOIN micro_product mp ON mps.product_seq = mp.product_seq
+            AND mps.tenant_code = mp.tenant_code
+            <where>
+                mps.pass_num != 0
+                <if test="productNameOrCode != null and productNameOrCode != ''">
+                    and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat('%', #{productNameOrCode}, '%'))
+                </if>
+            </where>
+        ) a
+        GROUP BY
+        a.product_seq
+        ORDER BY totalPassNum desc
+    </select>
+
+    <select id="selectPassProductAndProcessListByStock" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.PassProductAndProcess">
+        SELECT mp.product_seq            as productSeq,
+               mps.process_seq           as processSeq,
+               mp.product_name           as productName,
+               mp.product_code           as productCode,
+               mpc.process_name          as processName,
+               mps.pass_num              as passNum
+        FROM micro_process_storage mps
+                 INNER JOIN micro_product mp on mps.product_seq = mp.product_seq and mps.tenant_code = mp.tenant_code
+                 INNER JOIN micro_process_common mpc on mps.process_seq = mpc.process_seq and mps.tenant_code = mpc.tenant_code
+        WHERE mps.pass_num != 0
+        ORDER BY mps.pass_num DESC
+    </select>
+
+    <select id="selectProductList" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.RecordForProduct">
+        SELECT
+        b.product_code as productCode,
+        b.product_name as productName,
+        b.product_seq as productSeq,
+        IFNULL(sum(b.total_pass_num ), 0) + IFNULL(sum(b.total_ng_num), 0) as totalNums
+        FROM
+        (
+        SELECT
+        mws.product_seq,
+        mp.product_name,
+        mp.product_code,
+        IFNULL(sum(pass_num), 0) as total_pass_num,
+        IFNULL(sum(ng_num),0) as total_ng_num
+        FROM micro_work_submit mws
+        INNER JOIN micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        INNER JOIN micro_user mu on mu.id = mws.submit_user
+        <where>
+            submit_type = '1'
+            and submit_status in (1, 2)
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat(
+                '%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="userName!= null and userName != ''">
+                and mu.user_name = #{userName}
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day,'%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+        GROUP BY mws.product_seq
+        UNION ALL
+        SELECT
+        mws.product_seq,
+        mp.product_name,
+        mp.product_code,
+        IFNULL(sum(check_pass_num), 0) as total_pass_num,
+        IFNULL(sum(check_ng_num),0) as total_ng_num
+        FROM micro_work_submit mws
+        INNER JOIN micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        INNER JOIN micro_user mu on mu.id = mws.submit_user
+        <where>
+            submit_type = '1'
+            and submit_status = 0
+            <if test="productNameOrCode != null and productNameOrCode != ''">
+                and (mp.product_code like concat('%', #{productNameOrCode}, '%') or mp.product_name like concat(
+                '%', #{productNameOrCode}, '%'))
+            </if>
+            <if test="userName!= null and userName != ''">
+                and mu.user_name = #{userName}
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day,'%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+        GROUP BY mws.product_seq
+        ) b
+        GROUP BY productSeq
+        ORDER BY totalNums desc
+    </select>
+
+    <select id="selectProductAndProcessList" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.RecordForProductAndProcess">
+        SELECT
+        a.product_seq as productSeq,
+        a.operate_process_seq as processSeq,
+        a.product_name as productName,
+        a.process_name as processName,
+        a.product_code as productCode,
+        IFNULL(sum(a.pass_num), 0) as passNum,
+        IFNULL(sum(a.ng_num), 0) as ngNum
+        FROM
+        (
+        SELECT
+        mws.product_seq,
+        mws.operate_process_seq,
+        mp.product_name,
+        mpc.process_name,
+        mp.product_code,
+        IFNULL(sum(mws.check_pass_num), 0) as pass_num,
+        IFNULL(sum(mws.check_ng_num), 0) as ng_num
+        FROM micro_work_submit mws
+        INNER JOIN micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        INNER JOIN micro_process_common mpc on mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+        INNER JOIN micro_user mu on mu.id = mws.submit_user
+        <where>
+            mws.submit_type = '1'
+            and mws.submit_status = 0
+            <if test="productSeqList != null">
+                and mws.product_seq in
+                <foreach item="productSeq" collection='productSeqList.split(",")' open="(" separator="," close=")">
+                    #{productSeq}
+                </foreach>
+            </if>
+            <if test="userName!= null and userName != ''">
+                and mu.user_name = #{userName}
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+        GROUP BY mws.product_seq, mws.operate_process_seq
+        UNION ALL
+        SELECT
+        mws.product_seq,
+        mws.operate_process_seq,
+        mp.product_name,
+        mpc.process_name,
+        mp.product_code,
+        IFNULL(sum(mws.pass_num), 0) as pass_num,
+        IFNULL(sum(mws.ng_num), 0) as ng_num
+        FROM micro_work_submit mws
+        INNER JOIN micro_product mp on mws.product_seq = mp.product_seq and mws.tenant_code = mp.tenant_code
+        INNER JOIN micro_process_common mpc on mws.operate_process_seq = mpc.process_seq and mws.tenant_code = mpc.tenant_code
+        INNER JOIN micro_user mu on mu.id = mws.submit_user
+        <where>
+            mws.submit_type = '1'
+            and mws.submit_status in (1,2)
+            <if test="productSeqList != null">
+                and mws.product_seq in
+                <foreach item="productSeq" collection='productSeqList.split(",")' open="(" separator="," close=")">
+                    #{productSeq}
+                </foreach>
+            </if>
+            <if test="userName!= null and userName != ''">
+                and mu.user_name = #{userName}
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+        GROUP BY mws.product_seq, mws.operate_process_seq
+        ) a
+        GROUP BY a.product_seq, a.operate_process_seq
+    </select>
+
+    <select id="selectWorkerList" resultMap="RecordForWorkerResult">
+        SELECT
+        IFNULL(sum(a.total_num), 0) as total_num,
+        a.user_name as user_name,
+        a.nick_name as nick_name
+        FROM
+        (
+        SELECT
+        IFNULL(sum(mws.check_pass_num), 0) + IFNULL(sum(mws.check_ng_num), 0) as total_num,
+        mu.user_name,
+        mu.nick_name
+        FROM micro_work_submit mws
+        INNER JOIN micro_user mu on mu.id = mws.submit_user
+        <where>
+            mws.submit_type = '1'
+            and mws.submit_status = 0
+            <if test="submitNickName != null and submitNickName != ''">
+                and mu.nick_name like concat('%', #{submitNickName}, '%')
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+        GROUP BY mu.user_name
+        UNION ALL
+        SELECT
+        IFNULL(sum(mws.pass_num), 0) + IFNULL(sum(mws.ng_num), 0) as total_num,
+        mu.user_name,
+        mu.nick_name
+        FROM micro_work_submit mws
+        INNER JOIN micro_user mu on mu.id = mws.submit_user
+        <where>
+            mws.submit_type = '1'
+            and mws.submit_status in (1, 2)
+            <if test="submitNickName != null and submitNickName != ''">
+                and mu.nick_name like concat('%', #{submitNickName}, '%')
+            </if>
+            <if test="startDate != null">and #{startDate} &lt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+            <if test="endDate != null">and #{endDate} &gt;= DATE_FORMAT(mws.submit_day, '%Y-%m-%d')</if>
+        </where>
+        GROUP BY mu.user_name) a
+        GROUP BY a.user_name
+        ORDER BY total_num DESC
+    </select>
+
+    <select id="obtainedTotalStock" resultType="com.cosmo.hhim.micro.base.domain.entity.analysis.TotalStock">
+        select ifnull(sum(pass_num), 0) as totalPassNum,
+               ifnull(sum(ng_num), 0)   as totalNgNum
+        from micro_process_storage
+        where tenant_code = #{tenantCode}
+    </select>
+</mapper>

@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.thirdplat.modules.wechatmp.autoconfig.WechatMpAutoConfig

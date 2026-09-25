@@ -1,0 +1,69 @@
+name: CI
+
+# 触发时机：推送到主要分支 或 对主要分支发起 PR
+on:
+  push:
+    branches: [ master, main, optimize, open ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  backend-build:
+    name: 后端编译打包 (JDK8 + Maven)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - name: 配置阿里云 Maven 镜像（加速依赖下载）
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<'EOF'
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+            <mirrors>
+              <mirror>
+                <id>aliyun-central</id>
+                <mirrorOf>central</mirrorOf>
+                <url>https://maven.aliyun.com/repository/central</url>
+              </mirror>
+            </mirrors>
+          </settings>
+          EOF
+
+      - name: 编译 + 打包（跳过测试）
+        # 注意：单元测试多为 SpringBootTest，需 MySQL/Redis/RocketMQ 服务，CI 暂不跑；
+        # 后续可增加"起 docker compose 中间件后 mvn test"的 job
+        run: mvn -B clean package -DskipTests
+
+      - name: 上传构建产物（留档用）
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-artifacts
+          path: |
+            cosmo-hhim-micro/hhim-micro-be/micro-interface/target/*.jar
+            hhim-third-platform/thirdplat-web/target/*.jar
+
+  frontend-build:
+    name: 前端构建 (uni-app H5)
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node 16（uni-app 要求 16/18）
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: 安装依赖（--legacy-peer-deps 规避 eslint peer 冲突）
+        run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+      - name: 构建 H5
+        run: npm run build:h5
+        working-directory: cosmo-hhim-micro/hhim-micro-app

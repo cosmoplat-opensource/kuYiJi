@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.thridplat.api.wechatminiapp.factory.RemoteWxMiniAppBaseFallbackFactory,\
+  com.cosmo.hhim.thridplat.api.wechatminiapp.factory.RemoteWxMiniAppQrCodeFallbackFactory,\
+  com.cosmo.hhim.thridplat.api.wechatminiapp.factory.RemoteWxMiniAppUserInfoFallbackFactory,\
+  com.cosmo.hhim.thridplat.api.wechatminiapp.factory.RemoteWxMiniAppMessageFallbackFactory

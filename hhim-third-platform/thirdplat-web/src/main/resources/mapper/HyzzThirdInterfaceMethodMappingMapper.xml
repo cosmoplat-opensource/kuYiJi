@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.external.mapper.HyzzThirdInterfaceMethodMappingMapper">
+
+    <resultMap type="com.cosmo.hhim.thirdplat.api.thirdclient.domain.HyzzThirdInterfaceMethodMapping" id="methodMappingResult">
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="clientSupport" column="client_support"/>
+        <result property="method" column="method"/>
+        <result property="requestType" column="request_type"/>
+        <result property="version" column="version"/>
+        <result property="requestUrl" column="request_url"/>
+        <result property="appId" column="app_id"/>
+        <result property="signType" column="sign_type"/>
+        <result property="privateKey" column="private_key"/>
+        <result property="publicKey" column="public_key"/>
+        <result property="authInfo" column="auth_info"/>
+        <result property="callback" column="callback"/>
+        <result property="callbackTopic" column="callback_topic"/>
+        <result property="callbackTag" column="callback_tag"/>
+    </resultMap>
+
+
+    <select id="selectClientSupportList" resultMap="methodMappingResult">
+        SELECT mp.tenant_code,
+               mp.client_support,
+               mp.version,
+               mp.method,
+               mp.request_type,
+               mp.callback,
+               mp.callback_topic,
+               mp.callback_tag,
+               it.request_url,
+               it.app_id,
+               it.sign_type,
+               it.private_key,
+               it.public_key,
+               it.auth_info
+        FROM hyzz_third_interface_method_mapping mp
+                 LEFT JOIN hyzz_third_interface_tenant it ON mp.interface_tenant_id = it.id
+        WHERE
+              mp.status='1'
+          AND mp.method = #{method}
+          AND mp.tenant_code = #{tenantCode}
+          AND mp.version = #{version}
+    </select>
+</mapper>

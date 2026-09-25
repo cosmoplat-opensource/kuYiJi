@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzTenantJobMapper">
+    
+    <resultMap type="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzTenantJob" id="HyzzTenantJobResult">
+        <result property="id"    column="id"    />
+        <result property="systemCode"    column="system_code"    />
+        <result property="taskDesc"    column="task_desc"    />
+        <result property="cron"    column="cron"    />
+        <result property="taskNextTime"    column="task_next_time"    />
+        <result property="taskLastTime"    column="task_last_time"    />
+        <result property="topic"    column="topic"    />
+        <result property="tag"    column="tag"    />
+        <result property="taskParam"    column="task_param"    />
+        <result property="taskStatus"    column="task_status"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectHyzzTenantJobVo">
+        select id, system_code, task_desc, cron, task_next_time, task_last_time, topic, tag, task_param, task_status, create_by, create_time, update_by, update_time from hyzz_tenant_job
+    </sql>
+
+    <select id="selectHyzzTenantJobList"  resultMap="HyzzTenantJobResult">
+        <include refid="selectHyzzTenantJobVo"/>
+        <where>  
+            <if test="systemCode != null  and systemCode != ''"> and system_code = #{systemCode}</if>
+            <if test="taskDesc != null  and taskDesc != ''"> and task_desc = #{taskDesc}</if>
+            <if test="cron != null  and cron != ''"> and cron = #{cron}</if>
+            <if test="taskNextTime != null "> and task_next_time = #{taskNextTime}</if>
+            <if test="taskLastTime != null "> and task_last_time = #{taskLastTime}</if>
+            <if test="topic != null  and topic != ''"> and topic = #{topic}</if>
+            <if test="tag != null  and tag != ''"> and tag = #{tag}</if>
+            <if test="taskParam != null  and taskParam != ''"> and task_param = #{taskParam}</if>
+            <if test="taskStatus != null "> and task_status = #{taskStatus}</if>
+        </where>
+    </select>
+    
+    <select id="selectHyzzTenantJobById" parameterType="Long" resultMap="HyzzTenantJobResult">
+        <include refid="selectHyzzTenantJobVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertHyzzTenantJob"  useGeneratedKeys="true" keyProperty="id">
+        insert into hyzz_tenant_job
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="systemCode != null">system_code,</if>
+            <if test="taskDesc != null">task_desc,</if>
+            <if test="cron != null and cron != ''">cron,</if>
+            <if test="taskNextTime != null">task_next_time,</if>
+            <if test="taskLastTime != null">task_last_time,</if>
+            <if test="topic != null and topic != ''">topic,</if>
+            <if test="tag != null and tag != ''">tag,</if>
+            <if test="taskParam != null">task_param,</if>
+            <if test="taskStatus != null">task_status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="systemCode != null">#{systemCode},</if>
+            <if test="taskDesc != null">#{taskDesc},</if>
+            <if test="cron != null and cron != ''">#{cron},</if>
+            <if test="taskNextTime != null">#{taskNextTime},</if>
+            <if test="taskLastTime != null">#{taskLastTime},</if>
+            <if test="topic != null and topic != ''">#{topic},</if>
+            <if test="tag != null and tag != ''">#{tag},</if>
+            <if test="taskParam != null">#{taskParam},</if>
+            <if test="taskStatus != null">#{taskStatus},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHyzzTenantJob" >
+        update hyzz_tenant_job
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="systemCode != null">system_code = #{systemCode},</if>
+            <if test="taskDesc != null">task_desc = #{taskDesc},</if>
+            <if test="cron != null and cron != ''">cron = #{cron},</if>
+            <if test="taskNextTime != null">task_next_time = #{taskNextTime},</if>
+            <if test="taskLastTime != null">task_last_time = #{taskLastTime},</if>
+            <if test="topic != null and topic != ''">topic = #{topic},</if>
+            <if test="tag != null and tag != ''">tag = #{tag},</if>
+            <if test="taskParam != null">task_param = #{taskParam},</if>
+            <if test="taskStatus != null">task_status = #{taskStatus},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteHyzzTenantJobById" parameterType="Long">
+        delete from hyzz_tenant_job where id = #{id}
+    </delete>
+
+    <delete id="deleteHyzzTenantJobByIds" parameterType="String">
+        delete from hyzz_tenant_job where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <select id="findExecuteList" resultMap="HyzzTenantJobResult">
+        <include refid="selectHyzzTenantJobVo"/>
+        <![CDATA[
+        where task_status=1 and task_next_time<= #{nowTime} and (id%#{shardTotal}=#{shardIndex})
+            ]]>
+    </select>
+</mapper>

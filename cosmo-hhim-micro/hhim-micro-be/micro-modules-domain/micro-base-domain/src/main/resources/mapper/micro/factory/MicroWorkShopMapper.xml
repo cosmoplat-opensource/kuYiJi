@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.factory.MicroWorkShopMapper">
+    
+    <resultMap type="MicroWorkshop" id="MicroWorkshopResult">
+        <result property="id"    column="id"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="wshopCode"    column="wshop_code"    />
+        <result property="wshopName"    column="wshop_name"    />
+        <result property="remark"    column="remark"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+    </resultMap>
+
+    <sql id="selectMicroWorkshopVo">
+        select id, tenant_code, wshop_code, wshop_name, remark, active_flag, created_by, created_date, last_upd_by, last_upd_date from micro_workshop
+    </sql>
+
+    <select id="selectMicroWorkshopList" parameterType="MicroWorkshop" resultMap="MicroWorkshopResult">
+        <include refid="selectMicroWorkshopVo"/>
+        <where>  
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+            <if test="wshopCode != null  and wshopCode != ''"> and wshop_code = #{wshopCode}</if>
+            <if test="wshopName != null  and wshopName != ''"> and wshop_name like concat('%', #{wshopName}, '%')</if>
+            <if test="searchValue != null  and searchValue != ''"> and (wshop_name like concat('%', #{searchValue}, '%') or wshop_code like concat('%', #{searchValue}, '%'))</if>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and last_upd_date = #{lastUpdDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectMicroWorkshopById" parameterType="Long" resultMap="MicroWorkshopResult">
+        <include refid="selectMicroWorkshopVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMicroWorkshop" parameterType="MicroWorkshop" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_workshop
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="wshopCode != null and wshopCode != ''">wshop_code,</if>
+            <if test="wshopName != null and wshopName != ''">wshop_name,</if>
+            <if test="remark != null">remark,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="wshopCode != null and wshopCode != ''">#{wshopCode},</if>
+            <if test="wshopName != null and wshopName != ''">#{wshopName},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroWorkshop" parameterType="MicroWorkshop">
+        update micro_workshop
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="wshopCode != null and wshopCode != ''">wshop_code = #{wshopCode},</if>
+            <if test="wshopName != null and wshopName != ''">wshop_name = #{wshopName},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroWorkshopById" parameterType="Long">
+        delete from micro_workshop where id = #{id}
+    </delete>
+
+    <update id="deleteMicroWorkshopByIds" parameterType="String">
+        update micro_workshop set active_flag = '0' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+
+    <select id="selectMicroWorkshopByCode" parameterType="java.lang.String" resultMap="MicroWorkshopResult">
+        <include refid="selectMicroWorkshopVo"/>
+        where wshop_code = #{wshopCode}
+    </select>
+
+</mapper>

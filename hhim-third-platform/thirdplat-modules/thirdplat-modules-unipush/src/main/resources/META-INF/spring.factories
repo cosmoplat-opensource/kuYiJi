@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.thirdplat.modules.unipush.config.UniPushAutoConfig
+
+  

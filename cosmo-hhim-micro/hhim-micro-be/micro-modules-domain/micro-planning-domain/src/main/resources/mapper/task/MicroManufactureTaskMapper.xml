@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.planning.domain.mapper.task.MicroManufactureTaskMapper">
+    
+    <resultMap type="MicroManufactureTask" id="MicroManufactureTaskResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="taskNo" column="task_no"/>
+        <result property="workOrderNo" column="work_order_no"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="taskPlanNum" column="task_plan_num"/>
+        <result property="submitableNum" column="submitable_num"/>
+        <result property="passNum" column="pass_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="pendNgNum" column="pend_ng_num"/>
+        <result property="submitStatus" column="submit_status"/>
+        <result property="beforeStatus" column="before_status"/>
+        <result property="wshopCode" column="wshop_code"/>
+        <result property="mlineCode" column="mline_code"/>
+        <result property="remark" column="remark"/>
+        <result property="techType" column="tech_type"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="isLastProcess" column="is_last_process"/>
+        <result property="isFirstProcess" column="is_first_process"/>
+        <result property="processName" column="process_name"/>
+        <result property="processCode" column="process_code"/>
+        <result property="sort" column="sort"/>
+    </resultMap>
+
+    <sql id="selectMicroManufactureTaskVo">
+        select id, tenant_code, task_no, work_order_no, order_no, product_seq, process_seq, task_plan_num, submitable_num, pass_num, ng_num, pend_ng_num, submit_status, before_status, wshop_code, mline_code, remark, tech_type, created_by, created_date, last_upd_by, last_upd_date, active_flag,is_last_process, is_first_process, sort from micro_manufacture_task
+    </sql>
+
+    <sql id="selectMicroManufactureTaskVoFirst">
+        select
+            mmt.id,
+            mmt.tenant_code,
+            mmt.task_no,
+            mmt.work_order_no,
+            mmt.order_no,
+            mmt.product_seq,
+            mmt.process_seq,
+            mmt.task_plan_num,
+            mmt.submitable_num,
+            mmt.pass_num,
+            mmt.ng_num,
+            mmt.pend_ng_num,
+            mmt.submit_status,
+            mmt.before_status,
+            mmt.wshop_code,
+            mmt.mline_code,
+            mmt.remark,
+            mmt.tech_type,
+            mmt.created_by,
+            mmt.created_date,
+            mmt.last_upd_by,
+            mmt.last_upd_date,
+            mmt.active_flag,
+            mmt.is_last_process,
+            mmt.is_first_process,
+            mmt.sort,
+            mpc.process_code,
+            mpc.process_name
+        from
+            micro_manufacture_task mmt
+            left join micro_process_common mpc on mpc .process_seq = mmt.process_seq
+    </sql>
+
+    <select id="selectMicroManufactureTaskList" parameterType="MicroManufactureTask" resultMap="MicroManufactureTaskResult">
+        <include refid="selectMicroManufactureTaskVoFirst"/>
+        <where>  
+            <if test="tenantCode != null  and tenantCode != ''"> and mmt.tenant_code = #{tenantCode}</if>
+            <if test="taskNo != null  and taskNo != ''"> and mmt.task_no = #{taskNo}</if>
+            <if test="workOrderNo != null  and workOrderNo != ''"> and mmt.work_order_no = #{workOrderNo}</if>
+            <if test="orderNo != null  and orderNo != ''"> and mmt.order_no = #{orderNo}</if>
+            <if test="productSeq != null  and productSeq != ''"> and mmt.product_seq = #{productSeq}</if>
+            <if test="processSeq != null "> and mmt.process_seq = #{processSeq}</if>
+            <if test="taskPlanNum != null "> and mmt.task_plan_num = #{taskPlanNum}</if>
+            <if test="submitableNum != null "> and mmt.submitable_num = #{submitableNum}</if>
+            <if test="passNum != null "> and mmt.pass_num = #{passNum}</if>
+            <if test="ngNum != null "> and mmt.ng_num = #{ngNum}</if>
+            <if test="pendNgNum != null "> and mmt.pend_ng_num = #{pendNgNum}</if>
+            <if test="submitStatus != null  and submitStatus != ''"> and mmt.submit_status = #{submitStatus}</if>
+            <if test="beforeStatus != null  and beforeStatus != ''"> and mmt.before_status = #{beforeStatus}</if>
+            <if test="wshopCode != null  and wshopCode != ''"> and mmt.wshop_code = #{wshopCode}</if>
+            <if test="mlineCode != null  and mlineCode != ''"> and mmt.mline_code = #{mlineCode}</if>
+            <if test="techType != null  and techType != ''"> and mmt.tech_type = #{techType}</if>
+            <if test="activeFlag != null  and activeFlag != ''"> and mmt.active_flag = #{activeFlag}</if>
+        </where>
+        order by mmt.id asc
+    </select>
+    
+    <select id="selectMicroManufactureTaskById" parameterType="Long" resultMap="MicroManufactureTaskResult">
+        <include refid="selectMicroManufactureTaskVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectMicroManufactureTaskListByCondition" parameterType="MicroManufactureTask" resultMap="MicroManufactureTaskResult">
+        <include refid="selectMicroManufactureTaskVoFirst"/>
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+            <if test="taskNo != null  and taskNo != ''"> and task_no = #{taskNo}</if>
+            <if test="workOrderNo != null  and workOrderNo != ''"> and work_order_no = #{workOrderNo}</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no = #{orderNo}</if>
+            <if test="productSeq != null  and productSeq != ''"> and product_seq = #{productSeq}</if>
+            <if test="processSeq != null "> and process_seq = #{processSeq}</if>
+            <if test="taskPlanNum != null "> and task_plan_num = #{taskPlanNum}</if>
+            <if test="submitableNum != null "> and submitable_num = #{submitableNum}</if>
+            <if test="passNum != null "> and pass_num = #{passNum}</if>
+            <if test="ngNum != null "> and ng_num = #{ngNum}</if>
+            <if test="pendNgNum != null "> and pend_ng_num = #{pendNgNum}</if>
+            <if test="submitStatus != null  and submitStatus != ''"> and submit_status = #{submitStatus}</if>
+            <if test="beforeStatus != null  and beforeStatus != ''"> and before_status = #{beforeStatus}</if>
+            <if test="wshopCode != null  and wshopCode != ''"> and wshop_code = #{wshopCode}</if>
+            <if test="mlineCode != null  and mlineCode != ''"> and mline_code = #{mlineCode}</if>
+            <if test="techType != null  and techType != ''"> and tech_type = #{techType}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and last_upd_date = #{lastUpdDate}</if>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+        </where>
+        order by mmt.id asc
+    </select>
+
+    <insert id="insertMicroManufactureTask" parameterType="MicroManufactureTask" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_manufacture_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="taskNo != null and taskNo != ''">task_no,</if>
+            <if test="workOrderNo != null and workOrderNo != ''">work_order_no,</if>
+            <if test="orderNo != null and orderNo != ''">order_no,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="processSeq != null">process_seq,</if>
+            <if test="taskPlanNum != null">task_plan_num,</if>
+            <if test="submitableNum != null">submitable_num,</if>
+            <if test="passNum != null">pass_num,</if>
+            <if test="ngNum != null">ng_num,</if>
+            <if test="pendNgNum != null">pend_ng_num,</if>
+            <if test="submitStatus != null">submit_status,</if>
+            <if test="beforeStatus != null">before_status,</if>
+            <if test="wshopCode != null">wshop_code,</if>
+            <if test="mlineCode != null">mline_code,</if>
+            <if test="remark != null">remark,</if>
+            <if test="techType != null">tech_type,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="activeFlag != null and isLastProcess != ''">is_last_process,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="taskNo != null and taskNo != ''">#{taskNo},</if>
+            <if test="workOrderNo != null and workOrderNo != ''">#{workOrderNo},</if>
+            <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="processSeq != null">#{processSeq},</if>
+            <if test="taskPlanNum != null">#{taskPlanNum},</if>
+            <if test="submitableNum != null">#{submitableNum},</if>
+            <if test="passNum != null">#{passNum},</if>
+            <if test="ngNum != null">#{ngNum},</if>
+            <if test="pendNgNum != null">#{pendNgNum},</if>
+            <if test="submitStatus != null">#{submitStatus},</if>
+            <if test="beforeStatus != null">#{beforeStatus},</if>
+            <if test="wshopCode != null">#{wshopCode},</if>
+            <if test="mlineCode != null">#{mlineCode},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="techType != null">#{techType},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="isLastProcess != null and isLastProcess != ''">#{isLastProcess},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroManufactureTask" parameterType="MicroManufactureTask">
+        update micro_manufacture_task
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="taskNo != null and taskNo != ''">task_no = #{taskNo},</if>
+            <if test="workOrderNo != null and workOrderNo != ''">work_order_no = #{workOrderNo},</if>
+            <if test="orderNo != null and orderNo != ''">order_no = #{orderNo},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="processSeq != null">process_seq = #{processSeq},</if>
+            <if test="taskPlanNum != null">task_plan_num = #{taskPlanNum},</if>
+            <if test="submitableNum != null">submitable_num = #{submitableNum},</if>
+            <if test="passNum != null">pass_num = #{passNum},</if>
+            <if test="ngNum != null">ng_num = #{ngNum},</if>
+            <if test="pendNgNum != null">pend_ng_num = #{pendNgNum},</if>
+            <if test="submitStatus != null">submit_status = #{submitStatus},</if>
+            <if test="beforeStatus != null">before_status = #{beforeStatus},</if>
+            <if test="wshopCode != null">wshop_code = #{wshopCode},</if>
+            <if test="mlineCode != null">mline_code = #{mlineCode},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="techType != null">tech_type = #{techType},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="isLastProcess != null and isLastProcess != ''">is_last_process = #{isLastProcess},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroManufactureTaskById" parameterType="Long">
+        delete from micro_manufacture_task where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroManufactureTaskByIds" parameterType="String">
+        delete from micro_manufacture_task where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id ="insertList" parameterType="java.util.List" >
+        insert into micro_manufacture_task (
+        tenant_code,
+        task_no,
+        work_order_no,
+        order_no,
+        product_seq,
+        process_seq,
+        task_plan_num,
+        wshop_code,
+        mline_code,
+        tech_type,
+        created_by,
+        created_date,
+        is_last_process,
+        is_first_process,
+        last_upd_by,
+        last_upd_date,
+        sort
+        )
+        values
+        <foreach collection ="list" item="task" index= "index" separator =",">
+            (
+            #{task.tenantCode},
+            #{task.taskNo},
+            #{task.workOrderNo},
+            #{task.orderNo},
+            #{task.productSeq},
+            #{task.processSeq},
+            #{task.taskPlanNum},
+            #{task.wshopCode},
+            #{task.mlineCode},
+            #{task.techType},
+            #{task.createdBy},
+            sysdate(),
+            #{task.isLastProcess},
+            #{task.isFirstProcess},
+            #{task.lastUpdBy},
+            sysdate(),
+            #{task.sort}
+            )
+        </foreach >
+    </insert >
+
+    <update id="addTaskFinishNum">
+        update micro_manufacture_task
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="pass_num =case" suffix="end,">
+                <foreach collection="taskList" item="i" index="index">
+                    <if test="i.passNum!=null">
+                        when task_no=#{i.taskNo} then pass_num + #{i.passNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="ng_num =case" suffix="end,">
+                <foreach collection="taskList" item="i" index="index">
+                    <if test="i.ngNum!=null">
+                        when task_no=#{i.taskNo} then ng_num + #{i.ngNum}
+                    </if>
+                </foreach>
+            </trim>
+            <if test="userId!=null and userId!=''">
+                last_upd_by= #{userId},
+            </if>
+            last_upd_date= sysdate()
+        </trim>
+        where task_no in
+        <foreach collection="taskList" index="index" item="i" separator="," open="(" close=")">
+            #{i.taskNo, jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
+    <select id="getProcessSeqByWorkOrderNo" parameterType="string" resultType="string">
+        select process_seq as processSeq
+        from micro_manufacture_task
+        where work_order_no = #{workOrderNo}
+        order by id asc
+    </select>
+    <select id="selectReProcessByProcessIds"
+            resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        select mpc.process_seq as itemSeq,
+        mpc.process_name as itemName,
+        mpc.process_code as itemCode,
+        mpc.id as itemId
+        from micro_manufacture_task mmt
+        inner join micro_process_common mpc
+        on mmt.tenant_code = mpc.tenant_code and mmt.process_seq=mpc.process_seq
+        where mpc.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

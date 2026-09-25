@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.process.MicroProcessStorageHistoryMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorageHistory" id="MicroProcessStorageHistoryResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productName" column="product_name"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="processCode" column="process_code"/>
+        <result property="processName" column="process_name"/>
+        <result property="operateNode" column="operate_node"/>
+        <result property="passFromNum" column="pass_from_num"/>
+        <result property="passToNum" column="pass_to_num"/>
+        <result property="ngFromNum" column="ng_from_num"/>
+        <result property="ngToNum" column="ng_to_num"/>
+        <result property="remark" column="remark"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="productUnit" column="unit"/>
+    </resultMap>
+
+    <sql id="selectMicroProcessStorageHistoryVo">
+        select id,
+               tenant_code,
+               product_code,
+               product_seq,
+               product_name,
+               process_seq,
+               process_code,
+               process_name,
+               operate_node,
+               pass_from_num,
+               pass_to_num,
+               ng_from_num,
+               ng_to_num,
+               remark,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_process_storage_history
+    </sql>
+
+    <select id="selectMicroProcessStorageHistoryList" parameterType="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorageHistory"
+            resultMap="MicroProcessStorageHistoryResult">
+        select sh.id,
+        sh.tenant_code,
+        sh.product_code,
+        sh.product_seq,
+        sh.product_name,
+        sh.process_seq,
+        sh.process_code,
+        sh.process_name,
+        sh.operate_node,
+        sh.pass_from_num,
+        sh.pass_to_num,
+        sh.ng_from_num,
+        sh.ng_to_num,
+        sh.remark,
+        mu.nick_name as created_by,
+        sh.created_date,
+        sh.last_upd_by,
+        sh.last_upd_date,
+        p.unit
+        from micro_process_storage_history sh
+        left join micro_product p on sh.tenant_code = p.tenant_code and sh.product_seq = p.product_seq
+        left join micro_user mu on sh.tenant_code = mu.tenant_code and sh.created_by = mu.id
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and sh.tenant_code = #{tenantCode}</if>
+            <if test="productCode != null  and productCode != ''">and sh.product_code = #{productCode}</if>
+            <if test="productSeq != null  and productSeq != ''">and sh.product_seq = #{productSeq}</if>
+            <if test="productName != null  and productName != ''">and sh.product_name = #{productName}</if>
+            <if test="processSeq != null  and processSeq != ''">and sh.process_seq = #{processSeq}</if>
+            <if test="processCode != null  and processCode != ''">and sh.process_code = #{processCode}</if>
+            <if test="processName != null  and processName != ''">and sh.process_name = #{processName}</if>
+            <if test="operateNode != null  and operateNode != ''">and sh.operate_node = #{operateNode}</if>
+            <if test="passFromNum != null ">and sh.pass_from_num = #{passFromNum}</if>
+            <if test="passToNum != null ">and sh.pass_to_num = #{passToNum}</if>
+            <if test="ngFromNum != null ">and sh.ng_from_num = #{ngFromNum}</if>
+            <if test="ngToNum != null ">and sh.ng_to_num = #{ngToNum}</if>
+            <if test="createdBy != null  and createdBy != ''">and sh.created_by = #{createdBy}</if>
+            <if test="startDate != null ">
+                <![CDATA[ and date_format(sh.created_date, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="endDate != null ">
+                <![CDATA[ and date_format(sh.created_date, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d') ]]>
+            </if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and sh.last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and sh.last_upd_date = #{lastUpdDate}</if>
+        </where>
+        order by sh.last_upd_date DESC, sh.id DESC
+    </select>
+
+    <select id="selectMicroProcessStorageHistoryById" parameterType="Long" resultMap="MicroProcessStorageHistoryResult">
+        <include refid="selectMicroProcessStorageHistoryVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMicroProcessStorageHistory" parameterType="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorageHistory"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        insert into micro_process_storage_history
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="productCode != null and productCode != ''">product_code,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="productName != null and productName != ''">product_name,</if>
+            <if test="processSeq != null and processSeq != ''">process_seq,</if>
+            <if test="processCode != null and processCode != ''">process_code,</if>
+            <if test="processName != null and processName != ''">process_name,</if>
+            <if test="operateNode != null and operateNode != ''">operate_node,</if>
+            <if test="passFromNum != null">pass_from_num,</if>
+            <if test="passToNum != null">pass_to_num,</if>
+            <if test="ngFromNum != null">ng_from_num,</if>
+            <if test="ngToNum != null">ng_to_num,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="productCode != null and productCode != ''">#{productCode},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="productName != null and productName != ''">#{productName},</if>
+            <if test="processSeq != null and processSeq != ''">#{processSeq},</if>
+            <if test="processCode != null and processCode != ''">#{processCode},</if>
+            <if test="processName != null and processName != ''">#{processName},</if>
+            <if test="operateNode != null and operateNode != ''">#{operateNode},</if>
+            <if test="passFromNum != null">#{passFromNum},</if>
+            <if test="passToNum != null">#{passToNum},</if>
+            <if test="ngFromNum != null">#{ngFromNum},</if>
+            <if test="ngToNum != null">#{ngToNum},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertMicroProcessStorageHistoryBatch">
+        insert into micro_process_storage_history
+        (tenant_code,
+        product_seq,
+        product_code,
+        product_name,
+        process_seq,
+        process_code,
+        process_name,
+        operate_node,
+        pass_from_num,
+        pass_to_num,
+        ng_from_num,
+        ng_to_num,
+        remark,
+        created_by,
+        created_date) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.tenantCode},
+            #{item.productSeq},
+            #{item.productCode},
+            #{item.productName},
+            #{item.processSeq},
+            #{item.processCode},
+            #{item.processName},
+            #{item.operateNode},
+            #{item.passFromNum},
+            #{item.passToNum},
+            #{item.ngFromNum},
+            #{item.ngToNum},
+            #{item.remark},
+            #{item.createdBy},
+            #{item.createdDate})
+        </foreach>
+    </insert>
+
+    <update id="updateMicroProcessStorageHistory" parameterType="com.cosmo.hhim.micro.base.domain.entity.storage.MicroProcessStorageHistory">
+        update micro_process_storage_history
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="productCode != null and productCode != ''">product_code = #{productCode},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="productName != null and productName != ''">product_name = #{productName},</if>
+            <if test="processSeq != null and processSeq != ''">process_seq = #{processSeq},</if>
+            <if test="processCode != null and processCode != ''">process_code = #{processCode},</if>
+            <if test="processName != null and processName != ''">process_name = #{processName},</if>
+            <if test="operateNode != null and operateNode != ''">operate_node = #{operateNode},</if>
+            <if test="productStatus != null and productStatus != ''">product_status = #{productStatus},</if>
+            <if test="passFromNum != null">pass_from_num = #{passFromNum},</if>
+            <if test="passToNum != null">pass_to_num = #{passToNum},</if>
+            <if test="ngFromNum != null">ng_from_num = #{ngFromNum},</if>
+            <if test="ngToNum != null">ng_to_num = #{ngToNum},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroProcessStorageHistoryById" parameterType="Long">
+        delete
+        from micro_process_storage_history
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroProcessStorageHistoryByIds" parameterType="String">
+        delete from micro_process_storage_history where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAllMicroProcessStorageHistory">
+        delete
+        from micro_process_storage_history
+    </delete>
+</mapper>

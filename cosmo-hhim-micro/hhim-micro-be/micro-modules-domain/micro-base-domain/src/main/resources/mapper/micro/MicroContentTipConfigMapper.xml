@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroContentTipConfigMapper">
+
+    <resultMap type="MicroContentTipConfig" id="MicroContentTipConfigResult">
+        <result property="id" column="id"/>
+        <result property="triggerRoles" column="trigger_roles"/>
+        <result property="triggerActions" column="trigger_actions"/>
+        <result property="actionType" column="action_type"/>
+        <result property="triggerBusinessBean" column="trigger_business_bean"/>
+        <result property="businessConditionConfig" column="business_condition_config"/>
+        <result property="priority" column="priority"/>
+        <result property="tipContent" column="tip_content"/>
+        <result property="tipWay" column="tip_way"/>
+        <result property="periodType" column="period_type"/>
+        <result property="periodTime" column="period_time"/>
+        <result property="periodUnit" column="period_unit"/>
+        <result property="intervalTime" column="interval_time"/>
+        <result property="intervalUnit" column="interval_unit"/>
+        <result property="periodMaxNum" column="period_max_num"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <sql id="selectMicroContentTipConfigVo">
+        select id,
+               trigger_roles,
+               trigger_actions,
+               action_type,
+               trigger_business_bean,
+               business_condition_config,
+               priority,
+               tip_content,
+               tip_way,
+               period_type,
+               period_time,
+               period_unit,
+               interval_time,
+               interval_unit,
+               period_max_num,
+               active_flag,
+               remark,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_content_tip_config
+    </sql>
+
+    <select id="selectMicroContentTipConfigList" parameterType="MicroContentTipConfigParam" resultMap="MicroContentTipConfigResult">
+        <include refid="selectMicroContentTipConfigVo"/>
+        <where>
+            <if test="triggerRoles != null  and triggerRoles.size() > 0">
+                and
+                <foreach item="item" index="index" collection="triggerRoles" open="(" separator="OR" close=")">
+                    find_in_set(#{item},trigger_roles)
+                </foreach>
+            </if>
+
+            <if test="triggerActions != null  and triggerActions.size() > 0">
+                and
+                <foreach item="item" index="index" collection="triggerActions" open="(" separator="OR" close=")">
+                    find_in_set(#{item},trigger_actions)
+                </foreach>
+            </if>
+
+            <if test="actionType != null and actionType != ''">
+                and action_type = #{actionType}
+            </if>
+            and active_flag = '0'
+        </where>
+    </select>
+
+    <select id="selectMicroContentTipConfigById" parameterType="Long" resultMap="MicroContentTipConfigResult">
+        <include refid="selectMicroContentTipConfigVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMicroContentTipConfig" parameterType="MicroContentTipConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_content_tip_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="triggerRoles != null and triggerRoles != ''">trigger_roles,</if>
+            <if test="triggerActions != null and triggerActions != ''">trigger_actions,</if>
+            <if test="actionType != null and actionType != ''">action_type,</if>
+            <if test="triggerBusinessBean != null">trigger_business_bean,</if>
+            <if test="businessConditionConfig != null">business_condition_config,</if>
+            <if test="priority != null">priority,</if>
+            <if test="tipContent != null and tipContent != ''">tip_content,</if>
+            <if test="tipWay != null and tipWay != ''">tip_way,</if>
+            <if test="periodType != null and periodType != ''">period_type,</if>
+            <if test="periodTime != null">period_time,</if>
+            <if test="periodUnit != null">period_unit,</if>
+            <if test="intervalTime != null">interval_time,</if>
+            <if test="intervalUnit != null">interval_unit,</if>
+            <if test="periodMaxNum != null">period_max_num,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="triggerRoles != null and triggerRoles != ''">#{triggerRoles},</if>
+            <if test="triggerActions != null and triggerActions != ''">#{triggerActions},</if>
+            <if test="actionType != null and actionType != ''">#{actionType},</if>
+            <if test="triggerBusinessBean != null">#{triggerBusinessBean},</if>
+            <if test="businessConditionConfig != null">#{businessConditionConfig},</if>
+            <if test="priority != null">#{priority},</if>
+            <if test="tipContent != null and tipContent != ''">#{tipContent},</if>
+            <if test="tipWay != null and tipWay != ''">#{tipWay},</if>
+            <if test="periodType != null and periodType != ''">#{periodType},</if>
+            <if test="periodTime != null">#{periodTime},</if>
+            <if test="periodUnit != null">#{periodUnit},</if>
+            <if test="intervalTime != null">#{intervalTime},</if>
+            <if test="intervalUnit != null">#{intervalUnit},</if>
+            <if test="periodMaxNum != null">#{periodMaxNum},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroContentTipConfig" parameterType="MicroContentTipConfig">
+        update micro_content_tip_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="triggerRoles != null and triggerRoles != ''">trigger_roles = #{triggerRoles},</if>
+            <if test="triggerActions != null and triggerActions != ''">trigger_actions = #{triggerActions},</if>
+            <if test="actionType != null and actionType != ''">action_type = #{actionType},</if>
+            <if test="triggerBusinessBean != null">trigger_business_bean = #{triggerBusinessBean},</if>
+            <if test="businessConditionConfig != null">business_condition_config = #{businessConditionConfig},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="tipContent != null and tipContent != ''">tip_content = #{tipContent},</if>
+            <if test="tipWay != null and tipWay != ''">tip_way = #{tipWay},</if>
+            <if test="periodType != null and periodType != ''">period_type = #{periodType},</if>
+            <if test="periodTime != null">period_time = #{periodTime},</if>
+            <if test="periodUnit != null">period_unit = #{periodUnit},</if>
+            <if test="intervalTime != null">interval_time = #{intervalTime},</if>
+            <if test="intervalUnit != null">interval_unit = #{intervalUnit},</if>
+            <if test="periodMaxNum != null">period_max_num = #{periodMaxNum},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroContentTipConfigById" parameterType="Long">
+        delete
+        from micro_content_tip_config
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroContentTipConfigByIds" parameterType="String">
+        delete from micro_content_tip_config where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

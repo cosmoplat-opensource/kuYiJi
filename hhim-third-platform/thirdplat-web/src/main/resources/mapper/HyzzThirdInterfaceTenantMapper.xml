@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.external.mapper.HyzzThirdInterfaceTenantMapper">
+    
+    <resultMap type="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzThirdInterfaceTenant" id="HyzzThirdInterfaceTenantResult">
+        <result property="id"    column="id"    />
+        <result property="appId"    column="app_id"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="tenantName" column="tenant_name"/>
+        <result property="clientSupport"    column="client_support"    />
+        <result property="signType"    column="sign_type"    />
+        <result property="publicKey"    column="public_key"    />
+        <result property="privateKey"    column="private_key"    />
+        <result property="requestUrl"    column="request_url"    />
+        <result property="authInfo"    column="auth_info"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+    </resultMap>
+
+    <sql id="selectHyzzThirdInterfaceTenantVo">
+        select id,
+               app_id,
+               tenant_code,
+               tenant_name,
+               client_support,
+               sign_type,
+               public_key,
+               private_key,
+               request_url,
+               auth_info,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from hyzz_third_interface_tenant
+    </sql>
+
+    <select id="selectHyzzThirdInterfaceTenantList" parameterType="com.cosmo.hhim.thirdplat.api.operation.domain.HyzzThirdInterfaceTenant" resultMap="HyzzThirdInterfaceTenantResult">
+        <include refid="selectHyzzThirdInterfaceTenantVo"/>
+        <where>  
+            <if test="appId != null  and appId != ''"> and app_id = #{appId}</if>
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+            <if test="tenantName != null  and tenantName != ''">and tenant_name = #{tenantName}</if>
+            <if test="clientSupport != null  and clientSupport != ''"> and client_support = #{clientSupport}</if>
+            <if test="signType != null  and signType != ''"> and sign_type = #{signType}</if>
+            <if test="publicKey != null  and publicKey != ''"> and public_key = #{publicKey}</if>
+            <if test="privateKey != null  and privateKey != ''"> and private_key = #{privateKey}</if>
+            <if test="requestUrl != null  and requestUrl != ''"> and request_url = #{requestUrl}</if>
+            <if test="authInfo != null  and authInfo != ''"> and auth_info = #{authInfo}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and last_upd_date = #{lastUpdDate}</if>
+        </where>
+        order by id desc
+    </select>
+    
+    <select id="findInfoByTenantCodeAndClient" parameterType="String" resultMap="HyzzThirdInterfaceTenantResult">
+        <include refid="selectHyzzThirdInterfaceTenantVo"/>
+        where tenant_code = #{tenantCode} and client_support = #{clientSupport}
+        limit 1;
+    </select>
+</mapper>

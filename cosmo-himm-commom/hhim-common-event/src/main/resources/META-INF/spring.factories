@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.common.event.config.EventAutoConfig,\
+  com.cosmo.hhim.common.springevent.aspect.ThirdInterfaceEventListenerAspect

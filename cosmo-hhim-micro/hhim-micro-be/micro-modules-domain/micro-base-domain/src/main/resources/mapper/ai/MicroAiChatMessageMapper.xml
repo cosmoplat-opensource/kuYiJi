@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.ai.MicroAiChatMessageMapper">
+
+    <resultMap id="MicroAiChatMessageResult" type="com.cosmo.hhim.micro.base.domain.entity.ai.MicroAiChatMessage">
+        <result property="id" column="id"/>
+        <result property="sessionId" column="session_id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="role" column="role"/>
+        <result property="content" column="content"/>
+        <result property="routeJson" column="route_json"/>
+        <result property="evidenceJson" column="evidence_json"/>
+        <result property="clarifyJson" column="clarify_json"/>
+        <result property="intent" column="intent"/>
+        <result property="elapsedMs" column="elapsed_ms"/>
+        <result property="msgTime" column="msg_time"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.cosmo.hhim.micro.base.domain.entity.ai.MicroAiChatMessage">
+        insert into micro_ai_chat_message
+        (session_id, tenant_code, role, content, route_json, evidence_json, clarify_json,
+         intent, elapsed_ms, msg_time, created_by, created_date)
+        values
+        (#{sessionId}, #{tenantCode}, #{role}, #{content}, #{routeJson}, #{evidenceJson}, #{clarifyJson},
+         #{intent}, #{elapsedMs}, #{msgTime}, #{createdBy}, #{createdDate})
+    </insert>
+
+    <select id="selectListBySession" resultMap="MicroAiChatMessageResult">
+        select * from micro_ai_chat_message
+        where session_id = #{sessionId}
+        order by msg_time asc, id asc
+    </select>
+
+    <select id="selectLastAiIntent" resultType="java.lang.String">
+        select intent from micro_ai_chat_message
+        where session_id = #{sessionId} and role = 'ai' and intent is not null and intent != ''
+        order by id desc limit 1
+    </select>
+
+    <select id="selectRecentBySession" resultMap="MicroAiChatMessageResult">
+        select * from micro_ai_chat_message
+        where session_id = #{sessionId}
+        order by id desc
+        limit #{limit}
+    </select>
+
+</mapper>

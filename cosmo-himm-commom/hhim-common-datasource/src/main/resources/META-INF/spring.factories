@@ -1,0 +1,6 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.common.datasource.config.DataSourceConfig,\
+  com.cosmo.hhim.common.datasource.config.MyWebConfig,\
+  com.cosmo.hhim.common.datasource.config.SendIhaierMsg,\
+  com.cosmo.hhim.common.datasource.config.BeanConfig,\
+  com.cosmo.hhim.common.datasource.config.JacksonXssConfig

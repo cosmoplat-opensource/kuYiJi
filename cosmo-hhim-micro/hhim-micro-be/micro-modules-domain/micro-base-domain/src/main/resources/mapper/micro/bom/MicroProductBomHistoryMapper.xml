@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.bom.MicroProductBomHistoryMapper">
+    
+    <resultMap type="MicroProductBomHistory" id="MicroProductBomHistoryResult">
+        <result property="id"    column="id"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="productSeq"    column="product_seq"    />
+        <result property="productType"    column="product_type"    />
+        <result property="productionMode"    column="production_mode"    />
+        <result property="productNumber"    column="product_number"    />
+        <result property="parentProductSeq"    column="parent_product_seq"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="ifChildren"    column="if_children"    />
+        <result property="bomType"    column="bom_type"    />
+        <result property="remark"    column="remark"    />
+        <result property="version"    column="version"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="createdDate"    column="created_date"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+        <result property="activeFlag"    column="active_flag"    />
+    </resultMap>
+
+    <sql id="selectMicroProductBomHistoryVo">
+        select id, tenant_code, product_seq, product_type, production_mode, product_number, parent_product_seq, parent_id, if_children, bom_type, remark, version, created_by, created_date, last_upd_by, last_upd_date, active_flag from micro_product_bom_history
+    </sql>
+
+    <select id="selectMicroProductBomHistoryList" parameterType="MicroProductBomHistory" resultMap="MicroProductBomHistoryResult">
+        <include refid="selectMicroProductBomHistoryVo"/>
+        <where>  
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+            <if test="productSeq != null  and productSeq != ''"> and product_seq = #{productSeq}</if>
+            <if test="productType != null  and productType != ''"> and product_type = #{productType}</if>
+            <if test="productionMode != null  and productionMode != ''"> and production_mode = #{productionMode}</if>
+            <if test="productNumber != null "> and product_number = #{productNumber}</if>
+            <if test="parentProductSeq != null  and parentProductSeq != ''"> and parent_product_seq = #{parentProductSeq}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="ifChildren != null  and ifChildren != ''"> and if_children = #{ifChildren}</if>
+            <if test="bomType != null  and bomType != ''"> and bom_type = #{bomType}</if>
+            <if test="version != null  and version != ''"> and version = #{version}</if>
+            <if test="createdBy != null  and createdBy != ''"> and created_by = #{createdBy}</if>
+            <if test="createdDate != null "> and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and last_upd_date = #{lastUpdDate}</if>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+        </where>
+    </select>
+    
+    <select id="selectMicroProductBomHistoryById" parameterType="Long" resultMap="MicroProductBomHistoryResult">
+        <include refid="selectMicroProductBomHistoryVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMicroProductBomHistory" parameterType="MicroProductBomHistory" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_product_bom_history
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="productType != null">product_type,</if>
+            <if test="productionMode != null">production_mode,</if>
+            <if test="productNumber != null">product_number,</if>
+            <if test="parentProductSeq != null">parent_product_seq,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="ifChildren != null">if_children,</if>
+            <if test="bomType != null">bom_type,</if>
+            <if test="remark != null">remark,</if>
+            <if test="version != null">version,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="activeFlag != null">active_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="productType != null">#{productType},</if>
+            <if test="productionMode != null">#{productionMode},</if>
+            <if test="productNumber != null">#{productNumber},</if>
+            <if test="parentProductSeq != null">#{parentProductSeq},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="ifChildren != null">#{ifChildren},</if>
+            <if test="bomType != null">#{bomType},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="version != null">#{version},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroProductBomHistory" parameterType="MicroProductBomHistory">
+        update micro_product_bom_history
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="productType != null">product_type = #{productType},</if>
+            <if test="productionMode != null">production_mode = #{productionMode},</if>
+            <if test="productNumber != null">product_number = #{productNumber},</if>
+            <if test="parentProductSeq != null">parent_product_seq = #{parentProductSeq},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="ifChildren != null">if_children = #{ifChildren},</if>
+            <if test="bomType != null">bom_type = #{bomType},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="version != null">version = #{version},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroProductBomHistoryById" parameterType="Long">
+        delete
+        from micro_product_bom_history
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroProductBomHistoryByIds" parameterType="String">
+        delete from micro_product_bom_history where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteMicroProductBomHistoryByProductSeq">
+        delete from micro_product_bom_history
+        <if test="productSeqList != null and productSeqList.size() > 0">
+            where product_seq in
+            <foreach collection="productSeqList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </delete>
+
+    <select id="getMaxVersion" parameterType="string" resultType="int">
+        select ifnull(max(version + 0), 0)
+        from micro_product_bom_history
+        where product_seq = #{productSeq}
+          and PARENT_ID = 0
+    </select>
+
+    <insert id="insertMicroProductBomHistoryList" parameterType="java.util.List">
+        insert into micro_product_bom_history (
+        tenant_code,
+        product_seq,
+        product_type,
+        production_mode,
+        product_number,
+        parent_product_seq,
+        parent_id,
+        if_children,
+        bom_type,
+        remark,
+        version,
+        created_by,
+        created_date,
+        last_upd_by,
+        last_upd_date,
+        active_flag
+        )
+        values
+        <foreach collection ="list" item="bom" index= "index" separator =",">
+            (
+            #{bom.tenantCode},
+            #{bom.productSeq},
+            #{bom.productType},
+            #{bom.productionMode},
+            #{bom.productNumber},
+            #{bom.parentProductSeq},
+            #{bom.parentId},
+            #{bom.ifChildren},
+            #{bom.bomType},
+            #{bom.remark},
+            #{bom.version},
+            #{bom.createdBy},
+            sysdate(),
+            #{bom.lastUpdBy},
+            sysdate(),
+            #{bom.activeFlag}
+            )
+        </foreach >
+    </insert >
+
+</mapper>

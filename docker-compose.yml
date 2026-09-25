@@ -1,0 +1,253 @@
+# ============================================================
+# cosmo-hhim 项目 Docker Compose 编排
+# 用法：
+#   cp .env.example .env    # 填密钥/地址
+#   docker compose up -d    # 一键启动
+# ============================================================
+services:
+  # ==================== 中间件 ====================
+
+  mysql:
+    image: mysql:8.0
+    container_name: hhim-mysql
+    restart: unless-stopped
+    environment:
+      # 必填：漏配时 docker compose 直接报错退出（MySQL 8 root 密码为空会初始化失败）
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-im_micro}
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      # 关闭 ONLY_FULL_GROUP_BY（项目部分 SQL 用了 GROUP BY 简写，如 GROUP BY product_seq 但 SELECT product_name，
+      # MySQL 8 默认 only_full_group_by 会直接报错；关闭后与常见公司/本地旧库行为一致）
+      - --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # 首次启动自动执行建表脚本（60 张表 micro_* 表）；本文件需和 init.sql 同目录
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # hyzz_* 三方对接表（im-portal 库，thirdplat 后端② db0 专用）；本文件需和 hyzz-schema.sql 同目录
+      - ./hyzz-schema.sql:/docker-entrypoint-initdb.d/hyzz-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}"]
+      # 首次初始化（跑 init.sql + hyzz-schema.sql 共 80 张表）可能耗时数分钟，start_period 给足容错
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 600s
+
+  redis:
+    image: redis:7-alpine
+    container_name: hhim-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    # 固定版本避免 latest 漂移（与公司部署 run 版一致时保持同版本）
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    container_name: hhim-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+  # 一次性初始化：自动创建 MinIO 桶（后端代码上传不自动建桶，不建会直接报错）
+  minio-init:
+    image: minio/mc:latest
+    container_name: hhim-minio-init
+    restart: "no"
+    depends_on:
+      - minio
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET: ${MINIO_BUCKET:-hhim}
+      MINIO_MICRO_BUCKET: ${MINIO_MICRO_BUCKET:-hhim-micro}
+    # 用 | 保留换行：每条命令独立一行，注释只影响本行（> 折叠会把多行压成一行导致 # 注释吞掉后续命令）
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until mc alias set local http://minio:9000 $${MINIO_ACCESS_KEY} $${MINIO_SECRET_KEY} >/dev/null 2>&1; do sleep 2; done
+        mc mb --ignore-existing local/$${MINIO_BUCKET}
+        mc mb --ignore-existing local/$${MINIO_MICRO_BUCKET}
+        # BOM 导入模板下载功能使用的桶（代码内固定桶名，见 getTemplateFilePath）
+        mc mb --ignore-existing local/hyzz-site-test
+        echo 'minio buckets ready'
+
+  # nacos（当前项目未使用，默认不开；需要时取消注释）
+  # nacos:
+  #   image: nacos/nacos-server:v2.2.5
+  #   container_name: hhim-nacos
+  #   restart: unless-stopped
+  #   environment:
+  #     MODE: standalone
+  #     NACOS_AUTH_ENABLE: "false"
+  #   ports:
+  #     - "8848:8848"
+
+  # ==================== 应用 ====================
+
+  hhim-micro-be:
+    build:
+      context: .
+      dockerfile: cosmo-hhim-micro/hhim-micro-be/Dockerfile
+    image: hhim-micro-be:1.0
+    container_name: hhim-micro-be
+    # 覆盖镜像 ENTRYPOINT：镜像内 jar 在 /app/app.jar
+    entrypoint: sh -c "java $$JAVA_OPTS -XX:+HeapDumpOnOutOfMemoryError -Dproject.name=hhim-micro-app -Duser.country=cn -Duser.language=zh -jar /app/app.jar"
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      # MySQL（db0 / db1 双数据源，同一实例）
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-im_micro}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}
+      DB1_HOST: ${DB1_HOST:-mysql}
+      DB1_PORT: ${DB1_PORT:-3306}
+      DB1_NAME: ${DB1_NAME:-im_micro}
+      DB1_USERNAME: ${DB1_USERNAME:-root}
+      DB1_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}
+      # Redis
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      # MinIO
+      MINIO_URL: ${MINIO_URL:-http://minio:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET: ${MINIO_BUCKET:-hhim}
+      MINIO_MICRO_BUCKET: ${MINIO_MICRO_BUCKET:-hhim-micro}
+      # JWT（必填：漏配时直接报错，避免 JWT 密钥为空导致认证可被伪造）
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      # Feign 直连后端②（容器内服务名）
+      FEIGNDEBUG_THIRDPLATURL: ${FEIGNDEBUG_THIRDPLATURL:-http://hhim-third-platform:8899}
+      # 意见反馈详情页链接（可选，飞书机器人消息附带）
+      FEEDBACK_DETAIL_URL: ${FEEDBACK_DETAIL_URL:-}
+      # 短信（micro-be 模板 ID，Feign 传给 thirdplat）
+      SMS_URL: ${SMS_URL:-}
+      SMS_WEEK_TEMPLATE: ${SMS_WEEK_TEMPLATE:-}
+      SMS_LOGIN_TEMPLATE: ${SMS_LOGIN_TEMPLATE:-}
+      # 待办推送（公司待办网关，按需配置）
+      TODOPUSH_APP_ID: ${TODOPUSH_APP_ID:-}
+      TODOPUSH_APP_SECRET: ${TODOPUSH_APP_SECRET:-}
+      TODOPUSH_GATEWAY_URL: ${TODOPUSH_GATEWAY_URL:-}
+      TODOPUSH_PARENT_ID: ${TODOPUSH_PARENT_ID:-0}
+      # 系统平台 / 业务默认值（按需配置）
+      SYS_URL: ${SYS_URL:-}
+      ORIGINAL_CUSTOMER_CODE: ${ORIGINAL_CUSTOMER_CODE:-}
+      APPLICATION_PRODUCT_ID: ${APPLICATION_PRODUCT_ID:-}
+      IMPORTEXPORT_IMPORT_LINK: ${IMPORTEXPORT_IMPORT_LINK:-}
+    ports:
+      - "9010:9010"
+
+  hhim-third-platform:
+    build:
+      context: .
+      dockerfile: hhim-third-platform/thirdplat-web/Dockerfile
+    image: hhim-third-platform:1.0
+    container_name: hhim-third-platform
+    # 覆盖镜像 ENTRYPOINT：镜像内 jar 在 /app/app.jar
+    entrypoint: sh -c "java $$JAVA_OPTS -XX:+HeapDumpOnOutOfMemoryError -Dproject.name=hhim-third-platform -Duser.country=cn -Duser.language=zh -jar /app/app.jar -c"
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      # MySQL（db0 = im-portal 库，hyzz_* 三方对接表；db1 = im_micro 与 micro-be 同库）
+      DB_HOST: ${THIRDPLAT_DB_HOST:-mysql}
+      DB_PORT: ${THIRDPLAT_DB_PORT:-3306}
+      DB_NAME: ${THIRDPLAT_DB_NAME:-im-portal}
+      DB_USERNAME: ${THIRDPLAT_DB_USERNAME:-root}
+      # 未单独配置 THIRDPLAT_DB_PASSWORD 时跟随 MYSQL_ROOT_PASSWORD（同容器 root 密码）
+      DB_PASSWORD: ${THIRDPLAT_DB_PASSWORD:-${MYSQL_ROOT_PASSWORD}}
+      DB1_HOST: ${DB1_HOST:-mysql}
+      DB1_PORT: ${DB1_PORT:-3306}
+      DB1_NAME: ${DB1_NAME:-im_micro}
+      DB1_USERNAME: ${DB1_USERNAME:-root}
+      DB1_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}
+      # Redis
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      # MinIO
+      MINIO_URL: ${MINIO_URL:-http://minio:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      # JWT（必填：漏配时直接报错，避免 JWT 密钥为空导致认证可被伪造）
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
+      # 短信网关（按需配置；不配则短信功能不可用）
+      COSMO_SMS_ACCESS_KEY: ${COSMO_SMS_ACCESS_KEY:-}
+      COSMO_SMS_URL: ${COSMO_SMS_URL:-}
+      COSMO_SMS_TEMPLATE: ${COSMO_SMS_TEMPLATE:-}
+      SMS_LOGIN_CODE: ${SMS_LOGIN_CODE:-}
+      SMS_WEEK_REPORT: ${SMS_WEEK_REPORT:-}
+      # uni-push 个推推送（按需配置）
+      UNIPUSH_APP_ID: ${UNIPUSH_APP_ID:-}
+      UNIPUSH_APP_KEY: ${UNIPUSH_APP_KEY:-}
+      UNIPUSH_APP_SECRET: ${UNIPUSH_APP_SECRET:-}
+      UNIPUSH_MASTER_SECRET: ${UNIPUSH_MASTER_SECRET:-}
+      UNIPUSH_APP_PACKAGE: ${UNIPUSH_APP_PACKAGE:-}
+      UNIPUSH_BASE_URL: ${UNIPUSH_BASE_URL:-}
+      # 微信公众号（按需配置）
+      WXMP_APP_ID: ${WXMP_APP_ID:-}
+      WXMP_APP_SECRET: ${WXMP_APP_SECRET:-}
+      WXMP_SERVER_TOKEN: ${WXMP_SERVER_TOKEN:-}
+      WXNO_SERVER_AES_KEY: ${WXNO_SERVER_AES_KEY:-}
+      # 海尔开放平台对接（按需配置）
+      COSMO_IOT_URL: ${COSMO_IOT_URL:-https://your-iot-platform.com}
+      COSMO_SQM_URL: ${COSMO_SQM_URL:-https://your-sqm-platform.com}
+      SQM_CLIENT_ID: ${SQM_CLIENT_ID:-}
+      SQM_CLIENT_SECRET: ${SQM_CLIENT_SECRET:-}
+    ports:
+      - "8899:8899"
+
+  hhim-h5:
+    build:
+      context: cosmo-hhim-micro/hhim-micro-app
+      args:
+        VITE_API_BASE: ${VITE_API_BASE:-/api}
+        VITE_EXPERIENCE_USERNAME: ${VITE_EXPERIENCE_USERNAME:-15888888888}
+        VITE_EXPERIENCE_PASSWORD: ${VITE_EXPERIENCE_PASSWORD:-cosmoplat}
+    image: hhim-h5:1.0
+    container_name: hhim-h5
+    restart: unless-stopped
+    depends_on:
+      - hhim-micro-be
+    ports:
+      # 宿主机映射端口（服务器要求 8080 时在 .env 里改 H5_PORT 即可）
+      - "${H5_PORT:-80}:80"
+
+# ==================== 数据卷 ====================
+volumes:
+  mysql-data:
+  redis-data:
+  minio-data:

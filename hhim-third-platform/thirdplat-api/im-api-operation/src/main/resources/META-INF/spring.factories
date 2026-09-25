@@ -1,0 +1,6 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.thirdplat.api.operation.factory.RemoteJobFallbackFactory, \
+  com.cosmo.hhim.thirdplat.api.operation.factory.RemoteCustomerSuggestFallbackFactory, \
+  com.cosmo.hhim.thirdplat.api.operation.factory.RemoteJobFallbackFactory, \
+  com.cosmo.hhim.thirdplat.api.operation.factory.RemoteWechatUserFallbackFactory, \
+  com.cosmo.hhim.thirdplat.api.operation.factory.RemoteMicroApplicationConfigFallbackFactory

@@ -1,0 +1,9 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.cosmo.hhim.common.core.thread.MdcThreadPoolTaskExecutor,\
+  com.cosmo.hhim.common.core.utils.SpringUtils,\
+  com.cosmo.hhim.common.core.web.controller.CommonController,\
+  com.cosmo.hhim.common.core.utils.HttpClientUtils,\
+  com.cosmo.hhim.common.core.utils.sign.service.MD5Signature,\
+  com.cosmo.hhim.common.core.utils.sign.service.RSASignature
+
+  

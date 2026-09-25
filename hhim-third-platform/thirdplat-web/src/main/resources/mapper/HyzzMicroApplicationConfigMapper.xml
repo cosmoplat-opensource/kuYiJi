@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzMicroApplicationConfigMapper">
+
+    <resultMap type="HyzzMicroApplicationConfig" id="HyzzMicroApplicationConfigResult">
+        <result property="id"    column="id"    />
+        <result property="applicationName"    column="application_name"    />
+        <result property="applicationSign"    column="application_sign"    />
+        <result property="applicationCode"    column="application_code"    />
+        <result property="deleted"    column="deleted"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectHyzzMicroApplicationConfigVo">
+        select id, application_name, application_sign, application_code, deleted, remark, create_by, create_time, update_by, update_time from hyzz_micro_application_config
+    </sql>
+
+    <select id="selectMicroApplicationConfigByAppCode" parameterType="java.lang.String" resultMap="HyzzMicroApplicationConfigResult">
+        <include refid="selectHyzzMicroApplicationConfigVo"/>
+        where application_code = #{appCode} and `deleted` = '0'
+    </select>
+
+    <select id="selectMicroApplicationConfigByAppSign" parameterType="java.lang.String" resultMap="HyzzMicroApplicationConfigResult">
+        <include refid="selectHyzzMicroApplicationConfigVo"/>
+        where application_sign = #{appSign} and `deleted` = '0'
+    </select>
+    <select id="selectMicroApplicationAllMapping" resultMap="HyzzMicroApplicationConfigResult">
+        <include refid="selectHyzzMicroApplicationConfigVo"/>
+        where `deleted` = '0'
+    </select>
+</mapper>

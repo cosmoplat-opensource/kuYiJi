@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.DeviceUserBindMapper">
+    
+    <resultMap type="com.cosmo.hhim.thirdplat.api.unipush.domain.out.DeviceUserBind" id="HyzzDeviceUserBindResult">
+        <result property="id"    column="id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectHyzzDeviceUserBindVo">
+        select id, device_id, user_name, status from hyzz_device_user_bind
+    </sql>
+
+    <select id="selectDeviceUserBindByDeviceId" parameterType="java.lang.String" resultMap="HyzzDeviceUserBindResult">
+        <include refid="selectHyzzDeviceUserBindVo"/>
+        where device_id = #{deviceId} and `status` = '1'
+    </select>
+
+    <select id="selectDeviceIdsByUsernames" parameterType="java.util.List" resultType="java.lang.String">
+        select device_id from hyzz_device_user_bind where `status` = '1' and user_name in
+        <foreach collection="usernames" item="username" separator="," open="(" close=")">
+            #{username}
+        </foreach>
+    </select>
+
+    <select id="selectDeviceIdsByTenant" parameterType="java.lang.String" resultType="java.lang.String">
+        select a.device_id from hyzz_device_user_bind a left join hyzz_customer_user b on a.user_name = b.user_name
+        where a.`status` = '1' and b.customer_code = #{tenantCode}
+    </select>
+        
+    <insert id="insertHyzzDeviceUserBind"  useGeneratedKeys="true" keyProperty="id">
+        insert into hyzz_device_user_bind
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceId != null and deviceId != ''">device_id,</if>
+            <if test="userName != null and userName != ''">user_name,</if>
+            <if test="status != null and status != ''">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceId != null and deviceId != ''">#{deviceId},</if>
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="status != null and status != ''">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHyzzDeviceUserBind" >
+        update hyzz_device_user_bind
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceId != null and deviceId != ''">device_id = #{deviceId},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+        </trim>
+        where id = #{id} and `status` = '1'
+    </update>
+
+    <update id="deleteByDeviceIds" parameterType="String">
+        update hyzz_device_user_bind set `status` = '0' where id in
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </update>
+
+    <delete id="deleteByUserName" parameterType="java.lang.String">
+        delete from hyzz_device_user_bind where user_name =#{username}
+    </delete>
+
+    <delete id="deleteByDeviceId" parameterType="java.lang.String">
+        delete from hyzz_device_user_bind where device_id =#{deviceId}
+    </delete>
+
+    <select id="findByUserName" resultMap="HyzzDeviceUserBindResult">
+        <include refid="selectHyzzDeviceUserBindVo"/>
+        where `status` = '1' and user_name in
+        <foreach collection="usernames" item="username" separator="," open="(" close=")">
+            #{username}
+        </foreach>
+    </select>
+
+</mapper>

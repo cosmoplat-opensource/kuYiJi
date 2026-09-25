@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzWechatUserMapper">
+    
+    <resultMap type="HyzzWechatUser" id="HyzzWechatUserResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="nickname"    column="nickname"    />
+        <result property="sex"    column="sex"    />
+        <result property="city"    column="city"    />
+        <result property="province"    column="province"    />
+        <result property="country"    column="country"    />
+        <result property="headImgUrl"    column="head_img_url"    />
+        <result property="subscribe"    column="subscribe"    />
+        <result property="language"    column="language"    />
+        <result property="subscribeTime"    column="subscribe_time"    />
+        <result property="unionid"    column="unionid"    />
+        <result property="remark"    column="remark"    />
+        <result property="groupid"    column="groupid"    />
+        <result property="tagidList"    column="tagid_list"    />
+        <result property="subscribeScene"    column="subscribe_scene"    />
+        <result property="qrScene"    column="qr_scene"    />
+        <result property="qrSceneStr"    column="qr_scene_str"    />
+        <result property="lastLoginTime"    column="last_login_time"    />
+        <result property="lastLoginIp"    column="last_login_ip"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+
+    <resultMap id="WechatUserDetailInfoResult" type="com.cosmo.hhim.thirdplat.api.operation.domain.WechatUserInfoResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="nickname"    column="nickname"    />
+        <result property="sex"    column="sex"    />
+        <result property="city"    column="city"    />
+        <result property="province"    column="province"    />
+        <result property="country"    column="country"    />
+        <result property="headImgUrl"    column="head_img_url"    />
+        <result property="subscribe"    column="subscribe"    />
+        <result property="language"    column="language"    />
+        <result property="subscribeTime"    column="subscribe_time"    />
+        <result property="unionid"    column="unionid"    />
+        <result property="remark"    column="remark"    />
+        <result property="groupid"    column="groupid"    />
+        <result property="tagidList"    column="tagid_list"    />
+        <result property="subscribeScene"    column="subscribe_scene"    />
+        <result property="qrScene"    column="qr_scene"    />
+        <result property="qrSceneStr"    column="qr_scene_str"    />
+        <result property="lastLoginTime"    column="last_login_time"    />
+        <result property="lastLoginIp"    column="last_login_ip"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <collection property="wechatUserBindList" ofType="HyzzWechatUserBind">
+            <result property="id"    column="id"    />
+            <result property="openid"    column="openidB"    />
+            <result property="userName"    column="user_name"    />
+            <result property="userIdentity"    column="user_identity"    />
+            <result property="driverName"    column="driver_name"    />
+            <result property="tenantCode"    column="tenant_code"    />
+            <result property="createBy"    column="create_by"    />
+            <result property="createTime"    column="create_time"    />
+            <result property="updateBy"    column="update_by"    />
+            <result property="updateTime"    column="update_time"    />
+        </collection>
+    </resultMap>
+
+    <sql id="selectHyzzWechatUserVo">
+        select
+               id, openid, nickname, sex, city, province, country, head_img_url, subscribe, `language`, subscribe_time,
+               unionid, remark, groupid, tagid_list, subscribe_scene, qr_scene, qr_scene_str, last_login_time,
+               last_login_ip, create_by, create_time, update_by, update_time
+        from hyzz_wechat_user
+    </sql>
+
+    <select id="selectHyzzWechatUserList" parameterType="HyzzWechatUser" resultMap="HyzzWechatUserResult">
+        <include refid="selectHyzzWechatUserVo"/>
+        <where>  
+            <if test="openid != null  and openid != ''"> and openid = #{openid}</if>
+            <if test="nickname != null  and nickname != ''"> and nickname like concat('%', #{nickname}, '%')</if>
+            <if test="sex != null "> and sex = #{sex}</if>
+            <if test="city != null  and city != ''"> and city = #{city}</if>
+            <if test="province != null  and province != ''"> and province = #{province}</if>
+            <if test="country != null  and country != ''"> and country = #{country}</if>
+            <if test="headImgUrl != null  and headImgUrl != ''"> and head_img_url = #{headImgUrl}</if>
+            <if test="subscribe != null  and subscribe != ''"> and subscribe = #{subscribe}</if>
+            <if test="language != null  and language != ''"> and language = #{language}</if>
+            <if test="subscribeTime != null "> and subscribe_time = #{subscribeTime}</if>
+            <if test="unionid != null  and unionid != ''"> and unionid = #{unionid}</if>
+            <if test="groupid != null  and groupid != ''"> and groupid = #{groupid}</if>
+            <if test="tagidList != null  and tagidList != ''"> and tagid_list = #{tagidList}</if>
+            <if test="subscribeScene != null  and subscribeScene != ''"> and subscribe_scene = #{subscribeScene}</if>
+            <if test="qrScene != null  and qrScene != ''"> and qr_scene = #{qrScene}</if>
+            <if test="qrSceneStr != null  and qrSceneStr != ''"> and qr_scene_str = #{qrSceneStr}</if>
+            <if test="lastLoginTime != null "> and last_login_time = #{lastLoginTime}</if>
+            <if test="lastLoginIp != null  and lastLoginIp != ''"> and last_login_ip = #{lastLoginIp}</if>
+        </where>
+    </select>
+    
+    <select id="selectHyzzWechatUserByOpenId" parameterType="java.lang.String" resultMap="HyzzWechatUserResult">
+        <include refid="selectHyzzWechatUserVo"/>
+        where openid = #{openid}
+    </select>
+
+
+    <select id="selectWechatUserDetailInfoByOpenId" parameterType="java.lang.String" resultMap="WechatUserDetailInfoResult">
+        select a.id,a.openid,a.nickname,a.sex,a.city,a.province,a.country,a.head_img_url,a.subscribe,a.`language`,
+               a.subscribe_time,a.unionid,a.remark,a.groupid,a.tagid_list,a.subscribe_scene,a.qr_scene,a.qr_scene_str,
+               a.last_login_time,a.last_login_ip,a.create_by,a.create_time,a.update_by,a.update_time,
+               b.id, b.openid openidB, b.user_name, b.user_identity, b.driver_name, b.tenant_code, b.create_by,
+               b.create_time, b.update_by, b.update_time
+        from hyzz_wechat_user a left join hyzz_wechat_user_bind b on a.openid = b.openid
+        where a.openid = #{openid}
+    </select>
+        
+    <insert id="insertHyzzWechatUser" parameterType="HyzzWechatUser" useGeneratedKeys="true" keyProperty="id">
+        insert into hyzz_wechat_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="openid != null">openid,</if>
+            <if test="nickname != null">nickname,</if>
+            <if test="sex != null">sex,</if>
+            <if test="city != null">city,</if>
+            <if test="province != null">province,</if>
+            <if test="country != null">country,</if>
+            <if test="headImgUrl != null">head_img_url,</if>
+            <if test="subscribe != null">subscribe,</if>
+            <if test="language != null">language,</if>
+            <if test="subscribeTime != null">subscribe_time,</if>
+            <if test="unionid != null">unionid,</if>
+            <if test="remark != null">remark,</if>
+            <if test="groupid != null">groupid,</if>
+            <if test="tagidList != null">tagid_list,</if>
+            <if test="subscribeScene != null">subscribe_scene,</if>
+            <if test="qrScene != null">qr_scene,</if>
+            <if test="qrSceneStr != null">qr_scene_str,</if>
+            <if test="lastLoginTime != null">last_login_time,</if>
+            <if test="lastLoginIp != null">last_login_ip,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="openid != null">#{openid},</if>
+            <if test="nickname != null">#{nickname},</if>
+            <if test="sex != null">#{sex},</if>
+            <if test="city != null">#{city},</if>
+            <if test="province != null">#{province},</if>
+            <if test="country != null">#{country},</if>
+            <if test="headImgUrl != null">#{headImgUrl},</if>
+            <if test="subscribe != null">#{subscribe},</if>
+            <if test="language != null">#{language},</if>
+            <if test="subscribeTime != null">#{subscribeTime},</if>
+            <if test="unionid != null">#{unionid},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="groupid != null">#{groupid},</if>
+            <if test="tagidList != null">#{tagidList},</if>
+            <if test="subscribeScene != null">#{subscribeScene},</if>
+            <if test="qrScene != null">#{qrScene},</if>
+            <if test="qrSceneStr != null">#{qrSceneStr},</if>
+            <if test="lastLoginTime != null">#{lastLoginTime},</if>
+            <if test="lastLoginIp != null">#{lastLoginIp},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateHyzzWechatUser" parameterType="HyzzWechatUser">
+        update hyzz_wechat_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="country != null">country = #{country},</if>
+            <if test="headImgUrl != null">head_img_url = #{headImgUrl},</if>
+            <if test="subscribe != null">subscribe = #{subscribe},</if>
+            <if test="language != null">language = #{language},</if>
+            <if test="subscribeTime != null">subscribe_time = #{subscribeTime},</if>
+            <if test="unionid != null">unionid = #{unionid},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="groupid != null">groupid = #{groupid},</if>
+            <if test="tagidList != null">tagid_list = #{tagidList},</if>
+            <if test="subscribeScene != null">subscribe_scene = #{subscribeScene},</if>
+            <if test="qrScene != null">qr_scene = #{qrScene},</if>
+            <if test="qrSceneStr != null">qr_scene_str = #{qrSceneStr},</if>
+            <if test="lastLoginTime != null">last_login_time = #{lastLoginTime},</if>
+            <if test="lastLoginIp != null">last_login_ip = #{lastLoginIp},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where openid = #{openid}
+    </update>
+
+    <update id="updateHyzzWechatUserOpenId" parameterType="com.cosmo.hhim.thirdplat.api.operation.domain.WechatUserOpenIdUpdateParam">
+        update hyzz_wechat_user
+        set openid = #{newOpenId},
+            update_time = NOW()
+        where openid = #{oldOpenId}
+    </update>
+
+    <delete id="deleteHyzzWechatUserById" parameterType="Long">
+        delete from hyzz_wechat_user where id = #{id}
+    </delete>
+
+    <delete id="deleteHyzzWechatUserByIds" parameterType="String">
+        delete from hyzz_wechat_user where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

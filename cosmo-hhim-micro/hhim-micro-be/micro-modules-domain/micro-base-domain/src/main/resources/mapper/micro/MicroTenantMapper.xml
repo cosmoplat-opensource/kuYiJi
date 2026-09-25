@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroTenantMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroTenant" id="MicroTenantResult">
+        <result property="tenantCode"   column="tenant_code"/>
+        <result property="tenantName"   column="tenant_name"/>
+        <result property="customerName" column="customer_name"/>
+        <result property="status"       column="status"/>
+        <result property="createdAt"    column="created_at"/>
+        <result property="updatedAt"    column="updated_at"/>
+    </resultMap>
+
+    <sql id="selectMicroTenantVo">
+        select tenant_code, tenant_name, customer_name, status, created_at, updated_at
+        from micro_tenant
+    </sql>
+
+    <select id="selectByCode" resultMap="MicroTenantResult">
+        <include refid="selectMicroTenantVo"/>
+        where tenant_code = #{tenantCode}
+    </select>
+
+    <select id="selectActiveList" resultMap="MicroTenantResult">
+        <include refid="selectMicroTenantVo"/>
+        where status = 1
+    </select>
+
+    <select id="selectList" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroTenant" resultMap="MicroTenantResult">
+        <include refid="selectMicroTenantVo"/>
+        <where>
+            <if test="tenantCode != null and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="tenantName != null and tenantName != ''">and tenant_name like concat('%', #{tenantName}, '%')</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroTenant">
+        insert into micro_tenant (tenant_code, tenant_name, customer_name, status, created_at, updated_at)
+        values (#{tenantCode}, #{tenantName}, #{customerName}, #{status}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <update id="updateByCode" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroTenant">
+        update micro_tenant
+        <set>
+            <if test="tenantName != null and tenantName != ''">tenant_name = #{tenantName},</if>
+            <if test="customerName != null">customer_name = #{customerName},</if>
+            <if test="status != null">status = #{status},</if>
+            updated_at = #{updatedAt}
+        </set>
+        where tenant_code = #{tenantCode}
+    </update>
+</mapper>

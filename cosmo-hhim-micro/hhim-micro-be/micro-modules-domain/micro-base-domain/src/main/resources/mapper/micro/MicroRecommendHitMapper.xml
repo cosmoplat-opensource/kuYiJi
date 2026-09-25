@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroRecommendHitMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroRecommendHit" id="MicroRecommendHitResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="username" column="username"/>
+        <result property="originData" column="origin_data"/>
+        <result property="useData" column="use_data"/>
+        <result property="dataType" column="data_type"/>
+        <result property="dataId" column="data_id"/>
+        <result property="hitPrecision" column="hit_precision"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+    </resultMap>
+
+    <sql id="selectMicroRecommendHitVo">
+        select id,
+               tenant_code,
+               username,
+               origin_data,
+               use_data,
+               data_type,
+               data_id,
+               hit_precision,
+               created_by,
+               created_date
+        from micro_recommend_hit
+    </sql>
+
+    <select id="selectMicroRecommendHitList" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroRecommendHit"
+            resultMap="MicroRecommendHitResult">
+        <include refid="selectMicroRecommendHitVo"/>
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="username != null  and username != ''">and username like concat('%', #{username}, '%')</if>
+            <if test="originData != null  and originData != ''">and origin_data = #{originData}</if>
+            <if test="useData != null  and useData != ''">and use_data = #{useData}</if>
+            <if test="dataType != null  and dataType != ''">and data_type = #{dataType}</if>
+            <if test="dataId != null  and dataId != ''">and data_id = #{dataId}</if>
+            <if test="hitPrecision != null ">and hit_precision = #{hitPrecision}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+        </where>
+    </select>
+
+    <insert id="insertMicroRecommendHit" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroRecommendHit" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into micro_recommend_hit
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="username != null and username != ''">username,</if>
+            <if test="originData != null">origin_data,</if>
+            <if test="useData != null">use_data,</if>
+            <if test="dataType != null">data_type,</if>
+            <if test="dataId != null">data_id,</if>
+            <if test="hitPrecision != null">hit_precision,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="username != null and username != ''">#{username},</if>
+            <if test="originData != null">#{originData},</if>
+            <if test="useData != null">#{useData},</if>
+            <if test="dataType != null">#{dataType},</if>
+            <if test="dataId != null">#{dataId},</if>
+            <if test="hitPrecision != null">#{hitPrecision},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+        </trim>
+    </insert>
+    <insert id="insertMicroRecommendHitBatch">
+        INSERT INTO micro_recommend_hit (
+        tenant_code,
+        username,
+        origin_data,
+        use_data,
+        data_type,
+        data_id,
+        hit_precision,
+        created_by
+        )VALUES
+        <foreach collection="list" item="entity" index="index" separator=",">
+            (
+            #{entity.tenantCode}
+            ,#{entity.username}
+            ,#{entity.originData}
+            ,#{entity.useData}
+            ,#{entity.dataType}
+            ,#{entity.dataId}
+            ,#{entity.hitPrecision}
+            ,#{entity.createdBy}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteAllMicroRecommendHit">
+        delete
+        from micro_recommend_hit
+    </delete>
+
+</mapper>

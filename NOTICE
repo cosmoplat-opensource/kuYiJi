@@ -1,0 +1,170 @@
+cosmo-hhim-open
+Copyright 2026 海尔卡奥斯物联科技有限公司
+
+This product includes software developed by
+海尔卡奥斯物联科技有限公司
+
+This project is released under the MIT License (see the LICENSE file).
+The third-party components listed below remain under their own respective
+licenses.
+
+================================================================================
+Third-Party Components
+================================================================================
+
+The following third-party open source components are used in this project
+(direct or transitive dependencies). Each component remains under its own
+license; the notices below list the components by license category.
+
+Apache License 2.0
+------------------
+- Spring Framework (spring-framework) - Pivotal Software, Inc.
+- Spring Boot (spring-boot) - Pivotal Software, Inc.
+- Spring Cloud (spring-cloud) - Pivotal Software, Inc.
+- Spring Cloud Alibaba / Nacos (nacos-discovery / nacos-config) - Alibaba
+- MyBatis (mybatis / mybatis-spring / mybatis-spring-boot-starter) - MyBatis
+- MyBatis Plus (mybatis-plus) - MyBatis Plus
+- Fastjson (fastjson) - Alibaba
+- Druid (druid) - Alibaba
+- TransmittableThreadLocal (transmittable-thread-local) - Alibaba
+- Apache POI (poi / poi-ooxml) - Apache Software Foundation
+- EasyPoi (easypoi-spring-boot-starter) - JueYue
+- MVEL2 (mvel2) - JBoss
+- Apache Commons (commons-io / commons-fileupload / commons-lang3 / commons-collections4 / commons-pool2 / commons-beanutils / commons-codec) - Apache Software Foundation
+- Apache HttpClient / HttpCore (httpclient / httpcore) - Apache Software Foundation
+- Jackson (jackson-databind / jackson-core / jackson-annotations) - FasterXML
+- Tomcat Embed (tomcat-embed-core) - Apache Software Foundation
+- Netty (netty-*) - Netty Project
+- HikariCP (HikariCP) - Brett Wooldridge
+- ZXing (zxing core / javase) - ZXing Project
+- MinIO Java SDK (minio) - MinIO, Inc.
+- sms4j (sms4j-spring-boot-starter) - dromara
+  (sms4j-aliyun / sms4j-tencent / sms4j-huawei are reserved provider templates
+   declared in dependencyManagement only; they are not part of the build)
+- Plumelog (plumelog-trace / plumelog-logback) - plumelo
+- Quartz (quartz) - Terracotta, Inc.
+- jieba-analysis - Huaban
+- Hibernate Validator / validation-api (hibernate-validator / validation-api) - Red Hat, Inc.
+- swagger-annotations - SmartBear Software
+- SnakeYAML (snakeyaml) - SnakeYAML
+- Lettuce (lettuce-core) - Lettuce
+- JSqlParser (jsqlparser) - dual-licensed Apache-2.0 / LGPL-2.1, used under the Apache-2.0 option
+- JNA (jna / jna-platform) - dual-licensed Apache-2.0 / LGPL-2.1, used under the Apache-2.0 option
+- uni-app / uni-ui (@dcloudio/uni-app and related packages) - DCloud
+- TypeScript (typescript) - Microsoft
+- echarts - Apache Software Foundation
+- qiun-data-charts / uCharts (DCloud plugin market / gitee.com/uCharts/uCharts) - QIUN, Apache-2.0 (vendored for the mini-program chart)
+- z-paging (github.com/SmileZXLee/uni-z-paging) - SmileZXLee (vendored under src/uni_modules/z-paging)
+- DCloud uni_modules components (uni-badge / uni-drawer / uni-grid / uni-icons / uni-list /
+  uni-load-more / uni-nav-bar / uni-scss / uni-swipe-action, vendored under
+  src/uni_modules/*) - DCloud, same source as the Apache-2.0 @dcloudio/uni-ui
+- gio-miniprogram-sdk-saas (GrowingIO Mini Program SDK) - GrowingIO
+- Guava (guava) - Google
+- javassist (javassist) - multi-licensed MPL-1.1 / LGPL-2.1 / Apache-2.0, used under the Apache-2.0 option
+
+MIT License
+-----------
+- Lombok (lombok) - Project Lombok
+- SLF4J (slf4j-api) - QOS.ch
+- Jedis (jedis) - Redis
+- OSHI (oshi-core) - OSHI Project
+- PageHelper (pagehelper / pagehelper-spring-boot-starter) - com.github.pagehelper
+- Forest (forest-spring-boot-starter) - dtflys
+- vue / vuex - Evan You
+- dayjs - iamkun
+- bignumber.js - Michael Mclaughlin
+- eslint - ESLint
+- prettier - Prettier
+- sass (dart-sass) / sass-loader - Sass Team / webpack-contrib
+- svgo - Kir Belevich
+- vite / vite-plugin-style-import - Vite Team / anncwb
+- z-paging (uni-z-paging) - SmileZXLee
+- @types/md5 - DefinitelyTyped
+
+BSD 3-Clause License
+--------------------
+- md5 (node-md5) - pvorb
+- OWASP Java Encoder (org.owasp.encoder) - OWASP
+- zrender (transitive dependency of echarts) - ZRender Project
+- Reflections (reflections) - dual-licensed WTFPL / BSD-3-Clause, used under the BSD-3-Clause option
+- asm (org.ow2.asm) - BSD-3-Clause
+
+BSD 2-Clause License
+--------------------
+- terser - terser Project
+
+0BSD License
+------------
+- tslib - Microsoft
+
+Mulan Permissive Software License, Version 2 (Mulan PSL v2)
+-----------------------------------------------------------
+- Hutool (hutool-all) - looly
+
+Bouncy Castle Licence (MIT-style, no SPDX id)
+---------------------------------------------
+- Bouncy Castle (bcprov-jdk15on) - The Legion of the Bouncy Castle Inc.
+
+Eclipse Public License 1.0
+--------------------------
+- AspectJ (aspectjrt / aspectjweaver) - Eclipse Foundation
+- Logback (logback-classic / logback-core, dual-licensed EPL-1.0 / LGPL-2.1) - QOS.ch
+
+GNU General Public License v2 with Universal FOSS Exception, v1.0
+-----------------------------------------------------------------
+- MySQL Connector/J (mysql-connector-j) - Oracle Corporation
+
+GNU Affero General Public License 3.0
+-------------------------------------
+- MinIO Server (minio/minio container image) - MinIO, Inc.
+  Used only as a standalone infrastructure service at deployment time; it is
+  not linked into or distributed as part of this project's code. The MinIO
+  Java SDK used in this project is licensed under Apache License 2.0 (see above).
+
+Components with no explicit license
+------------------------------------
+None. All third-party components used by this project carry a license
+declaration (see the categories above); the former uni_modules plugins
+without license declarations were replaced during the 2026-02 cleanup:
+
+- lime-echart 0.6.5 (gitee.com/liangei/lime-echart) was replaced by the
+  self-developed component src/components/h-echart.vue (MIT) for H5,
+  and by qiun-data-charts / uCharts (Apache-2.0, vendored under
+  src/uni_modules/qiun-data-charts) for the mini-program chart.
+- ksp-cropper 1.1.6 (DCloud plugin market) was replaced by the self-developed
+  component src/components/h-cropper.vue (MIT).
+- q-previewImage 1.0.6 was removed (no code referenced it).
+
+Deployment images (infrastructure only, not part of this product's code)
+------------------------------------------------------------------------
+- node:16-alpine (MIT) - build stage for frontend
+- nginx:alpine (BSD-2-Clause) - H5 runtime
+- maven:3.8-openjdk-8 (Maven Apache-2.0 / OpenJDK GPLv2 + Classpath Exception) - build stage
+- eclipse-temurin:8-jre / 8-jdk (GPLv2 + Classpath Exception) - backend runtime
+- mysql:8.0 (GPLv2) - database service
+- redis:7-alpine (BSD-3-Clause) - cache service
+
+Note: RocketMQ was removed during the 2026-08 open-source cleanup; the in-process
+async message needs (third-party interface calls) were re-implemented on Redis
+Streams (a native Redis 5.0+ feature, part of the Redis server, BSD-3-Clause).
+
+================================================================================
+Internal Modules (this project's own code, not third-party)
+================================================================================
+
+The artifacts under groupId com.cosmo.plugins / com.cosmo.hhim.thirdplat /
+com.cosmo.hhim.micro are this project's own modules, not third-party
+components. Their source code is contained in this repository
+(cosmo-himm-commom / hhim-third-platform / hhim-micro-be) and is released
+under the MIT License together with this project.
+
+They are built from source by the root pom's reactor, so no prebuilt jars and
+no private artifact repository are required:
+
+    mvn clean install -DskipTests      # run from the repository root
+
+Note: hhim-common-swagger and hhim-common-uuc were removed during the
+open-source cleanup (2026-02) because their source code is not in this
+repository and no module referenced them.
+
+================================================================================

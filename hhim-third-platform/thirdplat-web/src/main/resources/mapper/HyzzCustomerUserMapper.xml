@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.thirdplat.web.mapper.HyzzCustomerUserMapper">
+    <resultMap type="HyzzCustomerUser" id="HyzzCustomerUserResult">
+        <result property="userId"    column="user_id"    />
+        <result property="customerCode"    column="customer_code"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="nickName"    column="nick_name"    />
+        <result property="userType"    column="user_type"    />
+        <result property="accountType"    column="account_type"    />
+        <result property="email"    column="email"    />
+        <result property="phonenumber"    column="phonenumber"    />
+        <result property="sex"    column="sex"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="password"    column="password"    />
+        <result property="status"    column="status"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="loginIp"    column="login_ip"    />
+        <result property="loginDate"    column="login_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="roleIds"    column="role_ids"    />
+        <result property="validDate"    column="valid_date"    />
+        <result property="playUser"    column="play_user"    />
+        <result property="uucUserId"    column="uuc_user_id"    />
+        <result property="isAuthentication"    column="is_authentication"    />
+    </resultMap>
+
+    <sql id="selectHyzzCustomerUserVo">
+        select user_id, customer_code, dept_id, user_name, nick_name, user_type, account_type, email, phonenumber, sex,
+               avatar, password, status, del_flag, login_ip, login_date, create_by, create_time, update_by, update_time,
+               remark, role_ids, valid_date, play_user, uuc_user_id, is_authentication
+        from hyzz_customer_user
+    </sql>
+
+    <insert id="insertHyzzCustomerUser" parameterType="HyzzCustomerUser" useGeneratedKeys="true" keyProperty="userId">
+        insert into hyzz_customer_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerCode != null and customerCode != ''">customer_code,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="userName != null and userName != ''">user_name,</if>
+            <if test="nickName != null and nickName != ''">nick_name,</if>
+            <if test="userType != null">user_type,</if>
+            <if test="accountType != null">account_type,</if>
+            <if test="email != null">email,</if>
+            <if test="phonenumber != null">phonenumber,</if>
+            <if test="sex != null">sex,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="password != null">password,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="loginIp != null">login_ip,</if>
+            <if test="loginDate != null">login_date,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="roleIds != null">role_ids,</if>
+            <if test="validDate != null">valid_date,</if>
+            <if test="uucUserId != null">uuc_user_id,</if>
+            <if test="isAuthentication != null">is_authentication,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customerCode != null and customerCode != ''">#{customerCode},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="userName != null and userName != ''">#{userName},</if>
+            <if test="nickName != null and nickName != ''">#{nickName},</if>
+            <if test="userType != null">#{userType},</if>
+            <if test="accountType != null">#{accountType},</if>
+            <if test="email != null">#{email},</if>
+            <if test="phonenumber != null">#{phonenumber},</if>
+            <if test="sex != null">#{sex},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="password != null">#{password},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="loginIp != null">#{loginIp},</if>
+            <if test="loginDate != null">#{loginDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="roleIds != null">#{roleIds},</if>
+            <if test="validDate != null">#{validDate},</if>
+            <if test="uucUserId != null">#{uucUserId},</if>
+            <if test="isAuthentication != null">#{isAuthentication},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertHyzzCustomerUserBatch">
+        insert into hyzz_customer_user ( customer_code,dept_id,user_name,nick_name,
+        user_type,account_type,phonenumber,password,valid_date,create_by,create_time)
+        values
+        <foreach collection="hyzzCustomerUsers" index="index" item="user" separator=",">
+            (
+            #{user.customerCode},
+            #{user.deptId},
+            #{user.userName},
+            #{user.nickName},
+            '20',
+            '2',
+            #{user.phonenumber},
+            #{user.password},
+            #{user.validDate},
+            #{user.createBy},
+            #{user.createTime}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateHyzzCustomerUser" parameterType="HyzzCustomerUser">
+        update hyzz_customer_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customerCode != null and customerCode != ''">customer_code = #{customerCode},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="nickName != null and nickName != ''">nick_name = #{nickName},</if>
+            <if test="userType != null">user_type = #{userType},</if>
+            <if test="accountType != null">account_type = #{accountType},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phonenumber != null">phonenumber = #{phonenumber},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="password != null and password!=''">password = #{password},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="loginIp != null">login_ip = #{loginIp},</if>
+            <if test="loginDate != null">login_date = #{loginDate},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="roleIds != null">role_ids = #{roleIds},</if>
+            <if test="validDate != null">valid_date = #{validDate},</if>
+            <if test="uucUserId != null">uuc_user_id = #{uucUserId},</if>
+            <if test="isAuthentication != null and isAuthentication!=0">is_authentication = #{isAuthentication},</if>
+        </trim>
+        where 1=1
+        <if test="userId != null and userId != ''">and user_id = #{userId}</if>
+        <if test="userName != null and userName != ''">and user_name = #{userName}</if>
+        <if test="customerCode != null and customerCode != ''">and customer_code = #{customerCode}</if>
+        <if test="uucActiveUpdateFlag == true">
+            and uuc_user_id is null and is_authentication = '0'
+        </if>
+        and del_flag = '0'
+    </update>
+
+    <update id="updateForUucActive" parameterType="HyzzCustomerUser">
+        update hyzz_customer_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="customerCode != null and customerCode != ''">customer_code = #{customerCode},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="nickName != null and nickName != ''">nick_name = #{nickName},</if>
+            <if test="userType != null">user_type = #{userType},</if>
+            <if test="accountType != null">account_type = #{accountType},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phonenumber != null">phonenumber = #{phonenumber},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="password != null and password!=''">password = #{password},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="loginIp != null">login_ip = #{loginIp},</if>
+            <if test="loginDate != null">login_date = #{loginDate},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="roleIds != null">role_ids = #{roleIds},</if>
+            <if test="validDate != null">valid_date = #{validDate},</if>
+            <if test="uucUserId != null">uuc_user_id = #{uucUserId},</if>
+            <if test="isAuthentication != null">is_authentication = #{isAuthentication},</if>
+        </trim>
+        where user_id = #{userId}
+        and uuc_user_id is null and is_authentication = '0'
+        and del_flag = '0'
+    </update>
+
+
+    <select id="findByUser" resultMap="HyzzCustomerUserResult">
+        <include refid="selectHyzzCustomerUserVo"/>
+        where user_name = #{username}
+    </select>
+
+
+    <select id="findByPhone" resultMap="HyzzCustomerUserResult">
+        <include refid="selectHyzzCustomerUserVo"/>
+        where  phonenumber=#{phone}
+    </select>
+
+    <delete id="deleteByUserId" parameterType="Long">
+        delete from hyzz_customer_user where user_id = #{userId}
+    </delete>
+</mapper>

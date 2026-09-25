@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.tech.MicroProcessChainMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessChain" id="MicroProcessChainResult">
+        <result property="id" column="id"/>
+        <result property="techId" column="tech_id"/>
+        <result property="processId" column="process_id"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="processCode" column="process_code"/>
+        <result property="processName" column="process_name"/>
+        <result property="parentProcessId" column="parent_process_id"/>
+        <result property="parentProcessSeq" column="parent_process_seq"/>
+        <result property="isLastProcess" column="is_last_process"/>
+        <result property="sort" column="sort"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="activeFlag" column="active_flag"/>
+    </resultMap>
+
+    <sql id="selectMicroProcessChainVo">
+        SELECT pc.id,
+               pc.tech_id,
+               pc.process_id,
+               mp.process_seq,
+               mp.process_code,
+               mp.process_name,
+               pc.parent_process_id,
+               pc.parent_process_seq,
+               pc.is_last_process,
+               pc.sort,
+               pc.tenant_code,
+               pc.created_by,
+               pc.created_date,
+               pc.last_upd_by,
+               pc.last_upd_date,
+               pc.active_flag
+        FROM micro_process_chain pc
+                 LEFT JOIN micro_process_common mp ON pc.process_id = mp.id
+    </sql>
+
+    <select id="selectMicroProcessChainList" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessChain"
+            resultMap="MicroProcessChainResult">
+        <include refid="selectMicroProcessChainVo"/>
+        <where>
+            <if test="techId != null ">and pc.tech_id = #{techId}</if>
+            <if test="processId != null ">and pc.process_id = #{processId}</if>
+            <if test="processSeq != null  and processSeq != ''">and pc.process_seq = #{processSeq}</if>
+            <if test="parentProcessId != null ">and pc.parent_process_id = #{parentProcessId}</if>
+            <if test="parentProcessSeq != null ">and pc.parent_process_seq = #{parentProcessSeq}</if>
+            <if test="isLastProcess != null  and isLastProcess != ''">and pc.is_last_process = #{isLastProcess}</if>
+            <if test="sort != null ">and pc.sort = #{sort}</if>
+            <if test="tenantCode != null  and tenantCode != ''">and pc.tenant_code = #{tenantCode}</if>
+            <if test="createdBy != null  and createdBy != ''">and pc.created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and pc.created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and pc.last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and pc.last_upd_date = #{lastUpdDate}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and pc.active_flag = #{activeFlag}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroProcessChainById" parameterType="Long" resultMap="MicroProcessChainResult">
+        <include refid="selectMicroProcessChainVo"/>
+        where pc.id = #{id} and pc.active_flag = '1'
+    </select>
+    <select id="selectMicroProcessChainListByTechId" resultMap="MicroProcessChainResult">
+        <include refid="selectMicroProcessChainVo"/>
+        where pc.tech_id = #{techId} and pc.active_flag = '1'
+    </select>
+    <select id="selectStandardProcessChainByProduct" resultType="java.lang.String">
+        SELECT
+        mpc.process_seq
+        FROM
+        micro_process_chain mpc
+        JOIN micro_technology mt ON
+        mpc.tenant_code = mt.tenant_code AND mt.active_flag = '1' AND mpc.tech_id = mt.id
+        JOIN micro_product mp ON mt.product_id = mp.id AND mt.tenant_code = mp.tenant_code
+        WHERE mpc.active_flag = '1'
+        <choose>
+            <when test="productId != null">
+                AND mp.product_name =#{productId}
+            </when>
+            <when test="productSeq != null and productSeq != ''">
+                AND mp.product_seq =#{productSeq}
+            </when>
+            <when test="productCode != null and productCode != ''">
+                AND mp.product_code =#{productCode}
+            </when>
+        </choose>
+        UNION
+        SELECT
+        mpc.parent_process_seq
+        FROM
+        micro_process_chain mpc
+        JOIN micro_technology mt ON
+        mpc.tenant_code = mt.tenant_code AND mt.active_flag = '1' AND mpc.tech_id = mt.id
+        JOIN micro_product mp ON mt.product_id = mp.id AND mt.tenant_code = mp.tenant_code
+        WHERE mpc.active_flag = '1' AND mpc.parent_process_seq !='0'
+        <choose>
+            <when test="productId != null and productId != ''">
+                AND mp.product_name =#{productId}
+            </when>
+            <when test="productSeq != null and productSeq != ''">
+                AND mp.product_seq =#{productSeq}
+            </when>
+            <when test="productCode != null and productCode != ''">
+                AND mp.product_code =#{productCode}
+            </when>
+        </choose>
+    </select>
+    <select id="selectReProcessByProcessIds"
+            resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        select
+        mpc.process_seq as itemSeq,
+        mpc.process_name as itemName,
+        mpc.process_code as itemCode,
+        mpc.id as itemId
+        from micro_process_chain t
+        inner join micro_process_common mpc on mpc.tenant_code = t.tenant_code and mpc.id =t.process_id
+        where mpc.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <insert id="insertMicroProcessChain"
+            parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessChain" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into micro_process_chain
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="techId != null">tech_id,</if>
+            <if test="processId != null">process_id,</if>
+            <if test="processSeq != null and processSeq != ''">process_seq,</if>
+            <if test="parentProcessId != null">parent_process_id,</if>
+            <if test="parentProcessSeq != null">parent_process_seq,</if>
+            <if test="isLastProcess != null">is_last_process,</if>
+            <if test="sort != null">sort,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="activeFlag != null">active_flag,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="techId != null">#{techId},</if>
+            <if test="processId != null">#{processId},</if>
+            <if test="processSeq != null and processSeq != ''">#{processSeq},</if>
+            <if test="parentProcessId != null">#{parentProcessId},</if>
+            <if test="parentProcessSeq != null">#{parentProcessSeq},</if>
+            <if test="isLastProcess != null">#{isLastProcess},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+        </trim>
+    </insert>
+    <insert id="insertBatch">
+        INSERT INTO micro_process_chain (
+        tech_id,
+        process_id,
+        process_seq,
+        process_code,
+        parent_process_id,
+        parent_process_seq,
+        is_last_process,
+        sort,
+        tenant_code,
+        created_by,
+        last_upd_by,
+        created_date,
+        last_upd_date
+        ) VALUES
+        <foreach collection="dataList" item="entity" index="index" separator=",">
+            (
+            #{entity.techId,jdbcType=VARCHAR}
+            ,#{entity.processId,jdbcType=DECIMAL}
+            ,#{entity.processSeq,jdbcType=VARCHAR}
+            ,#{entity.processCode,jdbcType=VARCHAR}
+            ,#{entity.parentProcessId,jdbcType=DECIMAL}
+            ,#{entity.parentProcessSeq,jdbcType=DECIMAL}
+            ,#{entity.isLastProcess,jdbcType=VARCHAR}
+            ,#{entity.sort,jdbcType=INTEGER}
+            ,#{entity.tenantCode,jdbcType=VARCHAR}
+            ,#{entity.createdBy,jdbcType=VARCHAR}
+            ,#{entity.lastUpdBy,jdbcType=VARCHAR}
+            ,sysdate()
+            ,sysdate()
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateMicroProcessChain" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroProcessChain">
+        update micro_process_chain
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="techId != null">tech_id = #{techId},</if>
+            <if test="processId != null">process_id = #{processId},</if>
+            <if test="processSeq != null and processSeq != ''">process_seq = #{processSeq},</if>
+            <if test="isLastProcess != null">is_last_process = #{isLastProcess},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroProcessChainById" parameterType="Long">
+        delete
+        from micro_process_chain
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroProcessChainByIds" parameterType="String">
+        delete from micro_process_chain
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteByTechIds">
+        delete from micro_process_chain
+        where tech_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="saveProcessChainHistory">
+        insert into micro_process_chain_history
+        select * from micro_process_chain mpc
+        where mpc.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </insert>
+    <insert id="saveProcessChainHistoryByTech">
+        insert into micro_process_chain_history
+        select * from micro_process_chain mpc
+        where mpc.tech_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </insert>
+</mapper>

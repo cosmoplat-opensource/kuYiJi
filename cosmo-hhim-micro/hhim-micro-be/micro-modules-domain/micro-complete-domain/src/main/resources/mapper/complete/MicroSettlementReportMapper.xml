@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.complete.domain.mapper.MicroSettlementReportMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementReportEntity" id="MicroSettlementReportResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="submitId" column="submit_id"/>
+        <result property="employeeId" column="employee_id"/>
+        <result property="checkedNum" column="checked_num"/>
+        <result property="settledNum" column="settled_num"/>
+        <result property="adjustedNum" column="adjusted_num"/>
+        <result property="settlementDay" column="settlement_day"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="operateProcessSeq" column="operate_process_seq"/>
+        <result property="operateProcessCode" column="operate_process_code"/>
+        <result property="operateProcessName" column="operate_process_name"/>
+        <result property="remark" column="remark"/>
+        <result property="settlementStatus" column="settlement_status"/>
+        <result property="settlementNo" column="settlement_no"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <sql id="selectMicroSettlementReport">
+        select id,
+               tenant_code,
+               submit_id,
+               employee_id,
+               checked_num,
+               settled_num,
+               adjusted_num,
+               settlement_day,
+               product_seq,
+               operate_process_seq,
+               remark,
+               settlement_status,
+               settlement_no,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_settlement_report
+    </sql>
+
+
+    <select id="selectMicroSettlementReportList" parameterType="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementReportEntity"
+            resultMap="MicroSettlementReportResult">
+        <include refid="selectMicroSettlementReport"/>
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="submitId != null ">and submit_id = #{submitId}</if>
+            <if test="employeeId != null ">and employee_id = #{employeeId}</if>
+            <if test="checkedNum != null ">and checked_num = #{checkedNum}</if>
+            <if test="settledNum != null ">and settled_num = #{settledNum}</if>
+            <if test="adjustedNum != null ">and adjusted_num = #{adjustedNum}</if>
+            <if test="settlementDay != null ">
+                AND DATE_FORMAT(settlement_day,'%y%m') = DATE_FORMAT(#{settlementDay},'%y%m')
+            </if>
+            <if test="productSeq != null  and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="operateProcessSeq != null  and operateProcessSeq != ''">and operate_process_seq = #{operateProcessSeq}</if>
+            <if test="remark != null  and remark != ''">and remark like concat('%', #{remark}, '%')</if>
+            <if test="settlementStatus != null  and settlementStatus != ''">and settlement_status = #{settlementStatus}</if>
+            <if test="settlementNo != null  and settlementNo != ''">and settlement_no = #{settlementNo}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+        </where>
+        order by submit_id
+    </select>
+
+    <resultMap type="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementReportResultDomain" id="MicroSettlementReportDomainResult">
+        <result property="employeeId" column="employeeId"/>
+        <result property="employeeName" column="employeeName"/>
+        <result property="employeeUserName" column="employeeUserName"/>
+        <result property="productSeq" column="productSeq"/>
+        <result property="productName" column="productName"/>
+        <result property="productCode" column="productCode"/>
+        <result property="productUnit" column="productUnit"/>
+        <result property="operateProcessSeq" column="operateProcessSeq"/>
+        <result property="operateProcessCode" column="operateProcessCode"/>
+        <result property="operateProcessName" column="operateProcessName"/>
+        <result property="adjustedNum" column="adjustedNum"/>
+        <result property="settledNum" column="settledNum"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+
+    <select id="selectMicroSettlementReportByUser"
+            resultType="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementReportEmployeeDomain">
+        SELECT
+        mu.id AS employeeId,
+        IF(mu.nick_name IS NULL, mu.user_name, nick_name) as employeeName,
+        mu.user_name as employeeUserName,
+        CASE #{entity.settlementStatus}
+        WHEN '10' THEN ROUND(SUM(msr.adjusted_num - msr.settled_num),4)
+        WHEN '20' THEN 0
+        END AS totalAdjustedNum,
+        CASE #{entity.settlementStatus}
+        WHEN '10' THEN 0
+        WHEN '20' THEN SUM(msr.settled_num)
+        END AS totalSettledNum
+        FROM micro_settlement_report msr
+        INNER JOIN micro_user mu ON msr.tenant_code = mu.tenant_code AND msr.employee_id = mu.id
+        WHERE 1=1
+        <if test="entity !=null">
+            <if test="entity.settlementStatus != null">
+                and msr.settlement_status = #{entity.settlementStatus}
+            </if>
+            <if test="entity.employeeId != null">
+                and msr.employee_id = #{entity.employeeId}
+            </if>
+            <if test="entity.settlementDay != null">
+                AND DATE_FORMAT(msr.settlement_day,'%y%m') = DATE_FORMAT(#{entity.settlementDay},'%y%m')
+            </if>
+            <if test="entity.productSeq != null and entity.productSeq != ''">and msr.product_seq = #{entity.productSeq}</if>
+            <if test="entity.operateProcessSeq != null and entity.operateProcessSeq != ''">and msr.operate_process_seq = #{entity.operateProcessSeq}
+            </if>
+        </if>
+        GROUP BY mu.id
+        ORDER BY mu.id
+    </select>
+
+    <select id="selectMicroSettlementReportUserDetail" resultMap="MicroSettlementReportDomainResult">
+        SELECT
+        msr.employee_id AS employeeId,
+        msr.settlement_day AS settlementDay,
+        msr.product_seq AS productSeq,
+        MAX(mp.product_code) AS productCode,
+        MAX(mp.product_name) AS productName,
+        MAX(mp.unit) AS productUnit,
+        msr.operate_process_seq AS operateProcessSeq,
+        MAX(mpc.process_code) AS operateProcessCode,
+        MAX(mpc.process_name) AS operateProcessName,
+        ROUND(SUM(msr.adjusted_num - msr.settled_num), 4) AS adjustedNum,
+        SUM(msr.settled_num) AS settledNum,
+        MAX(msr.remark) AS remark
+        FROM micro_settlement_report msr
+        LEFT JOIN micro_process_common mpc ON msr.tenant_code = mpc.tenant_code AND msr.operate_process_seq = mpc.process_seq
+        LEFT JOIN micro_product mp ON msr.tenant_code = mp.tenant_code AND msr.product_seq = mp.product_seq
+        WHERE
+        msr.employee_id in
+        <foreach collection="employeeIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="entity !=null">
+            <if test="entity.settlementStatus != null">
+                and msr.settlement_status = #{entity.settlementStatus}
+            </if>
+            <if test="entity.employeeId != null">
+                and msr.employee_id = #{entity.employeeId}
+            </if>
+            <if test="entity.settlementDay != null">
+                AND DATE_FORMAT(msr.settlement_day,'%y%m') = DATE_FORMAT(#{entity.settlementDay},'%y%m')
+            </if>
+            <if test="entity.productSeq != null and entity.productSeq != ''">and msr.product_seq = #{entity.productSeq}</if>
+            <if test="entity.operateProcessSeq != null and entity.operateProcessSeq != ''">and msr.operate_process_seq = #{entity.operateProcessSeq}
+            </if>
+        </if>
+        GROUP BY msr.employee_id, msr.product_seq,msr.operate_process_seq
+        ORDER BY msr.employee_id, msr.product_seq,msr.operate_process_seq
+    </select>
+
+    <select id="getSettledByProduct" resultType="com.cosmo.hhim.micro.complete.domain.entity.MicroSettledProductDomain">
+        SELECT msr.product_seq as productSeq,
+        MAX(mp.product_code) AS productCode,
+        MAX(mp.product_name) AS productName,
+        MAX(mp.unit) AS productUnit,
+        SUM(msr.product_complete_num) AS storageNum,
+        COUNT(distinct msr.operate_process_seq) as processNum,
+        COUNT(distinct msr.employee_id) as employeeNum
+        FROM micro_settlement_report msr
+        LEFT JOIN micro_product mp ON
+        msr.product_seq = mp.product_seq
+        AND msr.tenant_code = mp.tenant_code
+        WHERE msr.settlement_status = '20'
+        <if test="entity !=null">
+            <if test="entity.employeeId != null">and msr.employee_id = #{entity.employeeId}</if>
+            <if test="entity.settlementDay != null">
+                AND DATE_FORMAT(msr.settlement_day,'%y%m') = DATE_FORMAT(#{entity.settlementDay},'%y%m')
+            </if>
+            <if test="entity.productSeq != null and entity.productSeq != ''">and msr.product_seq = #{entity.productSeq}</if>
+            <if test="entity.operateProcessSeq != null and entity.operateProcessSeq != ''">and msr.operate_process_seq = #{entity.operateProcessSeq}
+            </if>
+        </if>
+        GROUP BY msr.product_seq
+        ORDER BY msr.product_seq
+    </select>
+    <resultMap type="com.cosmo.hhim.micro.complete.domain.entity.MicroSettledProductDetailDomain" id="MicroSettlementProductDetailResult">
+        <result property="productSeq" column="productSeq"/>
+        <result property="productCode" column="productCode"/>
+        <result property="productName" column="productName"/>
+        <result property="productUnit" column="productUnit"/>
+        <result property="operateProcessSeq" column="operateProcessSeq"/>
+        <result property="operateProcessCode" column="operateProcessCode"/>
+        <result property="operateProcessName" column="operateProcessName"/>
+        <collection property="detailList" select="selectProductDetail"
+                    column="{operateProcessSeq=operateProcessSeq,productSeq=productSeq,settlementDay=settlementDay,tenantCode=tenantCode}"/>
+    </resultMap>
+
+    <select id="selectSettledByProductDetail" resultMap="MicroSettlementProductDetailResult">
+        SELECT msr.product_seq         AS productSeq,
+               mp.product_code         AS productCode,
+               mp.product_name         AS productName,
+               mp.unit                 AS productUnit,
+               mpc.process_name        AS operateProcessName,
+               mpc.process_code        AS operateProcessCode,
+               msr.operate_process_seq AS operateProcessSeq,
+               msr.settlement_day      AS settlementDay,
+               msr.tenant_code         AS tenantCode
+        FROM micro_settlement_report msr
+                 LEFT JOIN micro_process_common mpc
+                           ON msr.tenant_code = mpc.tenant_code AND msr.operate_process_seq = mpc.process_seq
+                 LEFT JOIN micro_product mp on msr.tenant_code = mp.tenant_code AND msr.product_seq = mp.product_seq
+        WHERE msr.product_seq = #{productSeq}
+          AND msr.settlement_status = '20'
+          AND DATE_FORMAT(msr.settlement_day, '%y%m') = DATE_FORMAT(#{searchDate}, '%y%m')
+        GROUP BY msr.product_seq, msr.operate_process_seq
+        ORDER BY msr.product_seq, msr.operate_process_seq
+    </select>
+    <select id="selectProductDetail" resultType="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementReportEmployeeDomain">
+        SELECT msr.employee_id                                   AS employeeId,
+               IF(mu.nick_name IS NULL, mu.user_name, nick_name) AS employeeName,
+               SUM(msr.settled_num)                              AS totalSettledNum,
+               ROUND(SUM(msr.adjusted_num - msr.settled_num), 4) AS totalSettledNum
+        FROM micro_settlement_report msr
+                 LEFT JOIN micro_user mu ON msr.tenant_code = mu.tenant_code AND msr.employee_id = mu.id
+        WHERE msr.tenant_code = #{tenantCode}
+          AND msr.settlement_status = '20'
+          AND DATE_FORMAT(msr.settlement_day, '%y%m') = DATE_FORMAT(#{settlementDay}, '%y%m')
+          AND msr.product_seq = #{productSeq}
+          AND msr.operate_process_seq = #{operateProcessSeq}
+        GROUP BY msr.employee_id
+    </select>
+
+    <select id="selectReportListBySubmitIds" resultMap="MicroSettlementReportResult">
+        <include refid="selectMicroSettlementReport"/>
+        where submit_id in
+        <foreach item="submitId" collection="submitIds" open="(" separator="," close=")">
+            #{submitId}
+        </foreach>
+    </select>
+
+    <select id="selectToGenerateReportList" resultMap="MicroSettlementReportResult">
+        <include refid="selectMicroSettlementReport"/>
+        where
+        settlement_status = '10'
+        and product_seq in
+        <foreach item="item" collection="productSeqs" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and created_date &lt;= #{submitDeadline}
+        order by product_seq,submit_id
+    </select>
+    <select id="selectEmployeeSettledNum" resultType="java.math.BigDecimal">
+        SELECT IFNULL(ROUND(SUM(settled_num), 4), 0) AS settledNum
+        FROM micro_settlement_report msr
+        WHERE msr.settlement_status = '20'
+          AND msr.employee_id = #{employeeId}
+          AND DATE_FORMAT(msr.settlement_day, '%y%m') = DATE_FORMAT(#{settlementDay}, '%y%m')
+    </select>
+    <select id="selectEmployeeOpenNum" resultType="java.math.BigDecimal">
+        SELECT IFNULL(ROUND(SUM(msr.adjusted_num - msr.settled_num), 4), 0) AS openNum
+        FROM micro_settlement_report msr
+        WHERE msr.settlement_status = '10'
+          AND msr.employee_id = #{employeeId}
+    </select>
+
+    <insert id="insertMicroSettlementReport"
+            parameterType="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementReportEntity"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into micro_settlement_report
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="submitId != null">submit_id,</if>
+            <if test="employeeId != null">employee_id,</if>
+            <if test="checkedNum != null">checked_num,</if>
+            <if test="settledNum != null">settled_num,</if>
+            <if test="adjustedNum != null">adjusted_num,</if>
+            <if test="settlementDay != null">settlement_day,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">operate_process_seq,</if>
+            <if test="remark != null">remark,</if>
+            <if test="settlementStatus != null">settlement_status,</if>
+            <if test="settlementNo != null and settlementNo != ''">settlement_no,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="submitId != null">#{submitId},</if>
+            <if test="employeeId != null">#{employeeId},</if>
+            <if test="checkedNum != null">#{checkedNum},</if>
+            <if test="settledNum != null">#{settledNum},</if>
+            <if test="adjustedNum != null">#{adjustedNum},</if>
+            <if test="settlementDay != null">#{settlementDay},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">#{operateProcessSeq},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="settlementStatus != null">#{settlementStatus},</if>
+            <if test="settlementNo != null and settlementNo != ''">#{settlementNo},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+        </trim>
+    </insert>
+    <insert id="insertMicroSettlementReportBatch">
+        INSERT INTO micro_settlement_report (
+        tenant_code,
+        submit_id,
+        employee_id,
+        checked_num,
+        settled_num,
+        adjusted_num,
+        settlement_day,
+        product_seq,
+        operate_process_seq,
+        remark,
+        settlement_status,
+        settlement_no,
+        created_by,
+        last_upd_by
+        )
+        VALUES
+        <foreach collection="dataList" item="entity" index="index" separator=",">
+            (
+            #{entity.tenantCode},
+            #{entity.submitId},
+            #{entity.employeeId},
+            #{entity.checkedNum},
+            #{entity.settledNum},
+            #{entity.adjustedNum},
+            #{entity.settlementDay},
+            #{entity.productSeq},
+            #{entity.operateProcessSeq},
+            #{entity.remark},
+            #{entity.settlementStatus},
+            #{entity.settlementNo},
+            #{entity.createdBy},
+            #{entity.lastUpdBy}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateMicroSettlementReport" parameterType="com.cosmo.hhim.micro.complete.domain.entity.MicroSettlementReportEntity">
+        update micro_settlement_report
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="submitId != null">submit_id = #{submitId},</if>
+            <if test="employeeId != null">employee_id = #{employeeId},</if>
+            <if test="checkedNum != null">checked_num = #{checkedNum},</if>
+            <if test="settledNum != null">settled_num = #{settledNum},</if>
+            <if test="adjustedNum != null">adjusted_num = #{adjustedNum},</if>
+            <if test="settlementDay != null">settlement_day = #{settlementDay},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">operate_process_seq = #{operateProcessSeq},</if>
+            <if test="productCompleteNum != null">product_complete_num = #{productCompleteNum},</if>
+            <if test="productCompleteReportNo != null and productCompleteReportNo !=''">product_complete_report_no = #{productCompleteReportNo},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="settlementStatus != null">settlement_status = #{settlementStatus},</if>
+            <if test="settlementNo != null and settlementNo != ''">settlement_no = #{settlementNo},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroSettlementReportById" parameterType="Long">
+        delete
+        from micro_settlement_report
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroSettlementReportByIds" parameterType="String">
+        delete from micro_settlement_report where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteMicroSettlementReportBySubmitIds">
+        delete from micro_settlement_report where submit_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

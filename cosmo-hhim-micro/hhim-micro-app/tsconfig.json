@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "types": ["@dcloudio/types", "miniprogram-api-typings", "mini-types"],
+    "baseUrl": ".",
+    "noImplicitAny": false, // 设成 false
+    "typeRoots": ["./src/types"],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "lib": ["es2018", "dom"]
+  },
+  "exclude": ["node_modules", "dist"]
+}

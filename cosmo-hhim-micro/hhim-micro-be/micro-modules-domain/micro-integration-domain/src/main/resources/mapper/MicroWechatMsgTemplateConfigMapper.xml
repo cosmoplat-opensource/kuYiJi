@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.integration.domain.mapper.MicroWechatMsgTemplateConfigMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.integration.domain.entity.MicroWechatMsgTemplateConfig" id="MicroWechatMsgTemplateConfigResult">
+        <result property="id" column="id"/>
+        <result property="templateType" column="template_type"/>
+        <result property="messageType" column="message_type"/>
+        <result property="messageClazz" column="message_clazz"/>
+        <result property="templateId" column="template_id"/>
+        <result property="messageTitle" column="message_title"/>
+        <result property="skipUrl" column="skip_url"/>
+        <result property="serviceSign" column="service_sign"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <sql id="selectMicroWechatMsgTemplateConfigVo">
+        select id,
+               template_type,
+               message_type,
+               message_clazz,
+               template_id,
+               message_title,
+               skip_url,
+               service_sign,
+               active_flag,
+               remark,
+               create_by,
+               create_time,
+               last_upd_by,
+               last_upd_date
+        from micro_wechat_msg_template_config
+    </sql>
+
+    <select id="selectMicroWechatMsgTemplateConfigList" parameterType="com.cosmo.hhim.micro.integration.domain.entity.MicroWechatMsgTemplateConfig"
+            resultMap="MicroWechatMsgTemplateConfigResult">
+        <include refid="selectMicroWechatMsgTemplateConfigVo"/>
+        <where>
+            <if test="templateType != null  and templateType != ''">and template_type = #{templateType}</if>
+            <if test="messageType != null  and messageType != ''">and message_type = #{messageType}</if>
+            <if test="messageClazz != null  and messageClazz != ''">and message_clazz = #{messageClazz}</if>
+            <if test="templateId != null  and templateId != ''">and template_id = #{templateId}</if>
+            <if test="messageTitle != null  and messageTitle != ''">and message_title = #{messageTitle}</if>
+            <if test="skipUrl != null  and skipUrl != ''">and skip_url = #{skipUrl}</if>
+            <if test="serviceSign != null  and serviceSign != ''">and service_sign = #{serviceSign}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and active_flag = #{activeFlag}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroWechatMsgTemplateConfig" resultMap="MicroWechatMsgTemplateConfigResult">
+        <include refid="selectMicroWechatMsgTemplateConfigVo"/>
+        where service_sign = #{serviceSign}
+        and template_type = #{templateType}
+        and message_type = #{messageType}
+    </select>
+
+    <insert id="insertMicroWechatMsgTemplateConfig" parameterType="com.cosmo.hhim.micro.integration.domain.entity.MicroWechatMsgTemplateConfig"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into micro_wechat_msg_template_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateType != null">template_type,</if>
+            <if test="messageType != null">message_type,</if>
+            <if test="messageClazz != null">message_clazz,</if>
+            <if test="templateId != null">template_id,</if>
+            <if test="messageTitle != null">message_title,</if>
+            <if test="skipUrl != null">skip_url,</if>
+            <if test="serviceSign != null">service_sign,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateType != null">#{templateType},</if>
+            <if test="messageType != null">#{messageType},</if>
+            <if test="messageClazz != null">#{messageClazz},</if>
+            <if test="templateId != null">#{templateId},</if>
+            <if test="messageTitle != null">#{messageTitle},</if>
+            <if test="skipUrl != null">#{skipUrl},</if>
+            <if test="serviceSign != null">#{serviceSign},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroWechatMsgTemplateConfig" parameterType="com.cosmo.hhim.micro.integration.domain.entity.MicroWechatMsgTemplateConfig">
+        update micro_wechat_msg_template_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="templateType != null">template_type = #{templateType},</if>
+            <if test="messageType != null">message_type = #{messageType},</if>
+            <if test="messageClazz != null">message_clazz = #{messageClazz},</if>
+            <if test="templateId != null">template_id = #{templateId},</if>
+            <if test="messageTitle != null">message_title = #{messageTitle},</if>
+            <if test="skipUrl != null">skip_url = #{skipUrl},</if>
+            <if test="serviceSign != null">service_sign = #{serviceSign},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroWechatMsgTemplateConfigById" parameterType="Long">
+        delete
+        from micro_wechat_msg_template_config
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroWechatMsgTemplateConfigByIds" parameterType="String">
+        delete from micro_wechat_msg_template_config where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

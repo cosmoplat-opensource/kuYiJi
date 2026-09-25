@@ -1,0 +1,12 @@
+{
+  "outPath": "D:\\cosmo-code", //输出路径
+  "rpcApiDependencies": [
+    {
+      "artifactId": "im-api-operation", //项目子模块pom的artifactId
+      "groupId": "com.cosmo.hhim.thirdplat", //项目模块中的groupId
+      "version": "1.0" //项目模块版本号
+    }
+  ]
+
+
+}

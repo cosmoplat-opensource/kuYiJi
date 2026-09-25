@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.integration.domain.mapper.MicroNoticeConfigMapper">
+    
+    <resultMap type="MicroNoticeConfig" id="MicroNoticeConfigResult">
+        <result property="id"    column="id"    />
+        <result property="tenantCode"    column="tenant_code"    />
+        <result property="businessSign"    column="business_sign"    />
+        <result property="noticeRoles"    column="notice_roles"    />
+        <result property="noticeUsers"    column="notice_users"    />
+        <result property="appSign"    column="app_sign"    />
+        <result property="noticeChannels"    column="notice_channels"    />
+        <result property="noticeConditions"    column="notice_conditions"    />
+        <result property="activeFlag"    column="active_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="lastUpdBy"    column="last_upd_by"    />
+        <result property="lastUpdDate"    column="last_upd_date"    />
+    </resultMap>
+
+    <sql id="selectMicroNoticeConfigVo">
+        select id, business_sign, notice_roles, notice_users, app_sign, notice_channels, notice_conditions, active_flag, remark, create_by, create_time, last_upd_by, last_upd_date from micro_notice_config
+    </sql>
+
+    <select id="selectMicroNoticeConfigList" parameterType="MicroNoticeConfig" resultMap="MicroNoticeConfigResult">
+        <include refid="selectMicroNoticeConfigVo"/>
+        <where>  
+            <if test="businessSign != null  and businessSign != ''"> and business_sign = #{businessSign}</if>
+            <if test="noticeRoles != null  and noticeRoles != ''"> and notice_roles = #{noticeRoles}</if>
+            <if test="noticeUsers != null  and noticeUsers != ''"> and notice_users = #{noticeUsers}</if>
+            <if test="appSign != null  and appSign != ''"> and app_sign = #{appSign}</if>
+            <if test="noticeChannels != null  and noticeChannels != ''"> and notice_channels = #{noticeChannels}</if>
+            <if test="noticeConditions != null  and noticeConditions != ''"> and notice_conditions = #{noticeConditions}</if>
+            <if test="activeFlag != null  and activeFlag != ''"> and active_flag = #{activeFlag}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''"> and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null "> and last_upd_date = #{lastUpdDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectMicroNoticeConfigById" parameterType="Long" resultMap="MicroNoticeConfigResult">
+        <include refid="selectMicroNoticeConfigVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectMicroNoticeConfigInfo" resultMap="MicroNoticeConfigResult">
+        <include refid="selectMicroNoticeConfigVo"/>
+        where app_sign = #{appSign} and business_sign = #{businessSign}
+    </select>
+        
+    <insert id="insertMicroNoticeConfig" parameterType="MicroNoticeConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_notice_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="businessSign != null and businessSign != ''">business_sign,</if>
+            <if test="noticeRoles != null">notice_roles,</if>
+            <if test="noticeUsers != null">notice_users,</if>
+            <if test="appSign != null and appSign != ''">app_sign,</if>
+            <if test="noticeChannels != null and noticeChannels != ''">notice_channels,</if>
+            <if test="noticeConditions != null and noticeConditions != ''">notice_conditions,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="businessSign != null and businessSign != ''">#{businessSign},</if>
+            <if test="noticeRoles != null">#{noticeRoles},</if>
+            <if test="noticeUsers != null">#{noticeUsers},</if>
+            <if test="appSign != null and appSign != ''">#{appSign},</if>
+            <if test="noticeChannels != null and noticeChannels != ''">#{noticeChannels},</if>
+            <if test="noticeConditions != null and noticeConditions != ''">#{noticeConditions},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroNoticeConfig" parameterType="MicroNoticeConfig">
+        update micro_notice_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="businessSign != null and businessSign != ''">business_sign = #{businessSign},</if>
+            <if test="noticeRoles != null">notice_roles = #{noticeRoles},</if>
+            <if test="noticeUsers != null">notice_users = #{noticeUsers},</if>
+            <if test="appSign != null and appSign != ''">app_sign = #{appSign},</if>
+            <if test="noticeChannels != null and noticeChannels != ''">notice_channels = #{noticeChannels},</if>
+            <if test="noticeConditions != null and noticeConditions != ''">notice_conditions = #{noticeConditions},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateMicroNoticeConfigByAppSignAndBusSign" parameterType="MicroNoticeConfig">
+        update micro_notice_config
+        <trim prefix="SET" suffixOverrides=",">
+            notice_roles = #{noticeRoles},
+            notice_users = #{noticeUsers},
+            notice_channels = #{noticeChannels},
+            notice_conditions = #{noticeConditions},
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where business_sign = #{businessSign} and app_sign = #{appSign}
+    </update>
+
+    <delete id="deleteMicroNoticeConfigById" parameterType="Long">
+        delete from micro_notice_config where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroNoticeConfigByIds" parameterType="String">
+        delete from micro_notice_config where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

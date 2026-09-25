@@ -1,0 +1,116 @@
+{
+  "version": "1.2",
+  "description": "Ku易记 · 问数本体（关系层 v1.2）。scope=workshop 为当前产品范围；traversable=true 的关系允许追问串联（多步查询的传递白名单）。joinOn 是『已登记的连接方式』，作为**参考资料**提供给 AI（优先参考，不强制；不适用时允许 AI 自行判断，但须自报依据）。铁律：关系两端的实体必须已在 entities.json 中定义。",
+  "relations": [
+    {
+      "from": "product",
+      "to": "process",
+      "scope": "workshop",
+      "via": "工艺链（micro_tech / micro_product_process：产品×工序，含顺序与首末序）",
+      "joinOn": "经报工记录联结：报工.product_seq = 产品.product_seq 且 报工.operate_process_seq = 工序.process_seq；若只看工艺定义，用工艺链表按 产品×工序。",
+      "arity": "1:N",
+      "traversable": true,
+      "label": "工艺链",
+      "note": "产品→工序 可串联：查完产品指标后追问『哪道工序』"
+    },
+    {
+      "from": "employee",
+      "to": "submit",
+      "scope": "workshop",
+      "via": "报工.submit_user（micro_work_submit）",
+      "joinOn": "报工.submit_user = 员工.id（同租户 tenant_code）",
+      "arity": "1:N",
+      "traversable": false,
+      "label": "报工",
+      "note": "员工→报工：员工维度是常见切片（谁产量最高/谁拖后腿）"
+    },
+    {
+      "from": "submit",
+      "to": "qualityControl",
+      "scope": "workshop",
+      "via": "质检记录.submit_id（micro_quality_control_record）",
+      "joinOn": "质检.submit_id = 报工.id",
+      "arity": "1:1..N",
+      "traversable": false,
+      "label": "质检判定",
+      "note": "报工→质检（不良明细口径）；需质检开关，明细层不支持跨步"
+    },
+    {
+      "from": "submit",
+      "to": "completeReport",
+      "scope": "workshop",
+      "via": "完工报告.work_submit_id（micro_complete_report）",
+      "joinOn": "完工报告.work_submit_id = 报工.id",
+      "arity": "1:0..1",
+      "traversable": false,
+      "label": "尾序完工",
+      "note": "尾序报工→完工报告（只在指标内部使用）"
+    },
+    {
+      "from": "submit",
+      "to": "stock_wip",
+      "scope": "workshop",
+      "via": "在制余额随报工流转（micro_process_storage.pass_num）",
+      "joinOn": "报工.product_seq = 在制.product_seq 且 报工.operate_process_seq = 在制.process_seq；注意报工是流水、在制是当前余额（快照），不要相加。",
+      "arity": "1:1..N",
+      "traversable": true,
+      "label": "形成在制",
+      "note": "报工推进工序在制品；在制是快照，报工是流水"
+    },
+    {
+      "from": "product",
+      "to": "stock_wip",
+      "scope": "workshop",
+      "via": "在制.product_seq（micro_process_storage）",
+      "joinOn": "在制.product_seq = 产品.product_seq",
+      "arity": "1:0..N",
+      "traversable": true,
+      "label": "产品在制",
+      "note": "产品→在制：产品指标后追问在制"
+    },
+    {
+      "from": "product",
+      "to": "stock_finished",
+      "scope": "workshop",
+      "via": "成品库存.product_seq（micro_finished_product_storage）",
+      "joinOn": "成品库存.product_seq = 产品.product_seq；只统计 num > 0 的行。",
+      "arity": "1:0..N",
+      "traversable": true,
+      "label": "产品入库",
+      "note": "产品→成品库存"
+    },
+    {
+      "from": "product",
+      "to": "order",
+      "scope": "planning",
+      "via": "订单.product_seq（micro_manufacture_order）",
+      "joinOn": "订单.product_seq = 产品.product_seq（计划域，当前不投入）",
+      "arity": "1:N",
+      "traversable": false,
+      "label": "产品订单",
+      "note": "计划域：当前不投入（手机端无页面、部署多无数据）"
+    },
+    {
+      "from": "order",
+      "to": "workOrder",
+      "scope": "planning",
+      "via": "工单.order_no（micro_manufacture_work_order）",
+      "joinOn": "工单.order_no = 订单.order_no（计划域，当前不投入）",
+      "arity": "1:N",
+      "traversable": false,
+      "label": "订单开工单",
+      "note": "计划域"
+    },
+    {
+      "from": "workOrder",
+      "to": "task",
+      "scope": "planning",
+      "via": "任务.work_order_no（micro_manufacture_task）",
+      "joinOn": "任务.work_order_no = 工单.work_order_no（计划域，当前不投入）",
+      "arity": "1:N",
+      "traversable": false,
+      "label": "工单拆任务",
+      "note": "计划域"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroTagsMapper">
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.common.MicroTags" id="MicroTagsResult">
+        <result property="id" column="id"/>
+        <result property="tagName" column="tag_name"/>
+        <result property="tagType" column="tag_type"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+    </resultMap>
+
+    <sql id="selectMicroTagsVo">
+        select id, tag_name, tag_type, tenant_code, created_by, created_date
+        from micro_tags
+    </sql>
+
+
+    <insert id="insertMicroTagBatch" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroTags">
+        replace into micro_tags
+        (tenant_code,
+        tag_name,
+        tag_type,
+        created_by) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.tenantCode},
+            #{item.tagName},
+            #{item.tagType},
+            #{item.createdBy})
+        </foreach>
+    </insert>
+
+    <select id="selectMicroTagsList" parameterType="com.cosmo.hhim.micro.base.domain.entity.common.MicroTags" resultMap="MicroTagsResult">
+        <include refid="selectMicroTagsVo"/>
+        <where>
+            <if test="tagName != null  and tagName != ''">and tag_name like concat('%', #{tagName}, '%')</if>
+            <if test="tagType != null  and tagType != ''">and tag_type = #{tagType}</if>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+        </where>
+        order by id desc
+    </select>
+</mapper>

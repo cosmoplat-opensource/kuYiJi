@@ -1,0 +1,281 @@
+# ==============================================================
+# application-local.yml.example — 配置示例
+# ==============================================================
+# 使用方式：
+#   1. 复制本文件为 application-local.yml
+#   2. 把所有 please_set_xxx 替换为真实值（或通过环境变量注入）
+#   3. 也可以只保留占位符格式，启动时通过 -Dxxx=yyy 或 export xxx=yyy 注入
+# ==============================================================
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+  main:
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:please_set_redis_password}
+    timeout: 10s
+    lettuce:
+      pool:
+        min-idle: 0
+        max-idle: 8
+        max-active: 8
+    database: 1
+    multidb:
+      redisTemplatePrefix: im-redisTemplate-
+      databases: [0,1,2,3,4,5,6]
+      redisClientType: lettuce
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      db0:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:your_db_name}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&allowMultiQueries=true
+        username: ${DB_USERNAME:please_set_db_username}
+        password: ${DB_PASSWORD:please_set_db_password}
+        initialSize: 5
+        minIdle: 5
+        maxActive: 10
+        maxWait: 2000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+      db1:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${DB1_HOST:localhost}:${DB1_PORT:3306}/${DB1_NAME:your_db_name}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&allowMultiQueries=true
+        username: ${DB1_USERNAME:please_set_db_username}
+        password: ${DB1_PASSWORD:please_set_db_password}
+
+
+# mybatis配置
+mybatis:
+  typeAliasesPackage: com.cosmo.hhim.common.security.pojo,com.cosmo.hhim.micro
+  mapperLocations: classpath*:mapper/**/*.xml
+  tenantLineIgnoreTables: micro_trial_record,micro_content_tip_config,micro_content_tip_record,micro_wechat_msg_template_config,micro_tenant,micro_user_tenant_index,micro_app_config,micro_faq,micro_suggestion
+
+# feign 配置
+feign:
+  sentinel:
+    enabled: false
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+  client:
+    config:
+      default:
+        connectTimeout: 30000
+        readTimeout: 30000
+  compression:
+    request:
+      enabled: false
+    response:
+      enabled: false
+  hystrix:
+    enabled: false
+
+# 断路器
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+      circuitBreaker:
+        sleepWindowInMilliseconds: 30000
+        requestVolumeThreshold: 20
+        errorThresholdPercentage: 50
+
+# 暴露监控端点（收敛：仅 health/info，避免 heapdump/env 等敏感端点）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info"
+
+hhim-portal-system:
+  ribbon:
+    NFLoadBalancerRuleClassName: com.alibaba.cloud.nacos.ribbon.NacosRule
+
+logging:
+  config: classpath:logback-plumelog.xml
+  level:
+    druid.sql: error
+    com.cosmo.hhim: info
+    com.alibaba.nacos: error
+    com.cosmo.hhim.micro: info
+    org.springframework: warn
+
+# feignDebug 块（仅供开发阶段调试 Feign）
+feignDebug:
+  thirdplatUrl: http://localhost:8899
+
+# 意见反馈详情页链接（飞书机器人消息附带；开源部署按需配置）
+feedback:
+  detail-url: ${FEEDBACK_DETAIL_URL:}
+
+# 微信公众号生成token
+jwt:
+  secretKey: ${JWT_SECRET:please_set_jwt_secret_at_least_32_chars}
+  timeout: 604800
+
+minio:
+  url: ${MINIO_URL:https://your-minio-domain.com}
+  accessKey: ${MINIO_ACCESS_KEY:please_set_minio_access_key}
+  secretKey: ${MINIO_SECRET_KEY:please_set_minio_secret_key}
+  bucketName: ${MINIO_BUCKET:please_set_minio_bucket}
+  microBucketName: ${MINIO_MICRO_BUCKET:please_set_minio_micro_bucket}
+  fileFolder: micro
+
+monitor:
+  applications:
+    - pigx-upms-biz
+    - pigx-auth
+
+local: true
+
+sys:
+  url: ${SYS_URL:https://your-domain.com}
+
+# 通知服务（飞书 webhook 等敏感 URL 通过环境变量注入）
+notify:
+  feishu:
+    suggest-bot-url: ${FEISHU_SUGGEST_BOT_URL:please_set_feishu_suggest_bot_url}
+
+sms:
+  url: ${SMS_URL:https://your-sms-gateway/v1/sms/sendsms}
+  weekReportForMicroProcessTempleteId: ${SMS_WEEK_TEMPLATE:your_template_id}
+  loginVerificationCodeTempleteId: ${SMS_LOGIN_TEMPLATE:your_template_id}
+
+applicationInfo:
+  productId: ${APPLICATION_PRODUCT_ID:your_product_id}
+
+settings:
+  cleanTableNames: micro_process_storage,micro_process_storage_history,micro_recommend_hit,micro_work_submit,micro_work_submit_history,micro_tags,sys_logininfor,sys_oper_log,micro_technology,micro_technology_history,micro_complete_report,micro_finished_product_storage,micro_finished_product_storage_history,micro_settlement_report,micro_settlement_history
+
+  originalCustomerCode: ${ORIGINAL_CUSTOMER_CODE:000000}
+  tokenEffectiveTime: 86400
+  importexport:
+    importLink: ${IMPORTEXPORT_IMPORT_LINK:http://your-domain.com/micro-export}
+    linkEffectiveTime: 86400
+
+todopush:
+  appId: ${TODOPUSH_APP_ID:please_set_todopush_app_id}
+  appSecret: ${TODOPUSH_APP_SECRET:please_set_todopush_app_secret}
+  gatewayUrl: ${TODOPUSH_GATEWAY_URL:http://localhost:21799/gateway/}
+  pushPath: todo/push
+  finishPath: todo/finish
+  parentId: ${TODOPUSH_PARENT_ID:0}
+
+# 待办系统AES加解密密钥（可选，仅对接卡奥斯内部待办系统时需要，开源独立部署可留空）
+todo:
+  aes:
+    key: ${TODO_AES_KEY:}
+    iv: ${TODO_AES_IV:}
+
+# Druid 监控页（/druid/*）：默认关闭，避免生产环境暴露 SQL 监控等敏感信息；需要时开启并配置强密码
+druid:
+  monitor:
+    enabled: ${DRUID_MONITOR_ENABLED:false}
+    username: ${DRUID_MONITOR_USERNAME:}
+    password: ${DRUID_MONITOR_PASSWORD:}
+
+# Swagger 接口文档（引入 hhim-common-swagger 模块时生效）：默认关闭，需要时开启
+swagger:
+  enabled: ${SWAGGER_ENABLED:false}
+
+statistics:
+  personalizedThreshold: 14
+  decayFactor: 0.01
+  submitCountThreshold: 30
+  qcAndSubmitRadio: 0.6
+  consecutiveQc: 3
+  navPages:
+    - 工作台
+    - 记工列表
+    - 审核列表
+    - 车间库存
+    - 质检列表
+  currentPages:
+    - 审核列表-产品维度
+    - 审核列表-员工维度
+
+user:
+  maxUserThresholdValue: 100
+
+applicationProductIds:
+  micro_process: ${APPLICATION_PRODUCT_ID:your_product_id}
+
+certificate:
+  includedPaths: /import/**,/storage/finish/temp/**,/storage/process/temp/**,/bom/temp/**,/process/chain/temp/**
+  excludedPaths: /import/importTemplate
+
+newAddProductAndProcess:
+  includedPaths: /submit/add,/submit/edit,/submit/multiMixed,/ngProduct/manage/submitForInspection,/process/add,/product/add
+
+# ============================================================
+# 环境变量清单（请勿将明文密码提交到代码仓库）
+# ============================================================
+# DB_HOST              数据库地址
+# DB_PORT              数据库端口
+# DB_NAME              数据库名称
+# DB_USERNAME          数据库用户名
+# DB_PASSWORD          数据库密码
+# DB1_HOST             第二个数据库地址
+# DB1_PORT             第二个数据库端口
+# DB1_NAME             第二个数据库名称
+# DB1_USERNAME         第二个数据库用户名
+# DB1_PASSWORD         第二个数据库密码
+# REDIS_HOST           Redis 地址
+# REDIS_PORT           Redis 端口
+# REDIS_PASSWORD       Redis 密码
+# NACOS_USERNAME       Nacos 用户名
+# NACOS_PASSWORD       Nacos 密码
+# JWT_SECRET           JWT 密钥（至少 32 字符）
+# MINIO_URL            MinIO 服务地址
+# MINIO_ACCESS_KEY     MinIO AccessKey
+# MINIO_SECRET_KEY     MinIO SecretKey
+# MINIO_BUCKET         MinIO 桶名
+# MINIO_MICRO_BUCKET   MinIO 微应用桶名
+# TODOPUSH_APP_ID      待办推送 AppId
+# TODOPUSH_APP_SECRET  待办推送 AppSecret
+# TODOPUSH_GATEWAY_URL 待办推送网关地址
+# TODOPUSH_PARENT_ID   待办推送父 ID
+# TODO_AES_KEY         待办系统AES密钥（可选，仅对接卡奥斯内部待办系统时需要）
+# TODO_AES_IV          待办系统AES密钥偏移量（可选，同上）
+# DRUID_MONITOR_ENABLED  Druid 监控页开关（默认 false，开启需同时配置账号密码）
+# DRUID_MONITOR_USERNAME Druid 监控页账号
+# DRUID_MONITOR_PASSWORD Druid 监控页密码
+# SWAGGER_ENABLED       Swagger 接口文档开关（默认 false）
+# SMS_URL              短信网关地址
+# SMS_WEEK_TEMPLATE    周报短信模板 ID
+# SMS_LOGIN_TEMPLATE   登录验证码模板 ID
+# SYS_URL              系统 URL
+# APPLICATION_PRODUCT_ID 应用产品 ID
+# IMPORTEXPORT_IMPORT_LINK 导入导出链接
+# FEISHU_SUGGEST_BOT_URL 飞书意见收集 webhook（建议在飞书后台 rotate）
+# ORIGINAL_CUSTOMER_CODE  原始客户代码
+# FEEDBACK_DETAIL_URL     意见反馈详情页链接（飞书机器人消息附带）
+
+# ---- AI 问数（OpenAI 兼容网关）----
+# AI_ENABLED             AI 功能总开关（默认 true；false = 问数按规则直答）
+# AI_BASE_URL            LLM API 地址（OpenAI 兼容网关，如 DeepSeek / 通义 / OpenAI 等）
+# AI_API_KEY             LLM API 密钥【必填请替换，切勿泄露/提交】
+# AI_CHAT_MODEL          LLM 模型名
+# AI_TIMEOUT_MS          LLM 调用超时（毫秒，默认 10000）
+# AI_MONTHLY_BUDGET      租户月度调用预算（默认 500）
+# AI_REFINE_ENABLED      答案 LLM 润色开关（默认 true；false = 使用模板骨架答案）
+ai:
+  enabled: ${AI_ENABLED:true}
+  base-url: ${AI_BASE_URL:please_set_ai_base_url}
+  api-key: ${AI_API_KEY:please_set_ai_api_key}
+  chat-model: ${AI_CHAT_MODEL:please_set_ai_chat_model}
+  timeout-ms: ${AI_TIMEOUT_MS:10000}
+  monthly-budget: ${AI_MONTHLY_BUDGET:500}
+  refine-enabled: ${AI_REFINE_ENABLED:true}

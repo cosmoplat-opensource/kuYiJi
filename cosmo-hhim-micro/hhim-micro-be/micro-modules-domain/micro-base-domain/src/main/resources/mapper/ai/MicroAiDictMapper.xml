@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.ai.MicroAiDictMapper">
+
+    <!-- 实体检索：正向（字典名被查询词包含）+ 反向（查询词包含字典名）双向模糊。
+         反向匹配解决的问题：用户/LLM 说"车削工序"、"法兰盘DN15零件"，字典里只有"车削"/"法兰盘DN15"，
+         只做正向会 NOT_FOUND → 静默降级全量（历史现象："车削工序的良品率"答成全工序）。
+         前缀匹配优先（精确命中的排前面），最多 5 条，多条即由上层走澄清。 -->
+
+    <select id="selectProductByName" resultType="java.util.Map">
+        select product_seq as productSeq, product_name as productName, product_code as productCode
+        from micro_product
+        where product_name like concat('%', #{name}, '%')
+           or product_code = #{name}
+           or #{name} like concat('%', product_name, '%')
+           or #{name} like concat('%', product_code, '%')
+        order by (product_name = #{name} or product_code = #{name}) desc, length(product_name) desc
+        limit 5
+    </select>
+
+    <select id="selectProcessByName" resultType="java.util.Map">
+        select process_seq as processSeq, process_name as processName, process_code as processCode
+        from micro_process_common
+        where process_name like concat('%', #{name}, '%')
+           or process_code = #{name}
+           or #{name} like concat('%', process_name, '%')
+           or #{name} like concat('%', process_code, '%')
+        order by (process_name = #{name} or process_code = #{name}) desc, length(process_name) desc
+        limit 5
+    </select>
+
+    <select id="selectEmployeeByName" resultType="java.util.Map">
+        select id as userId, nick_name as nickName, user_name as userName
+        from micro_user
+        where nick_name like concat('%', #{name}, '%')
+           or user_name = #{name}
+           or phonenumber = #{name}
+           or #{name} like concat('%', nick_name, '%')
+        order by (nick_name = #{name} or user_name = #{name}) desc, length(nick_name) desc
+        limit 5
+    </select>
+
+    <!-- 实体清单（ENTITY_LIST）：按类型列举字典，Top 10 -->
+    <select id="selectEntityList" resultType="java.util.Map">
+        <choose>
+            <when test="type == 'product'">
+                select product_name as name, product_code as code
+                from micro_product
+                where tenant_code = #{tenantCode}
+                order by product_code limit 10
+            </when>
+            <when test="type == 'process'">
+                select process_name as name, process_code as code
+                from micro_process_common
+                where tenant_code = #{tenantCode}
+                order by process_code limit 10
+            </when>
+            <when test="type == 'employee'">
+                select nick_name as name, user_name as code
+                from micro_user
+                where tenant_code = #{tenantCode}
+                order by user_name limit 10
+            </when>
+            <otherwise>
+                select null as name where 1 = 0
+            </otherwise>
+        </choose>
+    </select>
+
+</mapper>

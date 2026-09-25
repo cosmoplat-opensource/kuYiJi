@@ -1,0 +1,11 @@
+repos:
+  - repo: local
+    hooks:
+      - id: alibaba-java-check
+        name: 阿里巴巴Java编码规范检查
+        entry: bash -c 'TOOL_DIR="$HOME/.java-checker"; JAR="$TOOL_DIR/p3c-pmd-2.1.1.jar"; URL="https://github.com/alibaba/p3c/releases/download/p3c-pmd-2.1.1/p3c-pmd-2.1.1.jar"; mkdir -p "$TOOL_DIR"; [ ! -f "$JAR" ] && curl -fSL -o "$JAR" "$URL"; TMPFILE="$TOOL_DIR/.pmd-filelist.tmp"; printf "%s\n" "$@" > "$TMPFILE"; java -cp "$JAR" net.sourceforge.pmd.PMD -filelist "$TMPFILE" -R rulesets/java/ali-constant.xml,rulesets/java/ali-concurrent.xml,rulesets/java/ali-exception.xml,rulesets/java/ali-flowcontrol.xml,rulesets/java/ali-naming.xml,rulesets/java/ali-oop.xml,rulesets/java/ali-orm.xml,rulesets/java/ali-other.xml,rulesets/java/ali-set.xml -f text --failOnViolation false' _
+        language: system
+        files: \.java$
+        pass_filenames: true
+        require_serial: true
+        verbose: true

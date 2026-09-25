@@ -1,0 +1,841 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.planning.domain.mapper.work.MicroManufactureWorkOrderMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.planning.domain.entity.work.MicroManufactureWorkOrder" id="MicroManufactureWorkOrderResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="workOrderNo" column="work_order_no"/>
+        <result property="orderNo" column="order_no"/>
+        <result property="wordOrderType" column="word_order_type"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="wshopCode" column="wshop_code"/>
+        <result property="mlineCode" column="mline_code"/>
+        <result property="workOrderNum" column="work_order_num"/>
+        <result property="deliveryDate" column="delivery_date"/>
+        <result property="planStartDate" column="plan_start_date"/>
+        <result property="planEndDate" column="plan_end_date"/>
+        <result property="produceStartDate" column="produce_start_date"/>
+        <result property="produceEndDate" column="produce_end_date"/>
+        <result property="workOrderStatus" column="work_order_status"/>
+        <result property="beforeStatus" column="before_status"/>
+        <result property="remark" column="remark"/>
+        <result property="sendBy" column="send_by"/>
+        <result property="sendDate" column="send_date"/>
+        <result property="inboundDate" column="inbound_date"/>
+        <result property="finishNum" column="finish_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="closeReason" column="close_reason"/>
+        <result property="extendContent" column="extend_content"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="mainFlag" column="main_flag"/>
+        <result property="productId" column="product_id"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="wshopName" column="wshop_name"/>
+        <result property="mlineName" column="mline_name"/>
+        <result property="unit"    column="unit"    />
+        <result property="productType"    column="product_type"    />
+        <result property="productionMode"    column="production_mode"    />
+        <result property="passNum"    column="pass_num"    />
+        <result property="techType"    column="tech_type"    />
+        <result property="owName"    column="ow_name"    />
+        <result property="orderPlanNum"    column="plan_num"    />
+        <result property="isComplete"    column="is_complete"    />
+    </resultMap>
+
+    <sql id="selectMicroManufactureWorkOrderVo">
+        select id, tenant_code, work_order_no, order_no, word_order_type, product_seq, wshop_code, mline_code,
+               work_order_num, delivery_date, plan_start_date, plan_end_date, produce_start_date, produce_end_date,
+               work_order_status, before_status, remark, send_by, send_date, inbound_date, finish_num, ng_num,
+               close_reason, extend_content, created_by, created_date, last_upd_by, last_upd_date, active_flag,
+               main_flag, is_complete
+        from micro_manufacture_work_order
+    </sql>
+
+    <sql id="selectMicroManufactureWorkOrderVoFirst">
+        select
+            mmwo.id,
+            mmwo.tenant_code,
+            mmwo.work_order_no,
+            mmwo.order_no,
+            mmwo.word_order_type,
+            mmwo.product_seq,
+            mmwo.wshop_code,
+            mmwo.mline_code,
+            mmwo.work_order_num,
+            mmwo.delivery_date,
+            mmwo.plan_start_date,
+            mmwo.plan_end_date,
+            mmwo.produce_start_date,
+            mmwo.produce_end_date,
+            mmwo.work_order_status,
+            mmwo.before_status,
+            mmwo.remark,
+            mmwo.send_by,
+            mmwo.send_date,
+            mmwo.inbound_date,
+            mmwo.finish_num,
+            mmwo.ng_num,
+            mmwo.close_reason,
+            mmwo.extend_content,
+            mmwo.created_by,
+            mmwo.created_date,
+            mmwo.last_upd_by,
+            mmwo.last_upd_date,
+            mmwo.active_flag,
+            mmwo.main_flag,
+            mmwo.is_complete,
+            mp.id as product_id,
+            mp.product_code ,
+            mp.product_name ,
+            mp.unit,
+            mp.product_type,
+            mp.production_mode,
+            mw.wshop_name ,
+            mml.mline_name,
+            mmt.pass_num,
+            mmt.tech_type
+        from
+            micro_manufacture_work_order mmwo
+        left join micro_product mp on
+            mmwo.product_seq = mp.product_seq
+        left join micro_workshop mw on
+            mmwo.wshop_code = mw.wshop_code
+        left join micro_manufacture_line mml on
+            mmwo.mline_code = mml.mline_code
+        left join micro_manufacture_task mmt on mmt.work_order_no=mmwo.work_order_no and mmt.is_last_process='0'
+    </sql>
+
+    <sql id="selectMicroManufactureWorkOrderVoSecond">
+        select
+            mmwo.id,
+            mmwo.tenant_code,
+            mmwo.work_order_no,
+            mmwo.order_no,
+            mmwo.word_order_type,
+            mmwo.product_seq,
+            mmwo.wshop_code,
+            mmwo.mline_code,
+            mmwo.work_order_num,
+            mmwo.delivery_date,
+            mmwo.plan_start_date,
+            mmwo.plan_end_date,
+            mmwo.produce_start_date,
+            mmwo.produce_end_date,
+            mmwo.work_order_status,
+            mmwo.before_status,
+            mmwo.remark,
+            mmwo.send_by,
+            mmwo.send_date,
+            mmwo.inbound_date,
+            mmwo.finish_num,
+            mmwo.ng_num,
+            mmwo.close_reason,
+            mmwo.extend_content,
+            mmwo.created_by,
+            mmwo.created_date,
+            mmwo.last_upd_by,
+            mmwo.last_upd_date,
+            mmwo.active_flag,
+            mmwo.main_flag,
+            mmo.plan_num,
+            mp.product_code ,
+            mp.product_name ,
+            mp.unit,
+            mc.customer_name as ow_name
+        from
+            micro_manufacture_work_order mmwo
+        left join micro_product mp on
+            mmwo.product_seq = mp.product_seq
+        left join micro_manufacture_order mmo on
+            mmwo .order_no = mmo.order_no
+        left join micro_customer mc on
+            mc.customer_code = mmo.ow_code
+    </sql>
+
+    <sql id="selectMicroManufactureWorkOrderVoThird">
+        select
+            mmwo.id,
+            mmwo.tenant_code,
+            mmwo.work_order_no,
+            mmwo.order_no,
+            mmwo.product_seq,
+            mmwo.wshop_code,
+            mmwo.mline_code,
+            mmwo.work_order_num,
+            mmwo.delivery_date,
+            mmwo.plan_start_date,
+            mmwo.plan_end_date,
+            mmwo.produce_start_date,
+            mmwo.produce_end_date,
+            mmwo.work_order_status,
+            mw.wshop_name ,
+            mml.mline_name,
+            mmt.pass_num
+        from
+            micro_manufacture_work_order mmwo
+            left join micro_workshop mw on
+            mmwo.wshop_code = mw.wshop_code
+            left join micro_manufacture_line mml on
+            mmwo.mline_code = mml.mline_code
+            left join micro_manufacture_task mmt on mmt.work_order_no=mmwo.work_order_no and mmt.is_last_process='0'
+    </sql>
+
+    <sql id="selectMicroManufactureWorkOrderVoFourth">
+        select
+            mmwo.id,
+            mmwo.tenant_code,
+            mmwo.work_order_no,
+            mmwo.order_no,
+            mmwo.word_order_type,
+            mmwo.product_seq,
+            mmwo.wshop_code,
+            mmwo.mline_code,
+            mmwo.work_order_num,
+            mmwo.delivery_date,
+            mmwo.plan_start_date,
+            mmwo.plan_end_date,
+            mmwo.produce_start_date,
+            mmwo.produce_end_date,
+            mmwo.work_order_status,
+            mmwo.before_status,
+            mmwo.remark,
+            mmwo.send_by,
+            mmwo.send_date,
+            mmwo.inbound_date,
+            mmwo.finish_num,
+            mmwo.ng_num,
+            mmwo.close_reason,
+            mmwo.extend_content,
+            mmwo.created_by,
+            mmwo.created_date,
+            mmwo.last_upd_by,
+            mmwo.last_upd_date,
+            mmwo.active_flag,
+            mmwo.main_flag,
+            mmwo.is_complete,
+            mp.id as product_id,
+            mp.product_code ,
+            mp.product_name ,
+            mp.unit,
+            mp.product_type,
+            mp.production_mode
+        from
+            micro_manufacture_work_order mmwo
+        left join micro_product mp on
+            mmwo.product_seq = mp.product_seq
+    </sql>
+
+    <select id="selectMicroManufactureWorkOrderList" parameterType="MicroManufactureWorkOrder" resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVo"/>
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="workOrderNo != null  and workOrderNo != ''">and work_order_no = #{workOrderNo}</if>
+            <if test="orderNo != null  and orderNo != ''">and order_no = #{orderNo}</if>
+            <if test="wordOrderType != null  and wordOrderType != ''">and word_order_type = #{wordOrderType}</if>
+            <if test="productSeq != null  and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="wshopCode != null  and wshopCode != ''">and wshop_code = #{wshopCode}</if>
+            <if test="mlineCode != null  and mlineCode != ''">and mline_code = #{mlineCode}</if>
+            <if test="workOrderNum != null ">and work_order_num = #{workOrderNum}</if>
+            <if test="deliveryDate != null ">and delivery_date = #{deliveryDate}</if>
+            <if test="planStartDate != null ">and plan_start_date &gt;= #{planStartDate}</if>
+            <if test="planEndDate != null ">and plan_end_date &lt;= #{planEndDate}</if>
+            <if test="produceStartDate != null ">and produce_start_date = #{produceStartDate}</if>
+            <if test="produceEndDate != null ">and produce_end_date = #{produceEndDate}</if>
+            <if test="workOrderStatus != null  and workOrderStatus != ''">and work_order_status = #{workOrderStatus}</if>
+            <if test="beforeStatus != null  and beforeStatus != ''">and before_status = #{beforeStatus}</if>
+            <if test="sendBy != null ">and send_by = #{sendBy}</if>
+            <if test="sendDate != null ">and send_date = #{sendDate}</if>
+            <if test="inboundDate != null ">and inbound_date = #{inboundDate}</if>
+            <if test="finishNum != null ">and finish_num = #{finishNum}</if>
+            <if test="ngNum != null ">and ng_num = #{ngNum}</if>
+            <if test="closeReason != null  and closeReason != ''">and close_reason = #{closeReason}</if>
+            <if test="extendContent != null  and extendContent != ''">and extend_content = #{extendContent}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and active_flag = #{activeFlag}</if>
+            <if test="mainFlag != null  and mainFlag != ''">and main_flag = #{mainFlag}</if>
+            <if test="isComplete != null  and isComplete != ''">and is_complete = #{isComplete}</if>
+        </where>
+    </select>
+    
+    <select id="selectMicroManufactureWorkOrderById" parameterType="Long" resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVoFirst"/>
+        where mmwo.id = #{id}
+    </select>
+
+    <select id="selectMicroManufactureWorkOrderByWorkOrderNo" parameterType="java.lang.String" resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVo"/>
+        where work_order_no = #{workOrderNo}
+    </select>
+
+    <select id="getOrderNoByNo"  resultMap="MicroManufactureWorkOrderResult">
+        select * from micro_manufacture_work_order
+        where work_order_no in
+        <foreach item="workOrderNo" collection="workOrderNoList" open="(" separator="," close=")">
+            #{workOrderNo}
+        </foreach>
+        and main_flag='1'
+    </select>
+
+
+    <select id="countWorkOrderByCondition" resultType="java.lang.Integer">
+        select count(1) from micro_manufacture_work_order mmwo
+        left join micro_product mp on
+        mmwo.product_seq = mp.product_seq
+        left join micro_workshop mw on
+        mmwo.wshop_code = mw.wshop_code
+        left join micro_manufacture_line mml on
+        mmwo.mline_code = mml.mline_code
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''"> and mmwo.tenant_code = #{tenantCode}</if>
+            <if test="queryNo != null  and queryNo != ''"> and (mmwo.work_order_no like concat('%', #{queryNo}, '%') or mmwo.order_no like concat('%', #{queryNo}, '%'))</if>
+            <if test="orderNo != null  and orderNo != ''"> and mmwo.order_no = #{orderNo}</if>
+            <if test="workOrderNo != null  and workOrderNo != ''"> and mmwo.work_order_no = #{workOrderNo}</if>
+            <if test="wordOrderType != null  and wordOrderType != ''"> and mmwo.word_order_type = #{wordOrderType}</if>
+            <if test="productSeq != null  and productSeq != ''"> and mmwo.product_seq = #{productSeq}</if>
+            <if test="productName != null  and productName != ''"> and (mp.product_name like concat('%', #{productName}, '%') or mp.product_code like concat('%', #{productName}, '%'))</if>
+            <if test="wshopCode != null  and wshopCode != ''"> and (mmwo.wshop_code like concat('%', #{wshopCode}, '%') or mw.wshop_name like concat('%', #{wshopCode}, '%'))</if>
+            <if test="mlineCode != null  and mlineCode != ''"> and (mmwo.mline_code like concat('%', #{mlineCode}, '%') or mml.mline_name like concat('%', #{mlineCode}, '%'))</if>
+            <if test="planStartDate != null ">
+                <![CDATA[ and date_format(mmwo.plan_start_date, '%Y-%m-%d') >= date_format(#{planStartDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="planEndDate != null ">
+                <![CDATA[ and date_format(mmwo.plan_start_date, '%Y-%m-%d') <= date_format(#{planEndDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="workOrderStatus != null  and workOrderStatus != ''"> and mmwo.work_order_status = #{workOrderStatus}</if>
+            <if test="extendContent != null  and extendContent != ''"> and mmwo.extend_content = #{extendContent}</if>
+            <if test="overDateFlag == 1">
+                <![CDATA[ and date_format(mmwo.plan_end_date, '%Y-%m-%d') < date_format(CURRENT_DATE, '%Y-%m-%d')]]>
+            </if>
+        </where>
+    </select>
+
+    <select id="getStatusCountByTask" resultType="java.lang.Integer">
+        select count(1) from micro_manufacture_work_order mmwo
+        left join micro_product mp on
+        mmwo.product_seq = mp.product_seq
+        left join micro_workshop mw on
+        mmwo.wshop_code = mw.wshop_code
+        left join micro_manufacture_line mml on
+        mmwo.mline_code = mml.mline_code
+        <where>
+            <if test="tenantCode != null  and tenantCode != ''"> and mmwo.tenant_code = #{tenantCode}</if>
+            <if test="queryNo != null  and queryNo != ''"> and (mmwo.work_order_no like concat('%', #{queryNo}, '%') or mmwo.order_no like concat('%', #{queryNo}, '%'))</if>
+            <if test="orderNo != null  and orderNo != ''"> and mmwo.order_no = #{orderNo}</if>
+            <if test="workOrderNo != null  and workOrderNo != ''"> and mmwo.work_order_no = #{workOrderNo}</if>
+            <if test="wordOrderType != null  and wordOrderType != ''"> and mmwo.word_order_type = #{wordOrderType}</if>
+            <if test="productSeq != null  and productSeq != ''"> and mmwo.product_seq = #{productSeq}</if>
+            <if test="productName != null  and productName != ''"> and (mp.product_name like concat('%', #{productName}, '%') or mp.product_code like concat('%', #{productName}, '%'))</if>
+            <if test="wshopCode != null  and wshopCode != ''"> and mmwo.wshop_code = #{wshopCode}</if>
+            <if test="mlineCode != null  and mlineCode != ''"> and mmwo.mline_code = #{mlineCode}</if>
+            <if test="wshopName != null  and wshopName != ''"> and (mmwo.wshop_code like concat('%', #{wshopName}, '%') or mw.wshop_name like concat('%', #{wshopName}, '%'))</if>
+            <if test="mlineName != null  and mlineName != ''"> and (mmwo.mline_code like concat('%', #{mlineName}, '%') or mml.mline_name like concat('%', #{mlineName}, '%'))</if>
+            <if test="planStartDate != null ">
+                <![CDATA[ and date_format(mmwo.plan_start_date, '%Y-%m-%d') >= date_format(#{planStartDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="planEndDate != null ">
+                <![CDATA[ and date_format(mmwo.plan_end_date, '%Y-%m-%d') <= date_format(#{planEndDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="workOrderStatus != null  and workOrderStatus != ''"> and mmwo.work_order_status = #{workOrderStatus}</if>
+            <if test="extendContent != null  and extendContent != ''"> and mmwo.extend_content = #{extendContent}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroManufactureWorkOrderListByCondition" parameterType="MicroManufactureWorkOrder" resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVoFirst"/>
+        <where>
+            <if test="workOrderNo != null and workOrderNo != ''"> and mmwo.work_order_no = #{workOrderNo}</if>
+            <if test="orderNo != null  and orderNo != ''"> and mmwo.order_no = #{orderNo}</if>
+            <if test="tenantCode != null  and tenantCode != ''"> and mmwo.tenant_code = #{tenantCode}</if>
+            <if test="queryNo != null  and queryNo != ''"> and (mmwo.work_order_no like concat('%', #{queryNo}, '%') or mmwo.order_no like concat('%', #{queryNo}, '%'))</if>
+            <if test="wordOrderType != null  and wordOrderType != ''"> and mmwo.word_order_type = #{wordOrderType}</if>
+            <if test="productSeq != null  and productSeq != ''"> and mmwo.product_seq = #{productSeq}</if>
+            <if test="productName != null  and productName != ''"> and (mp.product_name like concat('%', #{productName}, '%') or mp.product_code like concat('%', #{productName}, '%'))</if>
+            <if test="wshopCode != null  and wshopCode != ''"> and (mmwo.wshop_code like concat('%', #{wshopCode}, '%') or mw.wshop_name like concat('%', #{wshopCode}, '%'))</if>
+            <if test="mlineCode != null  and mlineCode != ''"> and (mmwo.mline_code like concat('%', #{mlineCode}, '%') or mml.mline_name like concat('%', #{mlineCode}, '%'))</if>
+            <if test="planStartDate != null ">
+                <![CDATA[ and date_format(mmwo.plan_start_date, '%Y-%m-%d') >= date_format(#{planStartDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="planEndDate != null ">
+                <![CDATA[ and date_format(mmwo.plan_start_date, '%Y-%m-%d') <= date_format(#{planEndDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="workOrderStatus != null  and workOrderStatus != ''"> and work_order_status = #{workOrderStatus}</if>
+            <if test="extendContent != null  and extendContent != ''"> and extend_content = #{extendContent}</if>
+            <if test="overDateFlag == 1">
+                <![CDATA[ and date_format(mmwo.plan_end_date, '%Y-%m-%d') < date_format(CURRENT_DATE, '%Y-%m-%d')]]>
+            </if>
+             <if test="availableFlag == 1">
+                 and work_order_status in ('10', '20')
+             </if>
+        </where>
+        order by mmwo.plan_start_date desc, mmwo.id desc
+    </select>
+
+    <insert id="insertMicroManufactureWorkOrder" parameterType="MicroManufactureWorkOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_manufacture_work_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="workOrderNo != null and workOrderNo != ''">work_order_no,</if>
+            <if test="orderNo != null">order_no,</if>
+            <if test="wordOrderType != null">word_order_type,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="wshopCode != null">wshop_code,</if>
+            <if test="mlineCode != null">mline_code,</if>
+            <if test="workOrderNum != null">work_order_num,</if>
+            <if test="deliveryDate != null">delivery_date,</if>
+            <if test="planStartDate != null">plan_start_date,</if>
+            <if test="planEndDate != null">plan_end_date,</if>
+            <if test="produceStartDate != null">produce_start_date,</if>
+            <if test="produceEndDate != null">produce_end_date,</if>
+            <if test="workOrderStatus != null and workOrderStatus != ''">work_order_status,</if>
+            <if test="beforeStatus != null">before_status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="sendBy != null">send_by,</if>
+            <if test="sendDate != null">send_date,</if>
+            <if test="inboundDate != null">inbound_date,</if>
+            <if test="finishNum != null">finish_num,</if>
+            <if test="ngNum != null">ng_num,</if>
+            <if test="closeReason != null">close_reason,</if>
+            <if test="extendContent != null">extend_content,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="mainFlag != null">main_flag,</if>
+            <if test="isComplete != null">is_complete,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="workOrderNo != null and workOrderNo != ''">#{workOrderNo},</if>
+            <if test="orderNo != null">#{orderNo},</if>
+            <if test="wordOrderType != null">#{wordOrderType},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="wshopCode != null">#{wshopCode},</if>
+            <if test="mlineCode != null">#{mlineCode},</if>
+            <if test="workOrderNum != null">#{workOrderNum},</if>
+            <if test="deliveryDate != null">#{deliveryDate},</if>
+            <if test="planStartDate != null">#{planStartDate},</if>
+            <if test="planEndDate != null">#{planEndDate},</if>
+            <if test="produceStartDate != null">#{produceStartDate},</if>
+            <if test="produceEndDate != null">#{produceEndDate},</if>
+            <if test="workOrderStatus != null and workOrderStatus != ''">#{workOrderStatus},</if>
+            <if test="beforeStatus != null">#{beforeStatus},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="sendBy != null">#{sendBy},</if>
+            <if test="sendDate != null">#{sendDate},</if>
+            <if test="inboundDate != null">#{inboundDate},</if>
+            <if test="finishNum != null">#{finishNum},</if>
+            <if test="ngNum != null">#{ngNum},</if>
+            <if test="closeReason != null">#{closeReason},</if>
+            <if test="extendContent != null">#{extendContent},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="mainFlag != null">#{mainFlag},</if>
+            <if test="isComplete != null">#{isComplete},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMicroManufactureWorkOrder" parameterType="MicroManufactureWorkOrder">
+        update micro_manufacture_work_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="workOrderNo != null and workOrderNo != ''">work_order_no = #{workOrderNo},</if>
+            <if test="orderNo != null">order_no = #{orderNo},</if>
+            <if test="wordOrderType != null">word_order_type = #{wordOrderType},</if>
+            <if test="productSeq != null and productSeq != ''">product_seq = #{productSeq},</if>
+            <if test="wshopCode != null">wshop_code = #{wshopCode},</if>
+            <if test="mlineCode != null">mline_code = #{mlineCode},</if>
+            <if test="workOrderNum != null">work_order_num = #{workOrderNum},</if>
+            <if test="deliveryDate != null">delivery_date = #{deliveryDate},</if>
+            <if test="planStartDate != null">plan_start_date = #{planStartDate},</if>
+            <if test="planEndDate != null">plan_end_date = #{planEndDate},</if>
+            <if test="produceStartDate != null">produce_start_date = #{produceStartDate},</if>
+            <if test="produceEndDate != null">produce_end_date = #{produceEndDate},</if>
+            <if test="workOrderStatus != null and workOrderStatus != ''">work_order_status = #{workOrderStatus},</if>
+            <if test="beforeStatus != null">before_status = #{beforeStatus},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="sendBy != null">send_by = #{sendBy},</if>
+            <if test="sendDate != null">send_date = #{sendDate},</if>
+            <if test="inboundDate != null">inbound_date = #{inboundDate},</if>
+            <if test="finishNum != null">finish_num = #{finishNum},</if>
+            <if test="ngNum != null">ng_num = #{ngNum},</if>
+            <if test="closeReason != null">close_reason = #{closeReason},</if>
+            <if test="extendContent != null">extend_content = #{extendContent},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="mainFlag != null">main_flag = #{mainFlag},</if>
+            <if test="isComplete != null">is_complete = #{isComplete},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="batchUpdateManufactureWorkOrder">
+        update micro_manufacture_work_order
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="before_status =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id=#{item.id} then #{item.beforeStatus}
+                </foreach>
+            </trim>
+            <trim prefix="work_order_status =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.workOrderStatus !=null and item.workOrderStatus != ''">
+                        when id=#{item.id} then #{item.workOrderStatus}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="last_upd_by =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    <if test="item.lastUpdBy !=null and item.lastUpdBy != ''">
+                        when id=#{item.id} then #{item.lastUpdBy}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <update id="updateMicroManufactureWorkOrder4Status">
+        update micro_manufacture_work_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="produceEndDate != null">produce_end_date = #{produceEndDate},</if>
+            <if test="workOrderStatus != null and workOrderStatus != ''">work_order_status = #{workOrderStatus},</if>
+            before_status = #{beforeStatus},
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+        </trim>
+        where id = #{id} and work_order_status!= #{workOrderStatus}
+    </update>
+
+    <delete id="deleteMicroManufactureWorkOrderById" parameterType="Long">
+        delete from micro_manufacture_work_order where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroManufactureWorkOrderByIds" parameterType="String">
+        delete from micro_manufacture_work_order where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getMicroManufactureTaskList" parameterType="MicroManufactureWorkOrder" resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVoFirst"/>
+        where mmwo.work_order_status in ('20','30')
+        <if test="productSeq != null  and productSeq != ''"> and  mmwo.product_seq = #{productSeq}</if>
+            <if test="queryNo != null  and queryNo != ''">
+                and (mmwo.work_order_no like concat('%', #{queryNo}, '%') OR mmwo.order_no like concat('%', #{queryNo}, '%'))
+            </if>
+            <if test="productName != null  and productName != ''">
+                and (mp.product_name like concat('%', #{productName}, '%') OR mp.product_code like concat('%', #{productName}, '%'))
+             </if>
+            <if test="wshopCode != null  and wshopCode != ''"> and mmwo.wshop_code = #{wshopCode}</if>
+            <if test="mlineCode != null  and mlineCode != ''"> and mmwo.mline_code = #{mlineCode}</if>
+            <if test="planStartDate != null ">
+                <![CDATA[ and date_format(mmwo.plan_start_date, '%Y-%m-%d') >= date_format(#{planStartDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="planEndDate != null ">
+                <![CDATA[ and date_format(mmwo.plan_end_date, '%Y-%m-%d') <= date_format(#{planEndDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="workOrderStatus != null  and workOrderStatus != ''"> and mmwo.work_order_status = #{workOrderStatus}</if>
+        order by  mmwo.created_date desc
+    </select>
+    <select id="selectWorkOrderListWithCustomerAndProduct" parameterType="MicroManufactureWorkOrder"
+            resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVoSecond"/>
+        <where>
+            mmwo.order_no is not null
+            <if test="productSeq != null  and productSeq != ''">and mmwo.product_seq = #{productSeq}</if>
+            <if test="orderNo != null  and orderNo != ''">and mmwo.order_no like concat('%', #{orderNo}, '%')</if>
+            <if test="owName != null  and owName != ''">
+                and (mc.customer_name like concat('%', #{owName}, '%') OR mc.customer_code like concat('%', #{owName},
+                '%'))
+            </if>
+            <if test="productName != null  and productName != ''">
+                and (mp.product_name like concat('%', #{productName}, '%') OR mp.product_code like concat('%',
+                #{productName}, '%'))
+            </if>
+            <if test="wshopCode != null  and wshopCode != ''">and mmwo.wshop_code = #{wshopCode}</if>
+            <if test="mlineCode != null  and mlineCode != ''">and mmwo.mline_code = #{mlineCode}</if>
+            <if test="planStartDate != null ">
+                <![CDATA[ and date_format(mmwo.delivery_date, '%Y-%m-%d') >= date_format(#{planStartDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="planEndDate != null ">
+                <![CDATA[ and date_format(mmwo.delivery_date, '%Y-%m-%d') <= date_format(#{planEndDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="workOrderStatus != null  and workOrderStatus != ''">and work_order_status = #{workOrderStatus}
+            </if>
+            <if test="orderStatusList != null and orderStatusList.size() > 0">
+                and mmo.order_status in
+                <foreach collection="orderStatusList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="mainFlag != null  and mainFlag != ''">and main_flag = #{mainFlag}</if>
+        </where>
+        order by mmwo.created_date desc
+    </select>
+
+    <update id="addWorkOrderFinishNum">
+        update micro_manufacture_work_order
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="finish_num =case" suffix="end,">
+                <foreach collection="workOrderList" item="i" index="index">
+                    <if test="i.finishNum!=null">
+                        when work_order_no=#{i.workOrderNo} then finish_num + #{i.finishNum}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="ng_num =case" suffix="end,">
+                <foreach collection="workOrderList" item="i" index="index">
+                    <if test="i.ngNum!=null">
+                        when work_order_no=#{i.workOrderNo} then ng_num + #{i.ngNum}
+                    </if>
+                </foreach>
+            </trim>
+            <if test="userId!=null and userId!=''">
+                last_upd_by= #{userId},
+            </if>
+            last_upd_date= sysdate()
+        </trim>
+        where work_order_no in
+        <foreach collection="workOrderList" item="i" index="index" separator="," open="(" close=")" >
+            #{i.workOrderNo,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
+    <select id="getWorkOrderInfoBySubmit" resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVoThird"/>
+        where mmwo.work_order_no in
+        <foreach collection="workOrderNoList" item="item" index="index" separator="," open="(" close=")" >
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectMicroManufactureWorkOrderList4NotComplete" parameterType="MicroManufactureWorkOrder" resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVo"/>
+        <where>
+            work_order_status in ('10','20')
+            <if test="tenantCode != null  and tenantCode != ''"> and tenant_code = #{tenantCode}</if>
+            <if test="workOrderNo != null  and workOrderNo != ''"> and work_order_no = #{workOrderNo}</if>
+            <if test="orderNo != null  and orderNo != ''"> and order_no = #{orderNo}</if>
+        </where>
+    </select>
+
+    <select id="selectNotCompleteMicroManufactureWorkOrderList" parameterType="com.cosmo.hhim.micro.planning.domain.entity.work.MicroManufactureWorkOrderParam"
+            resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVo"/>
+        <where>
+            work_order_status in ('30','40')
+            and is_complete = '1'
+            and finish_num > 0
+            <if test="orderOrWorkNo != null and orderOrWorkNo != ''">
+                and (work_order_no like concat('%', #{orderOrWorkNo}, '%') or order_no like concat('%', #{orderOrWorkNo}, '%'))
+            </if>
+        </where>
+        order by created_date desc
+    </select>
+
+    <update id="updateCompleteFlag">
+        update micro_manufacture_work_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workOrder.isComplete != null">is_complete = #{workOrder.isComplete},</if>
+            <if test="workOrder.lastUpdBy != null and workOrder.lastUpdBy != ''">last_upd_by = #{workOrder.lastUpdBy},</if>
+            <if test="workOrder.lastUpdDate != null">last_upd_date = #{workOrder.lastUpdDate},</if>
+        </trim>
+        where id in
+        <foreach collection="ids" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="selectNormalMicroManufactureWorkOrderById" parameterType="Long" resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVo"/>
+        where id = #{id} and active_flag = '1'
+    </select>
+
+    <select id="selectMicroManufactureWorkOrderListByWorkOrderStatusList" parameterType="MicroManufactureWorkOrder" resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVo"/>
+        <where>
+            <if test="statusList != null">
+                and work_order_status in
+                <foreach item="status" collection="statusList" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="isComplete != null  and isComplete != ''">and is_complete = #{isComplete}</if>
+            <if test="planStartDate != null ">
+                <![CDATA[ and date_format(plan_start_date, '%Y-%m-%d') >= date_format(#{planStartDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="planEndDate != null ">
+                <![CDATA[ and date_format(plan_start_date, '%Y-%m-%d') <= date_format(#{planEndDate}, '%Y-%m-%d')  ]]>
+            </if>
+        </where>
+    </select>
+
+    <select id="countWorkOrderNumByCondition" parameterType="com.cosmo.hhim.micro.planning.domain.entity.work.CountWorkOrderNumQueryParam" resultType="long">
+        select count(1) from micro_manufacture_work_order
+        <where>
+            <if test="workOrderStatus != null and workOrderStatus != ''">
+                and work_order_status = #{workOrderStatus}
+            </if>
+            <if test="startDate != null ">
+                <![CDATA[ and date_format(plan_start_date, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="endDate != null ">
+                <![CDATA[ and date_format(plan_start_date, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')  ]]>
+            </if>
+            <if test="overDateFlag == 1">
+                <![CDATA[ and date_format(plan_end_date, '%Y-%m-%d') < date_format(CURRENT_DATE, '%Y-%m-%d')]]>
+            </if>
+        </where>
+    </select>
+
+    <!--    注意 以下这个sql是取的是工单产品下bom的产品信息 -->
+    <select id="selectMaterialDemandInfoByStandardBom"
+            resultType="com.cosmo.hhim.micro.planning.domain.entity.work.MicroManufactureWorkOrderMaterialEntity">
+        SELECT t.work_order_no                                   as workOrderNo,
+               mp.tenant_code                                    as tenantCode,
+               mp.id                                             as productId,
+               mp.product_seq                                    as productSeq,
+               mp.product_code                                   as productCode,
+               mp.product_name                                   as productName,
+               mp.unit                                           as productUnit,
+               t.work_order_num                                  as workOrderNum,
+               round((t.work_order_num * pb2.product_number), 4) AS demandNum,
+               t.plan_start_date                                 as planStartDate,
+               t.plan_end_date                                   as planEndDate
+        FROM (SELECT w.work_order_no,
+                     MAX(w.plan_start_date) as plan_start_date,
+                     MAX(w.plan_end_date)   as plan_end_date,
+                     SUM(w.work_order_num)  as work_order_num,
+                     w.tenant_code,
+                     pb.product_seq
+              FROM micro_manufacture_work_order w
+                       LEFT JOIN micro_product_bom pb ON w.tenant_code = pb.tenant_code AND w.product_seq = pb.product_seq
+              WHERE pb.bom_type = 'STANDARD'
+                AND pb.parent_id = '0'
+                AND w.plan_start_date &gt;= #{condition.planStartDate}
+                AND w.plan_start_date &lt;= #{condition.planEndDate}
+                AND w.work_order_status IN ('10', '20')
+              GROUP BY w.work_order_no, pb.product_seq, w.tenant_code) AS t
+                 LEFT JOIN micro_product_bom pb2 ON t.tenant_code = pb2.tenant_code AND t.product_seq = pb2.parent_product_seq
+                 LEFT JOIN micro_product mp ON pb2.product_seq = mp.product_seq AND pb2.tenant_code = mp.tenant_code
+        ORDER BY t.plan_start_date
+    </select>
+    <!--    结束-->
+    <!--    注意 以下这个sql是取的工单的产品信息,而不是工单产品下bom的产品信息 -->
+    <select id="selectMaterialShortageDetailByStandardBom"
+            resultType="com.cosmo.hhim.micro.planning.domain.entity.work.MicroManufactureWorkOrderMaterialEntity">
+        SELECT
+        t.work_order_no AS workOrderNo,
+        t.tenant_code AS tenantCode,
+        t.product_id AS productId,
+        t.product_seq AS productSeq,
+        t.product_code AS productCode,
+        t.product_name AS productName,
+        t.unit AS productUnit,
+        t.work_order_num AS workOrderNum,
+        t.work_order_num * pb2.product_number AS demandNum,
+        t.plan_start_date AS planStartDate,
+        t.plan_end_date AS planEndDate
+        FROM (
+        SELECT
+        w.work_order_no,
+        MAX(w.plan_start_date) AS plan_start_date,
+        MAX(w.plan_end_date) AS plan_end_date,
+        SUM(w.work_order_num) AS work_order_num,
+        w.tenant_code,
+        pb.product_seq,
+        mp.product_code,
+        mp.product_name,
+        mp.unit,
+        mp.id AS product_id
+        FROM micro_manufacture_work_order w
+        LEFT JOIN micro_product_bom pb ON w.tenant_code = pb.tenant_code
+        AND w.product_seq = pb.product_seq
+        LEFT JOIN micro_product mp ON w.product_seq = mp.product_seq
+        AND w.tenant_code = mp.tenant_code
+        WHERE
+        pb.bom_type = 'STANDARD'
+        AND pb.parent_id = '0'
+        AND w.plan_start_date &gt;= #{condition.planStartDate}
+        AND w.plan_start_date &lt;= #{condition.planEndDate}
+        AND w.work_order_status IN ('10', '20')
+        GROUP BY w.work_order_no,
+        pb.product_seq,
+        w.tenant_code
+        ) AS t
+        LEFT JOIN micro_product_bom pb2 ON t.tenant_code = pb2.tenant_code
+        AND t.product_seq = pb2.parent_product_seq
+        <if test="condition.productSeq !=null and condition.productSeq !=''">
+            WHERE pb2.product_seq = #{condition.productSeq}
+        </if>
+        ORDER BY t.plan_start_date
+    </select>
+    <!--    结束 -->
+
+    <select id="getAllExistWorkOrderNoListInCurrentDate" resultType="java.lang.String">
+        select work_order_no
+        from micro_manufacture_work_order
+        where work_order_no like CONCAT('MO', DATE_FORMAT(CURRENT_DATE, '%y%m%d'), '%')
+    </select>
+    <select id="selectReProductByProductIds"
+            resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        SELECT mp.id as itemId,
+        mp.product_seq as itemSeq,
+        mp.product_code as itemCode,
+        mp.product_name as itemName
+        FROM micro_manufacture_work_order mmwo
+        INNER JOIN micro_product mp
+        ON mmwo.tenant_code = mp.tenant_code AND mmwo.product_seq = mp.product_seq
+        WHERE
+        mp.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectMicroMainManufactureWorkOrderByOrderNoList" resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVo"/>
+        <where>
+            main_flag = 1
+            <if test="orderNoList != null">
+                and order_no in
+                <foreach collection="orderNoList" item="orderNo" separator="," open="(" close=")">
+                    #{orderNo}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectSimpleWorkOrderInfoListByWorkOrderList"
+            resultMap="MicroManufactureWorkOrderResult">
+        <include refid="selectMicroManufactureWorkOrderVoFourth"/>
+        <where>
+            <if test="workOrderList != null">
+                and work_order_no in
+                <foreach collection="workOrderList" item="workOrderNo" open="(" close=")" separator=",">
+                    #{workOrderNo}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

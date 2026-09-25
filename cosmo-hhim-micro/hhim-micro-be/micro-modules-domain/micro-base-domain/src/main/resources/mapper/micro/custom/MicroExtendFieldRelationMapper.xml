@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.custom.MicroExtendFieldRelationMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.custom.MicroExtendFieldRelation"
+               id="MicroExtendFieldRelationResult">
+        <result property="id" column="id"/>
+        <result property="extFieldId" column="ext_field_id"/>
+        <result property="businessCode" column="business_code"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="remark" column="remark"/>
+        <result property="sequence" column="sequence"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="extField" column="ext_field"/>
+        <result property="extFieldLabel" column="ext_field_label"/>
+        <result property="fieldType" column="field_type"/>
+        <result property="extFieldOption" column="ext_field_option"/>
+    </resultMap>
+
+    <sql id="selectMicroExtendFieldRelationVo">
+        select id, ext_field_id, business_code, active_flag, created_by, created_date, last_upd_by, last_upd_date, remark, sequence, tenant_code from micro_extend_field_relation
+    </sql>
+
+    <sql id="selectMicroExtendFieldRelationVoFirst">
+        select
+            mefr.id,
+            mefr.ext_field_id,
+            mefr.business_code,
+            mefr.active_flag,
+            mefr.created_by,
+            mefr.created_date,
+            mefr.last_upd_by,
+            mefr.last_upd_date,
+            mefr.remark,
+            mefr.`sequence`,
+            mefr.tenant_code,
+            mef.ext_field ext_field,
+            mef.ext_field_label,
+            mef.field_type,
+            mef.ext_field_option
+        from
+            micro_extend_field_relation mefr
+        left join micro_extend_field mef on
+            mefr.ext_field_id = mef.id
+    </sql>
+
+    <select id="selectMicroExtendFieldRelationList"
+            parameterType="com.cosmo.hhim.micro.base.domain.entity.custom.MicroExtendFieldRelation"
+            resultMap="MicroExtendFieldRelationResult">
+        <include refid="selectMicroExtendFieldRelationVoFirst"/>
+        <where>
+            <if test="extFieldId != null ">and mefr.ext_field_id = #{extFieldId}</if>
+            <if test="businessCode != null  and businessCode != ''">and mefr.business_code = #{businessCode}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and mefr.active_flag = #{activeFlag}</if>
+            <if test="createdBy != null  and createdBy != ''">and mefr.created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and mefr.created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and mefr.last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and mefr.last_upd_date = #{lastUpdDate}</if>
+            <if test="sequence != null ">and mefr.sequence = #{sequence}</if>
+            <if test="tenantCode != null  and tenantCode != ''">and mefr.tenant_code = #{tenantCode}</if>
+        </where>
+        order by mefr.created_date asc
+    </select>
+
+    <select id="selectMicroExtendFieldRelationById" parameterType="Long" resultMap="MicroExtendFieldRelationResult">
+        <include refid="selectMicroExtendFieldRelationVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMicroExtendFieldRelation"
+            parameterType="com.cosmo.hhim.micro.base.domain.entity.custom.MicroExtendFieldRelation"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into micro_extend_field_relation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="extFieldId != null">ext_field_id,</if>
+            <if test="businessCode != null">business_code,</if>
+            <if test="activeFlag != null">active_flag,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="remark != null">remark,</if>
+            <if test="sequence != null">sequence,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="extFieldId != null">#{extFieldId},</if>
+            <if test="businessCode != null">#{businessCode},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="sequence != null">#{sequence},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+        </trim>
+    </insert>
+
+    <insert id="batchInsertExtendFieldRelations">
+        insert into micro_extend_field_relation
+        (ext_field_id, business_code, active_flag, created_by, created_date, last_upd_by, last_upd_date,
+        remark, sequence, tenant_code) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.extFieldId},
+            #{item.businessCode},
+            #{item.activeFlag},
+            #{item.createdBy},
+            #{item.createdDate},
+            #{item.lastUpdBy},
+            #{item.lastUpdDate},
+            #{item.remark},
+            #{item.sequence},
+            #{item.tenantCode})
+        </foreach>
+    </insert>
+
+    <update id="updateMicroExtendFieldRelation"
+            parameterType="com.cosmo.hhim.micro.base.domain.entity.custom.MicroExtendFieldRelation">
+        update micro_extend_field_relation
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="extFieldId != null">ext_field_id = #{extFieldId},</if>
+            <if test="businessCode != null">business_code = #{businessCode},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="sequence != null">sequence = #{sequence},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroExtendFieldRelationById" parameterType="Long">
+        delete from micro_extend_field_relation where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroExtendFieldRelationByIds" parameterType="String">
+        delete from micro_extend_field_relation where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

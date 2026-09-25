@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.common.MicroExperienceGuideGroupMapper">
+
+    <resultMap type="MicroExperienceGuideGroup" id="MicroExperienceGuideGroupResult">
+        <result property="id" column="id"/>
+        <result property="groupCode" column="group_code"/>
+        <result property="groupName" column="group_name"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="activeFlag" column="active_flag"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <sql id="selectMicroExperienceGuideGroupVo">
+        select id,
+               group_code,
+               group_name,
+               status,
+               remark,
+               active_flag,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date
+        from micro_experience_guide_group
+    </sql>
+
+    <select id="selectMicroExperienceGuideGroupList" parameterType="MicroExperienceGuideGroup" resultMap="MicroExperienceGuideGroupResult">
+        <include refid="selectMicroExperienceGuideGroupVo"/>
+        <where>
+            <if test="groupCode != null  and groupCode != ''">and group_code = #{groupCode}</if>
+            <if test="groupName != null  and groupName != ''">and group_name like concat('%', #{groupName}, '%')</if>
+            <if test="status != null  and status != ''">and status = #{status}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and active_flag = #{activeFlag}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroExperienceGuideGroupByCode" parameterType="java.lang.String" resultMap="MicroExperienceGuideGroupResult">
+        <include refid="selectMicroExperienceGuideGroupVo"/>
+        where active_flag = '0' and group_code = #{groupCode}
+    </select>
+
+    <insert id="insertMicroExperienceGuideGroup" parameterType="MicroExperienceGuideGroup" useGeneratedKeys="true" keyProperty="id">
+        insert into micro_experience_guide_group
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="groupCode != null and groupCode != ''">group_code,</if>
+            <if test="groupName != null">group_name,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="activeFlag != null and activeFlag != ''">active_flag,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="groupCode != null and groupCode != ''">#{groupCode},</if>
+            <if test="groupName != null">#{groupName},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="activeFlag != null and activeFlag != ''">#{activeFlag},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroExperienceGuideGroup" parameterType="MicroExperienceGuideGroup">
+        update micro_experience_guide_group
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="groupName != null">group_name = #{groupName},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where group_code = #{groupCode} and active_flag = '0'
+    </update>
+
+    <update id="updateAllGuideGroupDone" parameterType="MicroExperienceGuideGroup">
+        update micro_experience_guide_group
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="groupName != null">group_name = #{groupName},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where active_flag = '0'
+    </update>
+
+    <delete id="deleteMicroExperienceGuideGroupById" parameterType="Long">
+        delete
+        from micro_experience_guide_group
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroExperienceGuideGroupByIds" parameterType="String">
+        delete from micro_experience_guide_group where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

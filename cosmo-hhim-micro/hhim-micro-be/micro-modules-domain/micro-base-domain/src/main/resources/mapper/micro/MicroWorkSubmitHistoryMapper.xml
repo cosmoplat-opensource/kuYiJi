@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.submit.MicroWorkSubmitHistoryMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitHistory" id="MicroWorkSubmitHistoryResult">
+        <result property="id" column="id"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productName" column="product_name"/>
+        <result property="preProcessSeq" column="pre_process_seq"/>
+        <result property="preProcessCode" column="pre_process_code"/>
+        <result property="preProcessName" column="pre_process_name"/>
+        <result property="preProcessGroup" column="pre_process_group"/>
+        <result property="operateProcessSeq" column="operate_process_seq"/>
+        <result property="operateProcessCode" column="operate_process_code"/>
+        <result property="operateProcessName" column="operate_process_name"/>
+        <result property="operateProcessGroup" column="operate_process_group"/>
+        <result property="isLastProcess" column="is_last_process"/>
+        <result property="passNum" column="pass_num"/>
+        <result property="ngNum" column="ng_num"/>
+        <result property="repairNum" column="repair_num"/>
+        <result property="concessionNum" column="concession_num"/>
+        <result property="abandonedNum" column="abandoned_num"/>
+        <result property="settledNum" column="settled_num"/>
+        <result property="submitUser" column="submit_user"/>
+        <result property="submitDay" column="submit_day"/>
+        <result property="submitStatus" column="submit_status"/>
+        <result property="submitNo" column="submit_no"/>
+        <result property="remark" column="remark"/>
+        <result property="dataStatus" column="data_status"/>
+        <result property="operateNode" column="operate_node"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="submitPictures" column="submit_pictures"/>
+        <result property="isFirstProcess" column="is_first_process"/>
+        <result property="isComplete" column="is_complete"/>
+    </resultMap>
+
+    <resultMap id="MicroWorkSubmitHistoryDtoResult" type="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitHistoryDto"
+               extends="MicroWorkSubmitHistoryResult">
+        <result property="operatorName" column="operator_name"/>
+    </resultMap>
+
+    <sql id="selectMicroWorkSubmitHistoryVo">
+        select id,
+               tenant_code,
+               product_seq,
+               product_code,
+               product_name,
+               pre_process_seq,
+               pre_process_code,
+               pre_process_name,
+               pre_process_group,
+               operate_process_seq,
+               operate_process_code,
+               operate_process_name,
+               operate_process_group,
+               is_last_process,
+               pass_num,
+               ng_num,
+               submit_user,
+               submit_day,
+               submit_status,
+               submit_no,
+               remark,
+               data_status,
+               operate_node,
+               submit_pictures,
+               created_by,
+               created_date,
+               is_first_process,
+               is_complete
+        from micro_work_submit_history
+    </sql>
+
+    <select id="selectMicroWorkSubmitHistoryById" resultMap="MicroWorkSubmitHistoryResult">
+        <include refid="selectMicroWorkSubmitHistoryVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectMicroWorkSubmitHistoryList" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitHistory"
+            resultMap="MicroWorkSubmitHistoryResult">
+        <include refid="selectMicroWorkSubmitHistoryVo"/>
+        <where>
+            <if test="submitNo != null  and submitNo != ''">and submit_no = #{submitNo}</if>
+            <if test="productSeq != null  and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="productCode != null  and productCode != ''">and product_code = #{productCode}</if>
+            <if test="productName != null  and productName != ''">and product_name = #{productName}</if>
+            <if test="preProcessSeq != null  and preProcessSeq != ''">and pre_process_seq = #{preProcessSeq}</if>
+            <if test="operateProcessSeq != null  and operateProcessSeq != ''">and operate_process_seq = #{operateProcessSeq}</if>
+            <if test="preProcessGroup != null  and preProcessGroup != ''">and pre_process_group = #{preProcessGroup}</if>
+            <if test="operateProcessGroup != null  and operateProcessGroup != ''">and operate_process_group = #{operateProcessGroup}</if>
+            <if test="isLastProcess != null  and isLastProcess != ''">and is_last_process = #{isLastProcess}</if>
+            <if test="submitUser != null  and submitUser != ''">and submit_user = #{submitUser}</if>
+            <if test="submitDay != null ">and submit_day = #{submitDay}</if>
+            <if test="submitStatus != null ">and submit_status = #{submitStatus}</if>
+            <if test="submitNo != null  and submitNo != ''">and submit_no = #{submitNo}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="dataStatus != null ">and data_status = #{dataStatus}</if>
+            <if test="operateNode != null and operateNode != '' ">and operate_node = #{operateNode}</if>
+            <if test="isFirstProcess != null  and isFirstProcess != ''">and is_first_process = #{isFirstProcess}</if>
+            <if test="isComplete != null  and isComplete != ''">and is_complete = #{isComplete}</if>
+        </where>
+        ORDER BY created_date DESC
+    </select>
+
+    <select id="selectMicroWorkSubmitHistoryExList" parameterType="com.cosmo.hhim.micro.base.domain.entity.submit.MicroWorkSubmitHistory"
+            resultMap="MicroWorkSubmitHistoryDtoResult">
+        select mwsh.id,
+        mwsh.tenant_code,
+        mwsh.product_seq,
+        mwsh.product_code,
+        mwsh.product_name,
+        mwsh.pre_process_seq,
+        mwsh.pre_process_code,
+        mwsh.pre_process_name,
+        mwsh.pre_process_group,
+        mwsh.operate_process_seq,
+        mwsh.operate_process_code,
+        mwsh.operate_process_name,
+        mwsh.operate_process_group,
+        mwsh.is_last_process,
+        mwsh.pass_num,
+        mwsh.ng_num,
+        mwsh.repair_num,
+        mwsh.concession_num,
+        mwsh.abandoned_num,
+        mwsh.settled_num,
+        mwsh.submit_user,
+        mwsh.submit_day,
+        mwsh.submit_status,
+        mwsh.submit_no,
+        mwsh.remark,
+        mwsh.data_status,
+        mwsh.operate_node,
+        mwsh.created_by,
+        mwsh.created_date,
+        mwsh.submit_pictures,
+        mwsh.is_first_process,
+        mwsh.is_complete,
+        mu.nick_name as operator_name
+        from micro_work_submit_history mwsh
+        inner join micro_user mu on mwsh.created_by = mu.id
+        <where>
+            <if test="submitNo != null  and submitNo != ''">and mwsh.submit_no = #{submitNo}</if>
+            <if test="productSeq != null  and productSeq != ''">and mwsh.product_seq = #{productSeq}</if>
+            <if test="productCode != null  and productCode != ''">and mwsh.product_code = #{productCode}</if>
+            <if test="productName != null  and productName != ''">and mwsh.product_name = #{productName}</if>
+            <if test="preProcessSeq != null  and preProcessSeq != ''">and mwsh.pre_process_seq = #{preProcessSeq}</if>
+            <if test="operateProcessSeq != null  and operateProcessSeq != ''">and mwsh.operate_process_seq = #{operateProcessSeq}</if>
+            <if test="preProcessGroup != null  and preProcessGroup != ''">and mwsh.pre_process_group = #{preProcessGroup}</if>
+            <if test="operateProcessGroup != null  and operateProcessGroup != ''">and mwsh.operate_process_group = #{operateProcessGroup}</if>
+            <if test="isLastProcess != null  and isLastProcess != ''">and mwsh.is_last_process = #{isLastProcess}</if>
+            <if test="submitUser != null  and submitUser != ''">and mwsh.submit_user = #{submitUser}</if>
+            <if test="submitDay != null ">and mwsh.submit_day = #{submitDay}</if>
+            <if test="submitStatus != null ">and mwsh.submit_status = #{submitStatus}</if>
+            <if test="submitNo != null  and submitNo != ''">and mwsh.submit_no = #{submitNo}</if>
+            <if test="createdBy != null  and createdBy != ''">and mwsh.created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and mwsh.created_date = #{createdDate}</if>
+            <if test="dataStatus != null ">and mwsh.data_status = #{dataStatus}</if>
+            <if test="operateNode != null and operateNode != '' ">and mwsh.operate_node = #{operateNode}</if>
+            <if test="isFirstProcess != null  and isFirstProcess != ''">and mwsh.is_first_process = #{isFirstProcess}</if>
+            <if test="isComplete != null  and isComplete != ''">and mwsh.is_complete = #{isComplete}</if>
+        </where>
+        ORDER BY mwsh.created_date DESC
+    </select>
+
+    <insert id="insertMicroWorkSubmitHistory" keyProperty="id" useGeneratedKeys="true">
+        insert into micro_work_submit_history
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="productSeq != null and productSeq != ''">product_seq,</if>
+            <if test="productCode != null and productCode != ''">product_code,</if>
+            <if test="productName != null and productName != ''">product_name,</if>
+            <if test="preProcessSeq != null and preProcessSeq != ''">pre_process_seq,</if>
+            <if test="preProcessCode != null and preProcessCode != ''">pre_process_code,</if>
+            <if test="preProcessName != null and preProcessName != ''">pre_process_name,</if>
+            <if test="preProcessGroup != null and preProcessGroup != ''">pre_process_group,</if>
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">operate_process_seq,</if>
+            <if test="operateProcessCode != null and operateProcessCode != ''">operate_process_code,</if>
+            <if test="operateProcessName != null and operateProcessName != ''">operate_process_name,</if>
+            <if test="operateProcessGroup != null and operateProcessGroup != ''">operate_process_group,</if>
+            <if test="isLastProcess != null and isLastProcess != ''">is_last_process,</if>
+            <if test="passNum != null">pass_num,</if>
+            <if test="ngNum != null">ng_num,</if>
+            <if test="submitUser != null and submitUser != ''">submit_user,</if>
+            <if test="submitDay != null">submit_day,</if>
+            <if test="submitStatus != null">submit_status,</if>
+            <if test="submitNo != null and submitNo != ''">submit_no,</if>
+            <if test="dataStatus != null">data_status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="operateNode != null and operateNode != ''">operate_node,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            submit_pictures,
+            <if test="isFirstProcess != null and isFirstProcess != ''">is_first_process,</if>
+            <if test="isComplete != null and isComplete != ''">is_complete,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="productSeq != null and productSeq != ''">#{productSeq},</if>
+            <if test="productCode != null and productCode != ''">#{productCode},</if>
+            <if test="productName != null and productName != ''">#{productName},</if>
+            <if test="preProcessSeq != null and preProcessSeq != ''">#{preProcessSeq},</if>
+            <if test="preProcessCode != null and preProcessCode != ''">#{preProcessCode},</if>
+            <if test="preProcessName != null and preProcessName != ''">#{preProcessName},</if>
+            <if test="preProcessGroup != null and preProcessGroup != ''">#{preProcessGroup},</if>
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">#{operateProcessSeq},</if>
+            <if test="operateProcessCode != null and operateProcessCode != ''">#{operateProcessCode},</if>
+            <if test="operateProcessName != null and operateProcessName != ''">#{operateProcessName},</if>
+            <if test="operateProcessGroup != null and operateProcessGroup != ''">#{operateProcessGroup},</if>
+            <if test="isLastProcess != null and isLastProcess != ''">#{isLastProcess},</if>
+            <if test="passNum != null">#{passNum},</if>
+            <if test="ngNum != null">#{ngNum},</if>
+            <if test="submitUser != null and submitUser != ''">#{submitUser},</if>
+            <if test="submitDay != null">#{submitDay},</if>
+            <if test="submitStatus != null">#{submitStatus},</if>
+            <if test="submitNo != null and submitNo != ''">#{submitNo},</if>
+            <if test="dataStatus != null">#{dataStatus},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="operateNode != null and operateNode != ''">#{operateNode},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            #{submitPictures},
+            <if test="isFirstProcess != null and isFirstProcess != ''">#{isFirstProcess},</if>
+            <if test="isComplete != null and isComplete != ''">#{isComplete},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertMicroWorkSubmitHistoryBatch">
+        insert into micro_work_submit_history
+        (tenant_code,
+        product_seq,
+        product_code,
+        product_name,
+        pre_process_seq,
+        pre_process_code,
+        pre_process_name,
+        pre_process_group,
+        operate_process_seq,
+        operate_process_code,
+        operate_process_name,
+        operate_process_group,
+        is_last_process,
+        pass_num,
+        ng_num,
+        repair_num,
+        concession_num,
+        abandoned_num,
+        settled_num,
+        submit_user,
+        submit_day,
+        submit_status,
+        submit_no,
+        data_status,
+        remark,
+        operate_node,
+        created_by,
+        created_date,
+        submit_pictures,
+        is_first_process,
+        is_complete) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.tenantCode},
+            #{item.productSeq},
+            #{item.productCode},
+            #{item.productName},
+            #{item.preProcessSeq},
+            #{item.preProcessCode},
+            #{item.preProcessName},
+            #{item.preProcessGroup},
+            #{item.operateProcessSeq},
+            #{item.operateProcessCode},
+            #{item.operateProcessName},
+            #{item.operateProcessGroup},
+            #{item.isLastProcess},
+            #{item.passNum},
+            #{item.ngNum},
+            #{item.repairNum},
+            #{item.concessionNum},
+            #{item.abandonedNum},
+            #{item.settledNum},
+            #{item.submitUser},
+            #{item.submitDay},
+            #{item.submitStatus},
+            #{item.submitNo},
+            #{item.dataStatus},
+            #{item.remark},
+            #{item.operateNode},
+            #{item.createdBy},
+            #{item.createdDate},
+            #{item.submitPictures},
+            #{item.isFirstProcess},
+            #{item.isComplete})
+        </foreach>
+    </insert>
+
+    <update id="updateMicroWorkSubmitHistory">
+        update micro_work_submit_history
+        <set>
+            <if test="tenantCode != null and tenantCode != ''">
+                tenant_code = #{tenantCode},
+            </if>
+            <if test="productSeq != null and productSeq != ''">
+                product_seq = #{productSeq},
+            </if>
+            <if test="productCode != null and productCode != ''">
+                product_code = #{productCode},
+            </if>
+            <if test="productName != null and productName != ''">
+                product_name = #{productName},
+            </if>
+            <if test="preProcessSeq != null and preProcessSeq != ''">
+                pre_process_seq = #{preProcessSeq},
+            </if>
+            <if test="preProcessCode != null and preProcessCode != ''">
+                pre_process_code = #{preProcessCode},
+            </if>
+            <if test="preProcessName != null and preProcessName != ''">
+                pre_process_name = #{preProcessName},
+            </if>
+            <if test="preProcessGroup != null and preProcessGroup != ''">
+                pre_process_group = #{preProcessGroup},
+            </if>
+            <if test="operateProcessSeq != null and operateProcessSeq != ''">
+                operate_process_seq = #{operateProcessSeq},
+            </if>
+            <if test="operateProcessCode != null and operateProcessCode != ''">
+                operate_process_code = #{operateProcessCode},
+            </if>
+            <if test="operateProcessName != null and operateProcessName != ''">
+                operate_process_name = #{operateProcessName},
+            </if>
+            <if test="operateProcessGroup != null and operateProcessGroup != ''">
+                operate_process_group = #{operateProcessGroup},
+            </if>
+            <if test="isLastProcess != null and isLastProcess != ''">
+                is_last_process = #{isLastProcess},
+            </if>
+            <if test="passNum != null">
+                pass_num = #{passNum},
+            </if>
+            <if test="ngNum != null">
+                ng_num = #{ngNum},
+            </if>
+            <if test="submitUser != null and submitUser != ''">
+                submit_user = #{submitUser},
+            </if>
+            <if test="submitDay != null">
+                submit_day = #{submitDay},
+            </if>
+            <if test="submitStatus != null">
+                submit_status = #{submitStatus},
+            </if>
+            <if test="submitNo != null and submitNo != ''">
+                submit_no = #{submitNo},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="dataStatus != null">
+                data_status = #{dataStatus},
+            </if>
+            <if test="operateNode != null and operateNode != ''">
+                operate_node = #{operateNode},
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                created_by = #{createdBy},
+            </if>
+            <if test="createdDate != null">
+                created_date = #{createdDate},
+            </if>
+            submit_pictures = #{submitPictures},
+            <if test="isFirstProcess != null and isFirstProcess != ''">
+                is_first_process = #{isFirstProcess},
+            </if>
+            <if test="isComplete != null and isComplete != ''">
+                is_complete = #{isComplete},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroWorkSubmitHistoryById">
+        delete
+        from micro_work_submit_history
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroWorkSubmitHistoryBySubmitNo">
+        delete
+        from micro_work_submit_history
+        where submit_no = #{submitNo}
+    </delete>
+
+    <delete id="deleteMicroWorkSubmitHistoryBySubmitNos">
+        delete from micro_work_submit_history where submit_no in
+        <foreach item="submitNo" collection="array" open="(" separator="," close=")">
+            #{submitNo}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAllMicroWorkSubmitHistory">
+        delete
+        from micro_work_submit_history
+    </delete>
+
+</mapper>
+

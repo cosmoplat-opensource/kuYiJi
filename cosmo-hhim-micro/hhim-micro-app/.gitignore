@@ -1,0 +1,10 @@
+node_modules
+dist
+.idea
+unpackage
+.DS_Store
+.hbuilderx
+.vscode
+# dev server 运行日志（本地残留，不提交）
+.codex-h5-dev*.log
+*.log

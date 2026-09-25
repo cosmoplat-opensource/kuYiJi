@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.integration.domain.mapper.MicroWechatPushRecordMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.integration.domain.entity.MicroWechatPushRecord" id="MicroWechatPushRecordResult">
+        <result property="id" column="id"/>
+        <result property="toUsers" column="to_users"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="skipUrl" column="skip_url"/>
+        <result property="wechatModelId" column="wechat_model_id"/>
+        <result property="pushTime" column="push_time"/>
+        <result property="pushFinishTime" column="push_finish_time"/>
+        <result property="pushStatus" column="push_status"/>
+        <result property="pushResult" column="push_result"/>
+        <result property="templateType" column="template_type"/>
+        <result property="serviceSign" column="service_sign"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+    </resultMap>
+
+    <sql id="selectMicroWechatPushRecordVo">
+        select id,
+               to_users,
+               title,
+               content,
+               skip_url,
+               wechat_model_id,
+               push_time,
+               push_finish_time,
+               push_status,
+               push_result,
+               template_type,
+               service_sign,
+               remark,
+               create_by,
+               create_time,
+               last_upd_by,
+               last_upd_date
+        from micro_wechat_push_record
+    </sql>
+
+    <select id="selectMicroWechatPushRecordList" parameterType="com.cosmo.hhim.micro.integration.domain.entity.MicroWechatPushRecord"
+            resultMap="MicroWechatPushRecordResult">
+        <include refid="selectMicroWechatPushRecordVo"/>
+        <where>
+            <if test="toUsers != null  and toUsers != ''">and to_users = #{toUsers}</if>
+            <if test="title != null  and title != ''">and title = #{title}</if>
+            <if test="content != null  and content != ''">and content = #{content}</if>
+            <if test="skipUrl != null  and skipUrl != ''">and skip_url = #{skipUrl}</if>
+            <if test="wechatModelId != null  and wechatModelId != ''">and wechat_model_id = #{wechatModelId}</if>
+            <if test="pushTime != null ">and push_time = #{pushTime}</if>
+            <if test="pushFinishTime != null ">and push_finish_time = #{pushFinishTime}</if>
+            <if test="pushStatus != null  and pushStatus != ''">and push_status = #{pushStatus}</if>
+            <if test="pushResult != null  and pushResult != ''">and push_result = #{pushResult}</if>
+            <if test="templateType != null  and templateType != ''">and template_type = #{templateType}</if>
+            <if test="serviceSign != null  and serviceSign != ''">and service_sign = #{serviceSign}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroWechatPushRecordById" parameterType="Long" resultMap="MicroWechatPushRecordResult">
+        <include refid="selectMicroWechatPushRecordVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMicroWechatPushRecord" parameterType="com.cosmo.hhim.micro.integration.domain.entity.MicroWechatPushRecord"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into micro_wechat_push_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="toUsers != null">to_users,</if>
+            <if test="title != null">title,</if>
+            <if test="content != null">content,</if>
+            <if test="skipUrl != null">skip_url,</if>
+            <if test="wechatModelId != null">wechat_model_id,</if>
+            <if test="pushTime != null">push_time,</if>
+            <if test="pushFinishTime != null">push_finish_time,</if>
+            <if test="pushStatus != null">push_status,</if>
+            <if test="pushResult != null">push_result,</if>
+            <if test="templateType != null">template_type,</if>
+            <if test="serviceSign != null">service_sign,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="lastUpdBy != null">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="toUsers != null">#{toUsers},</if>
+            <if test="title != null">#{title},</if>
+            <if test="content != null">#{content},</if>
+            <if test="skipUrl != null">#{skipUrl},</if>
+            <if test="wechatModelId != null">#{wechatModelId},</if>
+            <if test="pushTime != null">#{pushTime},</if>
+            <if test="pushFinishTime != null">#{pushFinishTime},</if>
+            <if test="pushStatus != null">#{pushStatus},</if>
+            <if test="pushResult != null">#{pushResult},</if>
+            <if test="templateType != null">#{templateType},</if>
+            <if test="serviceSign != null">#{serviceSign},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="lastUpdBy != null">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMicroWechatPushRecord" parameterType="com.cosmo.hhim.micro.integration.domain.entity.MicroWechatPushRecord">
+        update micro_wechat_push_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="toUsers != null">to_users = #{toUsers},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="skipUrl != null">skip_url = #{skipUrl},</if>
+            <if test="wechatModelId != null">wechat_model_id = #{wechatModelId},</if>
+            <if test="pushTime != null">push_time = #{pushTime},</if>
+            <if test="pushFinishTime != null">push_finish_time = #{pushFinishTime},</if>
+            <if test="pushStatus != null">push_status = #{pushStatus},</if>
+            <if test="pushResult != null">push_result = #{pushResult},</if>
+            <if test="templateType != null">template_type = #{templateType},</if>
+            <if test="serviceSign != null">service_sign = #{serviceSign},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="lastUpdBy != null">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroWechatPushRecordById" parameterType="Long">
+        delete
+        from micro_wechat_push_record
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroWechatPushRecordByIds" parameterType="String">
+        delete from micro_wechat_push_record where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.tech.MicroTechnologyMapper">
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.tech.MicroTechnology" id="MicroTechnologyResult">
+        <result property="id" column="id"/>
+        <result property="techCode" column="tech_code"/>
+        <result property="techName" column="tech_name"/>
+        <result property="techGroup" column="tech_group"/>
+        <result property="techDesc" column="tech_desc"/>
+        <result property="techVersion" column="tech_version"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productId" column="product_id"/>
+        <result property="relationType" column="relation_type"/>
+        <result property="techType" column="tech_type"/>
+        <result property="techPattern" column="tech_pattern"/>
+        <result property="classCode" column="class_code"/>
+        <result property="className" column="class_name"/>
+        <result property="tenantCode" column="tenant_code"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastUpdBy" column="last_upd_by"/>
+        <result property="lastUpdDate" column="last_upd_date"/>
+        <result property="activeFlag" column="active_flag"/>
+    </resultMap>
+
+    <sql id="selectMicroTechnologyVo">
+        select id,
+               tech_code,
+               tech_name,
+               tech_group,
+               tech_desc,
+               tech_version,
+               product_seq,
+               product_id,
+               relation_type,
+               tech_type,
+               tech_pattern,
+               class_code,
+               class_name,
+               tenant_code,
+               created_by,
+               created_date,
+               last_upd_by,
+               last_upd_date,
+               active_flag
+        from micro_technology
+    </sql>
+
+    <select id="selectMicroTechnologyList" parameterType="com.cosmo.hhim.micro.base.domain.entity.tech.MicroTechnology"
+            resultMap="MicroTechnologyResult">
+        <include refid="selectMicroTechnologyVo"/>
+        <where>
+            <if test="techCode != null  and techCode != ''">and tech_code = #{techCode}</if>
+            <if test="techName != null  and techName != ''">and tech_name like concat('%', #{techName}, '%')</if>
+            <if test="techGroup != null  and techGroup != ''">and tech_group = #{techGroup}</if>
+            <if test="techDesc != null  and techDesc != ''">and tech_desc = #{techDesc}</if>
+            <if test="techVersion != null  and techVersion != ''">and tech_version = #{techVersion}</if>
+            <if test="productSeq != null  and productSeq != ''">and product_seq = #{productSeq}</if>
+            <if test="productId != null">and product_id = #{productId}</if>
+            <if test="relationType != null  and relationType != ''">and relation_type = #{relationType}</if>
+            <if test="techType != null  and techType != ''">and tech_type = #{techType}</if>
+            <if test="techPattern != null  and techPattern != ''">and tech_pattern = #{techPattern}</if>
+            <if test="classCode != null  and classCode != ''">and class_code = #{classCode}</if>
+            <if test="className != null  and className != ''">and class_name like concat('%', #{className}, '%')</if>
+            <if test="tenantCode != null  and tenantCode != ''">and tenant_code = #{tenantCode}</if>
+            <if test="createdBy != null  and createdBy != ''">and created_by = #{createdBy}</if>
+            <if test="createdDate != null ">and created_date = #{createdDate}</if>
+            <if test="lastUpdBy != null  and lastUpdBy != ''">and last_upd_by = #{lastUpdBy}</if>
+            <if test="lastUpdDate != null ">and last_upd_date = #{lastUpdDate}</if>
+            <if test="activeFlag != null  and activeFlag != ''">and active_flag = #{activeFlag}</if>
+        </where>
+    </select>
+
+    <select id="selectMicroTechnologyById" parameterType="Long" resultMap="MicroTechnologyResult">
+        <include refid="selectMicroTechnologyVo"/>
+        where id = #{id} and active_flag = '1'
+    </select>
+    <select id="selectMicroTechnologyByIds" resultType="com.cosmo.hhim.micro.base.domain.entity.tech.MicroTechnology">
+        <include refid="selectMicroTechnologyVo"/>
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="selectStandardProByKey" resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroStandardEntity">
+        SELECT
+        mp.id,
+        mp.product_seq AS itemSeq ,
+        mp.product_code AS itemCode ,
+        mp.product_name AS itemName ,
+        IF(mt.id IS NULL, 0, 1 ) AS standard
+        FROM
+        micro_product mp
+        LEFT JOIN micro_technology mt ON
+        mp.tenant_code = mt.tenant_code AND mp.product_seq = mt.product_seq AND mt.active_flag = '1' AND mt.tech_type='STANDARD'
+        WHERE 1 = 1
+        <if test="key!=null and key!=''">
+            AND (mp.product_code like concat('%', #{key}, '%') OR mp.product_name like concat('%', #{key}, '%'))
+        </if>
+        order by standard DESC,mp.id DESC
+    </select>
+
+    <select id="judgeStandardProduct" resultMap="MicroTechnologyResult">
+        SELECT mt.* FROM
+        micro_technology mt
+        JOIN micro_product mp ON mt.product_id = mp.id AND mt.tenant_code = mp.tenant_code
+        WHERE mt.active_flag = '1'
+        <choose>
+            <when test="productId != null">
+                AND mp.product_name =#{productId}
+            </when>
+            <when test="productSeq != null and productSeq != ''">
+                AND mp.product_seq =#{productSeq}
+            </when>
+            <when test="productCode != null and productCode != ''">
+                AND mp.product_code =#{productCode}
+            </when>
+        </choose>
+    </select>
+    <resultMap id="diffChain" type="com.cosmo.hhim.micro.base.domain.entity.tech.MicroTechDiffDomain">
+        <result property="techId" column="id"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productId" column="product_id"/>
+        <result property="productName" column="product_name"/>
+        <collection property="chainStrArray" select="selectStrArray" column="id"/>
+    </resultMap>
+    <select id="selectTechAllChainForCompare" resultMap="diffChain">
+        SELECT mt.id,
+               mt.product_seq,
+               mt.product_id,
+               mp.product_name,
+               mp.product_code
+        FROM micro_technology mt
+                 LEFT JOIN micro_product mp ON
+                    mt.tenant_code = mp.tenant_code
+                AND mt.product_id = mp.id
+        WHERE mt.active_flag = '1'
+          AND mt.tech_type = 'STANDARD'
+          AND mt.relation_type = 'PRODUCT'
+    </select>
+    <select id="selectStrArray" resultType="java.lang.String">
+        <![CDATA[
+        SELECT CONCAT_WS('&', mpc.process_id, mpc.parent_process_id, mpc.process_seq, mpc.parent_process_seq,
+                         IF(mpc.is_last_process is NULL, '1', mpc.is_last_process)) AS chainStr
+        FROM micro_process_chain mpc
+        WHERE mpc.active_flag = '1'
+          and mpc.tech_id = #{id}
+        ]]>
+    </select>
+    <select id="selectTechIdsByProductIdAndSeq" resultType="java.lang.Long">
+        select distinct mt.id
+        from micro_technology mt where
+        mt.relation_type = 'PRODUCT' AND mt.active_flag = '1'
+        <if test="techType != null and techType != ''">
+            AND mt.tech_type=#{techType}
+        </if>
+        AND (mt.product_id,mt.product_seq) in
+        <foreach collection="dataList" item="item" open="(" close=")" separator=",">
+            (#{item.productId},#{item.productSeq})
+        </foreach>
+    </select>
+    <resultMap id="similarTechProductResult" type="com.cosmo.hhim.micro.base.domain.entity.tech.MicroTechSimilarDomain">
+        <result property="productId" column="product_id"/>
+        <result property="productCode" column="product_code"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productName" column="product_name"/>
+        <result property="processSeq" column="process_seq"/>
+        <result property="parentProcessSeq" column="parent_process_seq"/>
+    </resultMap>
+    <select id="selectNonStandardProductTechChain" resultMap="similarTechProductResult">
+        <![CDATA[
+        SELECT t.id                                                                                  as product_id,
+               t.product_code,
+               t.product_seq,
+               t.product_name,
+               mws.operate_process_seq                                                               as process_seq,
+               IF(mws.pre_process_seq IS NULL OR mws.pre_process_seq = '', '0', mws.pre_process_seq) as parent_process_seq
+        FROM micro_work_submit mws
+                 INNER JOIN
+             (SELECT tenant_code,
+                     mp.product_seq,
+                     mp.product_code,
+                     mp.id,
+                     mp.product_name
+              FROM micro_product mp
+              WHERE NOT EXISTS(SELECT mt.product_id
+                               FROM micro_technology mt
+                               WHERE mt.product_id = mp.id
+                                 AND mt.active_flag = '1'
+                                 AND mt.tech_type = 'STANDARD'
+                                 AND mt.relation_type = 'PRODUCT'
+                  )) AS t
+             ON mws.tenant_code = t.tenant_code AND mws.product_seq = t.product_seq
+        WHERE mws.submit_status = '0' and mws.submit_type = '1'
+        ]]>
+    </select>
+    <select id="selectProcessByProduct" resultType="java.lang.Long">
+        SELECT
+        mpc.id
+        FROM
+        micro_technology mt
+        INNER JOIN micro_process_chain ch ON
+        mt.tenant_code = ch.tenant_code
+        AND mt.id = ch.tech_id
+        AND ch.active_flag = '1'
+        LEFT JOIN micro_process_common mpc ON
+        ch.process_id = mpc.id
+        WHERE
+        mt.active_flag = '1'
+        AND mt.product_seq = #{productSeq}
+        <if test="key != null  and key != ''">
+            AND ( mpc.process_name like concat('%', #{key}, '%')
+            OR mpc.process_code like concat('%', #{key}, '%')
+            )
+        </if>
+    </select>
+    <select id="selectMicroTechChainByProductIdsOrSeqs"
+            resultType="com.cosmo.hhim.micro.base.domain.entity.tech.MicroProcessChainBindEntity">
+        SELECT
+        a.id,
+        mt.id AS techId,
+        mt.product_id AS productId,
+        m.product_seq AS productSeq,
+        m.product_name AS productName,
+        a.process_id AS processId,
+        a.parent_process_id AS parentProcessId,
+        a.process_seq AS processSeq,
+        a.process_code AS processCode,
+        a.parent_process_seq AS parentProcessSeq,
+        IF(a.is_last_process IS NULL,'1',a.is_last_process) AS isLastProcess,
+        a.process_name as processName,
+        a.sort,
+        mt.created_date as createdDate,
+        mt.tech_pattern as techPattern,
+        mt.tech_type as techType,
+        mt.tech_name as techName
+        FROM
+        micro_technology mt
+        INNER JOIN (select
+        mp.id,mp.tech_id,mp.process_id,mp.parent_process_id,mp.process_seq,mp.parent_process_seq,mp.is_last_process,mpc.process_name,mp.tenant_code,mp.process_code,
+        mp.sort
+        from micro_process_chain mp left join micro_process_common mpc on mp.process_id = mpc.id and mp.tenant_code =mpc.tenant_code
+        ) as a ON
+        mt.tenant_code = a.tenant_code
+        AND mt.id = a.tech_id
+        left join micro_product m on mt.tenant_code = m.tenant_code and mt.product_id=m.id
+        WHERE
+        mt.active_flag = '1'
+        AND mt.relation_type = 'PRODUCT'
+        <if test="techType != null and techType != ''">
+            AND mt.tech_type = #{techType}
+        </if>
+        <if test="productIds != null and productIds.size() &gt; 0 ">
+            AND mt.product_id in
+            <foreach collection="productIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="productSeqs != null and productSeqs.size() &gt; 0 ">
+            AND mt.product_seq in
+            <foreach collection="productSeqs" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        order by a.sort asc,a.id asc
+    </select>
+
+    <resultMap type="com.cosmo.hhim.micro.base.domain.entity.tech.MicroSingleTechChainEntity" id="MicroSingleTechnologyResult">
+        <result property="techId" column="id"/>
+        <result property="productSeq" column="product_seq"/>
+        <result property="productId" column="product_id"/>
+        <result property="techType" column="tech_type"/>
+        <result property="techName" column="tech_name"/>
+        <collection property="processChainList" select="selectProcessChain" column="id"/>
+    </resultMap>
+    <select id="selectSingleTechChainByProductIdsOrSeqs" resultMap="MicroSingleTechnologyResult">
+        SELECT
+        mt.id,
+        mt.product_id ,
+        mt.product_seq,
+        mt.tech_type,
+        mt.tech_name
+        FROM
+        micro_technology mt
+        WHERE
+        mt.active_flag = '1'
+        AND mt.relation_type = 'PRODUCT'
+        <if test="productIds != null and productIds.size() &gt; 0 ">
+            AND mt.product_id in
+            <foreach collection="productIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="productSeqs != null and productSeqs.size() &gt; 0 ">
+            AND mt.product_seq in
+            <foreach collection="productSeqs" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectProcessChain" resultType="com.cosmo.hhim.micro.base.domain.entity.tech.MicroSaveChainNodeEntity">
+        SELECT mp.process_id      as processId,
+               mp.process_seq     as processSeq,
+               mpc.process_name   as processName,
+               mpc.process_code   as processCode,
+               mp.is_last_process as isLastProcess
+        FROM micro_process_chain mp
+                 LEFT JOIN micro_process_common mpc ON
+                    mp.tenant_code = mpc.tenant_code
+                AND mp.process_id = mpc.id
+        WHERE mp.tech_id = #{id}
+        order by mp.id
+    </select>
+    <select id="recommendByProcess" resultType="com.cosmo.hhim.micro.infrastructure.entity.MicroSelectEntity">
+        SELECT
+        mpc2.process_seq AS itemSeq,
+        mpc2.process_name AS itemName,
+        mpc2.process_code AS itemCode
+        FROM
+        micro_process_common mpc JOIN (
+        SELECT
+        mp.process_id, mp.process_seq, mp.parent_process_id , mp.parent_process_seq, mp.tenant_code
+        FROM
+        micro_process_chain mp
+        JOIN micro_technology mt ON mp.tenant_code = mt.tenant_code AND mp.tech_id = mt.id
+        JOIN micro_product mpt ON mt.product_id = mpt.id AND mt.tenant_code = mpt.tenant_code
+        WHERE mpt.product_code = #{productCode}
+        ) AS t ON
+        <choose>
+            <when test="preProcessCode != null  and preProcessCode != ''">
+                mpc.tenant_code = t.tenant_code AND mpc.id = t.parent_process_id
+                JOIN micro_process_common mpc2 ON mpc2.tenant_code = t.tenant_code AND mpc2.id = t.process_id
+                WHERE mpc.process_code =#{preProcessCode}
+            </when>
+            <when test="operateProcessCode != null  and operateProcessCode != ''">
+                mpc.tenant_code = t.tenant_code AND mpc.id = t.process_id
+                JOIN micro_process_common mpc2 ON mpc2.tenant_code = t.tenant_code AND mpc2.id = t.parent_process_id
+                WHERE mpc.process_code = #{operateProcessCode}
+            </when>
+        </choose>
+
+    </select>
+    <select id="recommendByProduct" resultType="com.cosmo.hhim.micro.base.domain.entity.tech.MicroProcessChainRecommendEntity">
+        SELECT mpc.process_seq   AS operateProcessSeq,
+               mpc.process_name  AS operateProcessName,
+               mpc.process_code  AS operateProcessCode,
+               mpc2.process_seq  AS preProcessSeq,
+               mpc2.process_name AS preProcessName,
+               mpc2.process_code AS preProcessCode
+        FROM micro_process_common mpc
+                 JOIN (SELECT mp.process_id,
+                              mp.process_seq,
+                              mp.parent_process_id,
+                              mp.parent_process_seq,
+                              mp.tenant_code
+                       FROM micro_process_chain mp
+                                JOIN micro_technology mt ON
+                                   mp.tenant_code = mt.tenant_code
+                               AND mp.tech_id = mt.id
+                                JOIN micro_product mpt ON
+                                   mt.product_id = mpt.id
+                               AND mt.tenant_code = mpt.tenant_code
+                       WHERE mpt.product_code = #{productCode}) AS t ON mpc.tenant_code = t.tenant_code AND mpc.id = t.process_id
+                 LEFT JOIN micro_process_common mpc2 ON mpc2.tenant_code = t.tenant_code AND mpc2.id = t.parent_process_id
+    </select>
+    <select id="recommendOperateProcessByProduct" resultType="com.cosmo.hhim.micro.base.domain.entity.tech.MicroProcessChainRecommendEntity">
+        SELECT
+        mt.product_seq as productSeq,
+        mpc.process_seq AS operateProcessSeq,
+        mpc.process_name AS operateProcessName,
+        mpc.process_code AS operateProcessCode,
+        max(mp.sort) as sort
+        FROM micro_process_chain mp
+        JOIN micro_technology mt ON mp.tenant_code = mt.tenant_code AND mp.tech_id = mt.id
+        LEFT JOIN micro_process_common mpc ON mpc.tenant_code = mp.tenant_code AND mpc.id = mp.process_id
+        WHERE
+        mt.tech_type='STANDARD'
+        AND mt.product_seq in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        group by mt.product_seq,mpc.process_seq, mpc.process_name,mpc.process_code
+        order by sort
+    </select>
+    <select id="judgeStandardProductByList" resultType="java.lang.String">
+        SELECT
+        mt.product_seq
+        FROM
+        micro_technology mt
+        WHERE
+        mt.active_flag = '1'
+        AND mt.relation_type = 'PRODUCT'
+        AND mt.tech_type = 'STANDARD'
+        <if test="productIds != null and productIds.size() &gt; 0 ">
+            AND mt.product_id in
+            <foreach collection="productIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="productSeqs != null and productSeqs.size() &gt; 0 ">
+            AND mt.product_seq in
+            <foreach collection="productSeqs" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectAllProductByTech" resultType="java.lang.String">
+        select concat_ws('&amp;',mp.product_seq,mp.id,mp.product_name) from micro_technology mt
+        left join micro_product mp on mt.tenant_code = mp.tenant_code and mt.product_id= mp.id
+        where mt.active_flag = '1'
+        AND mt.relation_type = 'PRODUCT'
+        <if test="entity.techType != null and entity.techType != ''">
+            AND mt.tech_type = #{entity.techType}
+        </if>
+        <if test="patternList != null and patternList.size() &gt; 0 ">
+            AND mt.tech_pattern in
+            <foreach collection="patternList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        group by mt.product_seq,mt.product_id
+    </select>
+
+    <insert id="insertMicroTechnology" parameterType="com.cosmo.hhim.micro.base.domain.entity.tech.MicroTechnology" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into micro_technology
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="techCode != null and techCode != ''">tech_code,</if>
+            <if test="techName != null and techName != ''">tech_name,</if>
+            <if test="techGroup != null">tech_group,</if>
+            <if test="techDesc != null">tech_desc,</if>
+            <if test="techVersion != null and techVersion != ''">tech_version,</if>
+            <if test="productSeq != null">product_seq,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="relationType != null and relationType != ''">relation_type,</if>
+            <if test="techType != null and techType != ''">tech_type,</if>
+            <if test="techPattern != null and techPattern != ''">tech_pattern,</if>
+            <if test="classCode != null">class_code,</if>
+            <if test="className != null">class_name,</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code,</if>
+            <if test="createdBy != null and createdBy != ''">created_by,</if>
+            <if test="createdDate != null">created_date,</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by,</if>
+            <if test="lastUpdDate != null">last_upd_date,</if>
+            <if test="activeFlag != null">active_flag,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="techCode != null and techCode != ''">#{techCode},</if>
+            <if test="techName != null and techName != ''">#{techName},</if>
+            <if test="techGroup != null">#{techGroup},</if>
+            <if test="techDesc != null">#{techDesc},</if>
+            <if test="techVersion != null and techVersion != ''">#{techVersion},</if>
+            <if test="productSeq != null">#{productSeq},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="relationType != null and relationType != ''">#{relationType},</if>
+            <if test="techType != null and techType != ''">#{techType},</if>
+            <if test="techPattern != null and techPattern != ''">#{techPattern},</if>
+            <if test="classCode != null">#{classCode},</if>
+            <if test="className != null">#{className},</if>
+            <if test="tenantCode != null and tenantCode != ''">#{tenantCode},</if>
+            <if test="createdBy != null and createdBy != ''">#{createdBy},</if>
+            <if test="createdDate != null">#{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">#{lastUpdBy},</if>
+            <if test="lastUpdDate != null">#{lastUpdDate},</if>
+            <if test="activeFlag != null">#{activeFlag},</if>
+        </trim>
+    </insert>
+    <insert id="insertMicroTechnologyBatch">
+        INSERT INTO
+        micro_technology (
+        id,
+        tech_code,
+        tech_name,
+        tech_group,
+        tech_desc,
+        tech_version,
+        product_seq,
+        product_id,
+        relation_type,
+        tech_type,
+        tech_pattern,
+        class_code,
+        class_name,
+        tenant_code,
+        created_by,
+        last_upd_by
+        )
+        VALUES
+        <foreach collection="dataList" item="entity" index="index" separator=",">
+            (
+            #{entity.id}
+            ,#{entity.techCode}
+            ,#{entity.techName}
+            ,#{entity.techGroup}
+            ,#{entity.techDesc}
+            ,#{entity.techVersion}
+            ,#{entity.productSeq}
+            ,#{entity.productId}
+            ,#{entity.relationType}
+            ,#{entity.techType}
+            ,#{entity.techPattern}
+            ,#{entity.classCode}
+            ,#{entity.className}
+            ,#{entity.tenantCode}
+            ,#{entity.createdBy}
+            ,#{entity.lastUpdBy}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateMicroTechnology" parameterType="com.cosmo.hhim.micro.base.domain.entity.tech.MicroTechnology">
+        update micro_technology
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="techCode != null and techCode != ''">tech_code = #{techCode},</if>
+            <if test="techName != null and techName != ''">tech_name = #{techName},</if>
+            <if test="techGroup != null">tech_group = #{techGroup},</if>
+            <if test="techDesc != null">tech_desc = #{techDesc},</if>
+            <if test="techVersion != null and techVersion != ''">tech_version = #{techVersion},</if>
+            <if test="productSeq != null">product_seq = #{productSeq},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="relationType != null and relationType != ''">relation_type = #{relationType},</if>
+            <if test="techType != null and techType != ''">tech_type = #{techType},</if>
+            <if test="techPattern != null and techPattern != ''">tech_pattern = #{techPattern},</if>
+            <if test="classCode != null">class_code = #{classCode},</if>
+            <if test="className != null">class_name = #{className},</if>
+            <if test="tenantCode != null and tenantCode != ''">tenant_code = #{tenantCode},</if>
+            <if test="createdBy != null and createdBy != ''">created_by = #{createdBy},</if>
+            <if test="createdDate != null">created_date = #{createdDate},</if>
+            <if test="lastUpdBy != null and lastUpdBy != ''">last_upd_by = #{lastUpdBy},</if>
+            <if test="lastUpdDate != null">last_upd_date = #{lastUpdDate},</if>
+            <if test="activeFlag != null">active_flag = #{activeFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMicroTechnologyById" parameterType="Long">
+        delete
+        from micro_technology
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteMicroTechnologyByIds" parameterType="String">
+        delete from micro_technology
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="saveTechnologyHistory">
+        insert into micro_technology_history
+        select * from micro_technology mt
+        where mt.id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </insert>
+</mapper>
