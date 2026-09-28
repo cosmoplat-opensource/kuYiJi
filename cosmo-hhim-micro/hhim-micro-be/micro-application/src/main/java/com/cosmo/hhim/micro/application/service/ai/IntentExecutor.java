@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.service.ai;
 
@@ -49,6 +49,8 @@ public class IntentExecutor {
     private final IMicroAnalysisService microAnalysisService;
     private final com.cosmo.hhim.micro.base.domain.mapper.ai.MicroAiDailyMapper dailyMapper;
     private final com.cosmo.hhim.micro.base.domain.mapper.ai.MicroAiDictMapper dictMapper;
+    /** 本体（指标人话名/口径的单一来源，用于依据卡片的"指标口径"） */
+    private final OntologyService ontologyService;
 
     /* ---------------- 组合登记台账（"覆盖不到"的唯一真相 = 本声明 ∩ 本体 dims） ----------------
      * 背景：本体 dims 是"语义上可以这么问"的白名单，执行器覆盖是"确实登记了实现"的白名单，
@@ -207,71 +209,306 @@ public class IntentExecutor {
         // 组合登记收口：本体 dims 内的粒度但执行器未登记 → 确定性错误（禁止静默空数据/静默换维度）
         String violation = coverageViolation(intent, metricCode);
         if (violation != null) {
+            log.warn("[AI执行] {} 未进入取数（组合未登记）：{} groupBy={}", metricCode, violation, intent.getGroupBy());
+            r.setNote(violation);
             r.setError(violation);
-            return r;
+            return finish(r, metricCode, intent);
         }
         try {
-            // 组合式：SUMMARY × groupBy=day（"哪天产量最高"类），走登记按日聚合 SQL
-            if ("SUMMARY".equals(metricCode) && "day".equals(intent.getGroupBy())) {
-                summaryByDay(intent, r);
-                return r;
-            }
-            // 组合式：SUMMARY × {product|employee|process}——"哪个产品/员工/工序产量最高"
-            // 复用良品率登记 SQL（同一批已审聚合），只换排序键=已审记工总数，不新增 SQL
-            if ("SUMMARY".equals(metricCode) && StringUtils.hasText(intent.getGroupBy())) {
-                summaryRank(intent, r, intent.getGroupBy());
-                return r;
-            }
-            // 组合式：良品率类指标 × 维度分组（process/product/employee/day）——"哪道工序呢/按天呢"
-            if (("PRODUCT_PASS_RATE".equals(metricCode) || "PROCESS_PASS_RATE".equals(metricCode)
-                    || "EMPLOYEE_PASS_RATE".equals(metricCode)) && StringUtils.hasText(intent.getGroupBy())) {
-                if ("day".equals(intent.getGroupBy())) {
-                    passRateByDay(intent, r);
-                } else {
-                    passRate(intent, r, intent.getGroupBy());
-                }
-                return r;
-            }
-            switch (metricCode) {
-                case "SUMMARY":
-                    summary(intent, r);
-                    break;
-                case "PRODUCT_PASS_RATE":
-                    passRate(intent, r, "product");
-                    break;
-                case "PROCESS_PASS_RATE":
-                    passRate(intent, r, "process");
-                    break;
-                case "EMPLOYEE_PASS_RATE":
-                    passRate(intent, r, "employee");
-                    break;
-                case "SUBMIT_RANK":
-                    submitRank(intent, r);
-                    break;
-                case "NG_DETAIL":
-                    ngDetail(intent, r);
-                    break;
-                case "STOCK":
-                    if ("product".equals(intent.getGroupBy())) {
-                        stockByProduct(intent, r);
-                    } else {
-                        stock(intent, r);
-                    }
-                    break;
-                case "ENTITY_LIST":
-                    entityList(intent, r);
-                    break;
-                case "DELIVERY_RISK":
-                    deliveryRisk(intent, r);
-                    break;
-                default:
-                    r.setError("该指标暂未支持执行器: " + metricCode);
-            }
+            dispatch(metricCode, intent, r);
         } catch (Exception e) {
             log.warn("[AI执行] {} 执行异常: {}", metricCode, e.getMessage());
             r.setError("执行异常: " + e.getMessage());
         }
+        return finish(r, metricCode, intent);
+    }
+
+    /**
+     * 取数路由：把"按哪个能力、哪个维度取数"分派到具体实现。
+     *
+     * <p>**单一出口约定**：这里只负责取数并把行写进 {@code r}，**绝不 return** ——
+     * 依据回填统一由 {@link #finish} 在出口处做。历史 bug（已修）：原先这些组合分支各自
+     * {@code return r} 提前返回，把末尾的依据回填整段绕过，导致「良品率×工序」这类走快路径的
+     * 能力依据为空、卡片核不到工序数据（实测 PROCESS_PASS_RATE）。
+     */
+    private void dispatch(String metricCode, AskIntentResult intent, AskExecutionResult r) {
+        // 组合式：SUMMARY × groupBy=day（"哪天产量最高"类），走登记按日聚合 SQL
+        if ("SUMMARY".equals(metricCode) && "day".equals(intent.getGroupBy())) {
+            summaryByDay(intent, r);
+            return;
+        }
+        // 组合式：SUMMARY × {product|employee|process}——"哪个产品/员工/工序产量最高"
+        // 复用良品率登记 SQL（同一批已审聚合），只换排序键=已审记工总数，不新增 SQL
+        if ("SUMMARY".equals(metricCode) && StringUtils.hasText(intent.getGroupBy())) {
+            summaryRank(intent, r, intent.getGroupBy());
+            return;
+        }
+        // 组合式：良品率类指标 × 维度分组（process/product/employee/day）——"哪道工序呢/按天呢"
+        if (("PRODUCT_PASS_RATE".equals(metricCode) || "PROCESS_PASS_RATE".equals(metricCode)
+                || "EMPLOYEE_PASS_RATE".equals(metricCode)) && StringUtils.hasText(intent.getGroupBy())) {
+            if ("day".equals(intent.getGroupBy())) {
+                passRateByDay(intent, r);
+            } else {
+                passRate(intent, r, intent.getGroupBy());
+            }
+            return;
+        }
+        switch (metricCode) {
+            case "SUMMARY":
+                summary(intent, r);
+                break;
+            case "PRODUCT_PASS_RATE":
+                passRate(intent, r, "product");
+                break;
+            case "PROCESS_PASS_RATE":
+                passRate(intent, r, "process");
+                break;
+            case "EMPLOYEE_PASS_RATE":
+                passRate(intent, r, "employee");
+                break;
+            case "SUBMIT_RANK":
+                submitRank(intent, r);
+                break;
+            case "NG_DETAIL":
+                ngDetail(intent, r);
+                break;
+            case "STOCK":
+                if ("product".equals(intent.getGroupBy())) {
+                    stockByProduct(intent, r);
+                } else {
+                    stock(intent, r);
+                }
+                break;
+            case "ENTITY_LIST":
+                entityList(intent, r);
+                break;
+            case "DELIVERY_RISK":
+                deliveryRisk(intent, r);
+                break;
+            default:
+                r.setError("该指标暂未支持执行器: " + metricCode);
+        }
+    }
+
+    /**
+     * **唯一出口**：依据回填 + 返回。
+     *
+     * <p>登记指标走的是既有接口/登记 SQL，产不出依据行的话，用户展开「依据」只能看到口径与来源、
+     * 看不到任何可核对的数 → 无论走哪条取数路径，都在这里统一补上依据。
+     */
+    private AskExecutionResult finish(AskExecutionResult r, String metricCode, AskIntentResult intent) {
+        // 排序度量回填（供上层极值投影用）：与依据回填同一出口，避免漏掉某条取数路径
+        r.setSortKey(intent == null ? null : intent.getOrderBy());
+        r.setEvidence(buildEvidence(r, metricCode, intent));
         return r;
+    }
+
+    /* ---------------- 依据回填（登记指标） ---------------- */
+
+    /** 「依据」快照最多给几条（前端逐行渲染，给多了会刷屏） */
+    private static final int EVIDENCE_TOP_N = 3;
+    /** 投影阶段可能算出来的派生度量键（SQL 与行里都没有，需要单独带出去给上层用） */
+    private static final List<String> DERIVED_KEYS = Collections.unmodifiableList(Arrays.asList(
+            "passRate", "ngRate", "repairRate", "abandonedRate", "rate"));
+    /** 快照里最长的文本值（超长截断，避免把整段说明塞进依据） */
+    private static final int SNAPSHOT_TEXT_MAX = 48;
+
+    /**
+     * 组装「依据」卡片：指标口径 / 数据来源 / 结果快照。
+     *
+     * <p>为什么要在这里做（而不是只靠 AnswerComposer）：登记指标取数在既有接口/登记 SQL 上完成，
+     * 有些能力返回的行与答案投影形状不一致；不统一回填就会出现「答案里有工序的数 ✗ 依据里核不到」
+     * 这种**对不上账**的情况。这里保证：只要执行器取到了行，依据里就有同源的数。
+     *
+     * <p>口径由本次查询确定（与页面同源），不暴露任何实现层信息。
+     */
+    private Map<String, Object> buildEvidence(AskExecutionResult r, String metricCode, AskIntentResult intent) {
+        Map<String, Object> evidence = new LinkedHashMap<>();
+        Map<String, Object> metric = new LinkedHashMap<>();
+        metric.put("name", metricName(metricCode));
+        metric.put("formula", metricFormula(metricCode, intent));
+        evidence.put("metric", metric);
+
+        Map<String, Object> source = new LinkedHashMap<>();
+        source.put("api", r.getApi());
+        source.put("params", r.getParams());
+        int count = resultCount(r);
+        boolean noContext = !StringUtils.hasText(tenantCode());
+        String note;
+        if (r.getError() != null) {
+            note = "本次未取到数据（未能完成取数，请稍后重试）";
+        } else if (noContext) {
+            // 缺会话上下文（租户为空）时登记 SQL 必然 0 行：必须说清是"没查到"而不是"没有数据"
+            note = "本次取数缺少会话上下文，未取到数据（已记录，请退出重新登录后再试）";
+        } else if (count <= 0) {
+            // 空结果必须说清"是查了没数据"，而不是让用户以为忘记查
+            note = "本次查询范围内没有符合条件的记录（已按该指标口径实查）";
+        } else {
+            note = "与本页统计同源（已审核口径）；本次取到 " + count + " 条记录";
+        }
+        source.put("note", note);
+        evidence.put("source", source);
+
+        List<Map<String, Object>> snapshot = new ArrayList<>();
+        if (r.getError() == null && r.getRows() != null) {
+            int shown = 0;
+            for (Map<String, Object> row : r.getRows()) {
+                if (shown >= EVIDENCE_TOP_N) {
+                    break;
+                }
+                Map<String, Object> item = toEvidenceItem(row);
+                if (item != null) {
+                    snapshot.add(item);
+                    shown++;
+                }
+            }
+        }
+        if (snapshot.isEmpty()) {
+            // 空快照会让卡片"看起来没有依据"：这里如实说明原因（取数会话上下文缺失 / 区间无数据 / 执行失败）
+            Map<String, Object> why = new LinkedHashMap<>();
+            why.put("label", "结果快照");
+            if (r.getError() != null) {
+                why.put("value", "本次取数未完成，未能取到数据");
+            } else if (noContext) {
+                why.put("value", "本次取数缺少会话上下文，未取到数据（已记录，请退出重新登录后再试）");
+                log.warn("[AI执行] 缺少会话上下文（租户为空）→ 登记 SQL 必然取不到数据: metric={} 时间={}~{}",
+                        metricCode, intent == null ? null : intent.getStartDate(),
+                        intent == null ? null : intent.getEndDate());
+            } else {
+                why.put("value", "本次查询范围内没有符合条件的记录（已按该指标口径实查）");
+            }
+            snapshot.add(why);
+        }
+        evidence.put("snapshot", snapshot);
+        evidence.put("asOf", java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+        return evidence;
+    }
+
+    /**
+     * 本次实查到的记录数：优先用执行器显式记下的条数（如按日聚合 30 行只展示 3 行），
+     * 否则退回"投影后的行数"，再否则看单行结果里是不是套了明细数组。
+     */
+    @SuppressWarnings("unchecked")
+    private int resultCount(AskExecutionResult r) {
+        if (r.getResultCount() != null) {
+            return r.getResultCount();
+        }
+        List<Map<String, Object>> rows = r.getRows();
+        if (rows == null || rows.isEmpty()) {
+            return 0;
+        }
+        if (rows.size() == 1) {
+            Object nested = rows.get(0).get("wip") != null ? rows.get(0).get("wip") : rows.get(0).get("finished");
+            if (nested instanceof List) {
+                return ((List<Object>) nested).size();
+            }
+        }
+        return rows.size();
+    }
+
+    /**
+     * 一行数据 → 一条依据（{label, value}）。
+     *
+     * <p>label = 可读对象名（首选本体里的实体名，如工序「攻丝」）；value = 该行的数（键值对形式）。
+     * 只保留**业务对象名 + 数值**：编码类字段不进依据（用户核不到账，也避免暴露实现层信息）。
+     */
+    private Map<String, Object> toEvidenceItem(Map<String, Object> row) {
+        if (row == null || row.isEmpty()) {
+            return null;
+        }
+        String label = "";
+        for (String key : ENTITY_LABEL_KEYS) {
+            Object v = row.get(key);
+            if (v instanceof String && StringUtils.hasText((String) v)) {
+                label = (String) v;
+                break;
+            }
+        }
+        StringBuilder val = new StringBuilder();
+        for (Map.Entry<String, Object> e : row.entrySet()) {
+            Object v = e.getValue();
+            if (v == null || !(v instanceof Number)) {
+                continue;
+            }
+            // 编码类字段不进依据（DN15 / K-21 / 6H3ACV 这类里的数字不是数据）
+            if (CODE_KEYS.contains(e.getKey())) {
+                continue;
+            }
+            if (val.length() > 0) {
+                val.append(" · ");
+            }
+            val.append(e.getKey()).append(" ").append(numText(v));
+        }
+        if (label.isEmpty() && val.length() == 0) {
+            return null;
+        }
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("label", label.isEmpty() ? "本次结果" : cutText(label));
+        item.put("value", val.length() == 0 ? "本次未取到数值" : val.toString());
+        return item;
+    }
+
+    /** 依据里的对象名候选（按可读性优先） */
+    private static final List<String> ENTITY_LABEL_KEYS = Collections.unmodifiableList(Arrays.asList(
+            "processName", "productName", "nickName", "submitDay", "orderNo", "ngTypeName", "name"));
+
+    /** 编码/主键类字段：不进依据 */
+    private static final Set<String> CODE_KEYS = Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
+            "processCode", "productCode", "productSeq", "itemSeq", "productId", "userName",
+            "nodeId", "code", "tenantCode", "id")));
+
+    /** 指标人话名：优先取本体登记名（单一来源），算子/兜底用内置表 */
+    private String metricName(String code) {
+        try {
+            com.alibaba.fastjson.JSONObject m = ontologyService.metric(code);
+            if (m != null && StringUtils.hasText(m.getString("name"))) {
+                return m.getString("name");
+            }
+        } catch (Exception ignore) {
+            // 本体不可用时退回内置名，不影响回答
+        }
+        if ("ATTRIBUTION".equals(code)) {
+            return "变化归因";
+        }
+        if ("COMPARE".equals(code)) {
+            return "两期对比";
+        }
+        if ("CONCENTRATE".equals(code)) {
+            return "集中度分析";
+        }
+        return "登记能力";
+    }
+
+    /** 指标计算口径：本体有 formula 就用本体的（单一来源），否则给中性描述 */
+    private String metricFormula(String code, AskIntentResult intent) {
+        try {
+            com.alibaba.fastjson.JSONObject m = ontologyService.metric(code);
+            if (m != null && StringUtils.hasText(m.getString("formula"))) {
+                return m.getString("formula");
+            }
+        } catch (Exception ignore) {
+            // 同上：本体不可用不影响回答
+        }
+        return "按本体登记的默认口径统计" + (intent == null || !StringUtils.hasText(intent.getGroupBy())
+                ? "" : "（按 " + groupByLabel(intent.getGroupBy()) + " 分组）");
+    }
+
+    /** 数值展示：去尾零（31.0000 → 31） */
+    private String numText(Object v) {
+        try {
+            double d = Double.parseDouble(v.toString());
+            if (d == Math.floor(d) && !Double.isInfinite(d)) {
+                return String.valueOf((long) d);
+            }
+            return new java.math.BigDecimal(v.toString()).stripTrailingZeros().toPlainString();
+        } catch (Exception e) {
+            return v.toString();
+        }
+    }
+
+    private String cutText(String s) {
+        return s.length() <= SNAPSHOT_TEXT_MAX ? s : s.substring(0, SNAPSHOT_TEXT_MAX) + "…";
     }
 
     /* ---------------- 各指标执行 ---------------- */
@@ -322,7 +559,7 @@ public class IntentExecutor {
                 submission ? "submission" : "production", start, end, data == null ? 0 : data.size(),
                 intent.getLimit(), intent.getOrderDir());
         // 产量口径 = 良品数（passNum）：报工合格数才是"产出"，不良不计入产量排序
-        r.setRows(project(data, intent, new String[]{"submitDay", "passNum", "ngNum"}, "passNum"));
+        r.setRows(project(r, data, intent, new String[]{"submitDay", "passNum", "ngNum"}, "passNum"));
         log.info("[AI执行] SUMMARY×day: afterProject={}, api={}", r.getRows().size(), r.getApi());
     }
 
@@ -375,7 +612,7 @@ public class IntentExecutor {
                 withTotal.add(m);
             }
         }
-        r.setRows(project(withTotal, intent, nameKeys, "totalNum"));
+        r.setRows(project(r, withTotal, intent, nameKeys, "totalNum"));
     }
 
     /**
@@ -414,7 +651,7 @@ public class IntentExecutor {
                 withRate.add(m);
             }
         }
-        r.setRows(project(withRate, intent, new String[]{"submitDay"}, "passRate"));
+        r.setRows(project(r, withRate, intent, new String[]{"submitDay"}, "passRate"));
     }
 
     /**
@@ -437,7 +674,7 @@ public class IntentExecutor {
         }
         Map<String, Object> merged = new LinkedHashMap<>();
         if (askWip) {
-            List<Map<String, Object>> wip = dailyMapper.selectProcessStockByProduct(tenantCode());
+            List<Map<String, Object>> wip = dailyMapper.selectProcessStockByProduct(tenantCode(), null);
             merged.put("wip", wip == null ? new ArrayList<>() : wip);
         }
         if (askFinished) {
@@ -478,7 +715,7 @@ public class IntentExecutor {
                     "employeeName", employeeEntity, "startDate", start, "endDate", end, "tenantCode", tenantCode()));
             List<Map<String, Object>> data = dailyMapper.selectProductPassRate(tenantCode(), start, end,
                     productEntity, processEntity, employeeEntity);
-            r.setRows(project(data, intent,
+            r.setRows(project(r, data, intent,
                     new String[]{"productName", "productCode", "checkPassNum", "checkNgNum"}, "passRate"));
             return;
         }
@@ -489,7 +726,7 @@ public class IntentExecutor {
                     "employeeName", employeeEntity, "startDate", start, "endDate", end, "tenantCode", tenantCode()));
             List<Map<String, Object>> data = dailyMapper.selectProcessPassRate(tenantCode(), start, end,
                     processEntity, productEntity, employeeEntity);
-            r.setRows(project(data, intent,
+            r.setRows(project(r, data, intent,
                     new String[]{"processName", "processCode", "checkPassNum", "checkNgNum"}, "passRate"));
             return;
         }
@@ -500,7 +737,7 @@ public class IntentExecutor {
                     "processNameOrCode", processEntity, "startDate", start, "endDate", end, "tenantCode", tenantCode()));
             List<Map<String, Object>> data = dailyMapper.selectEmployeePassRate(tenantCode(), start, end,
                     employeeEntity, productEntity, processEntity);
-            r.setRows(project(data, intent,
+            r.setRows(project(r, data, intent,
                     new String[]{"nickName", "userName", "checkPassNum", "checkNgNum"}, "passRate"));
             return;
         }
@@ -527,7 +764,7 @@ public class IntentExecutor {
         r.setApi("/analysis/submitRecordRank");
         r.setParams(strMap("startDate", intent.getStartDate(), "endDate", intent.getEndDate()));
         List<?> data = microAnalysisService.getRecordRankForSubmitter(start, end);
-        r.setRows(project(data, intent, new String[]{"nickName", "userName"}, "submitNum"));
+        r.setRows(project(r, data, intent, new String[]{"nickName", "userName"}, "submitNum"));
     }
 
     private void ngDetail(AskIntentResult intent, AskExecutionResult r) {
@@ -540,14 +777,16 @@ public class IntentExecutor {
         r.setApi("/analysis/showNgProductList");
         r.setParams(toParams(p));
         List<?> data = microAnalysisService.showNgProductList(p);
-        r.setRows(project(data, intent, new String[]{"productName", "processName", "ngTypeName", "nickName"}, "ngNum"));
+        r.setRows(project(r, data, intent, new String[]{"productName", "processName", "ngTypeName", "nickName"}, "ngNum"));
     }
 
     private void stock(AskIntentResult intent, AskExecutionResult r) {
         // 登记 SQL：成品库存 + 租户隔离（既有 obtainedTotalStock 查的是在制品且无租户过滤，口径不可信）
+        // 产品槽位下推：问「冰箱有成品吗」→ 只统计冰箱；无记录 → 0 件如实回答（不拿全厂合计冒充该产品库存）
+        String productEntity = intent.getEntities().get("productNameOrCode");
         r.setApi("/ai/registered/finishedStock（登记 SQL：成品库存+租户隔离）");
-        r.setParams(strMap("tenantCode", tenantCode()));
-        Map<String, Object> data = dailyMapper.selectFinishedStock(tenantCode());
+        r.setParams(strMap("tenantCode", tenantCode(), "productNameOrCode", productEntity));
+        Map<String, Object> data = dailyMapper.selectFinishedStock(tenantCode(), productEntity);
         List<Map<String, Object>> rows = new java.util.ArrayList<>();
         if (data != null) {
             rows.add(data);
@@ -557,7 +796,7 @@ public class IntentExecutor {
         boolean askWip = q.contains("在制") || q.contains("车间") || q.contains("工序");
         boolean explicitFinished = q.contains("成品") || q.contains("仓库");
         if (askWip || !explicitFinished) {
-            List<Map<String, Object>> wip = dailyMapper.selectProcessStockByProduct(tenantCode());
+            List<Map<String, Object>> wip = dailyMapper.selectProcessStockByProduct(tenantCode(), productEntity);
             long wipTotal = 0L;
             int wipProducts = 0;
             if (wip != null) {
@@ -671,14 +910,21 @@ public class IntentExecutor {
      * 排序 + TopN 投影：按 numericKey（如 passRate/submitNum/ngNum）排序，取前 limit；
      * 保留 nameKeys 可读字段。
      */
-    private List<Map<String, Object>> project(List<?> data, AskIntentResult intent, String[] nameKeys, String numericKey) {
+    private List<Map<String, Object>> project(AskExecutionResult r, List<?> data, AskIntentResult intent, String[] nameKeys, String numericKey) {
+        // 把"按哪个度量排序"钉在结果上：上层极值投影必须知道它，
+        // 否则只能"取行内第一个数字"，实测会把"良品率最低"按 passNum 取成"产量最少"的那天
+        if (r != null) {
+            r.setSortKey(numericKey);
+        }
         List<Map<String, Object>> rows = new ArrayList<>();
+        List<Map<String, Object>> derivedList = new ArrayList<>();
         if (data == null) {
             return rows;
         }
         for (Object o : data) {
             Map<String, Object> full = toMap(o);
             Map<String, Object> item = new HashMap<>();
+            Map<String, Object> derived = new HashMap<>();
             for (String k : nameKeys) {
                 Object v = full.get(k);
                 if (v != null) {
@@ -686,35 +932,89 @@ public class IntentExecutor {
                 }
             }
             Object num = firstOf(full, numericKey, "passRate", "submitNum", "totalNagNum", "totalPassNum", "ngNum", "num");
+            // 派生度量：SQL 与行里都没有、由投影阶段算出来的（如按天良品率）→ 记进 derived，供上层极值投影。
+            // 注意：比率值可能是 BigDecimal、也可能是 truncate 返回的**字符串**（"0.911"）→ 统一按数值解析，
+            // 只判 instanceof Number 会漏掉字符串形态（实测：极值投影因此取错列）。
+            for (String dk : DERIVED_KEYS) {
+                Object dv = full.get(dk);
+                Double d = toNullableDouble(dv);
+                if (d != null) {
+                    derived.put(dk, d);
+                }
+            }
             if (num != null) {
                 item.put(numericKey, num);
             } else {
                 item.put(numericKey, full.values().stream().filter(v -> v instanceof Number).findFirst().orElse(null));
             }
+            // 派生度量也放进投影行：这样「依据」卡片与答案投影用**同一个键**（都叫 passRate），
+            // 不会出现"行里有 passNum、派生才有 passRate"这种两套口径对不上的情况
+            item.putAll(derived);
             rows.add(item);
+            derivedList.add(derived);
+        }
+        RowMeta[] metas = new RowMeta[rows.size()];
+        for (int i = 0; i < rows.size(); i++) {
+            RowMeta m = new RowMeta(rows.get(i));
+            if (i < derivedList.size()) {
+                m.derived.putAll(derivedList.get(i));
+            }
+            metas[i] = m;
         }
         // 排序（数字取不到则保持原序）
-        Comparator<Map<String, Object>> cmp = Comparator.comparingDouble(
-                (Map<String, Object> m) -> toDouble(m.get(numericKey)));
-        if ("desc".equals(intent.getOrderDir())) {
-            cmp = cmp.reversed();
+        Integer[] idx = new Integer[rows.size()];
+        for (int i = 0; i < idx.length; i++) {
+            idx[i] = i;
         }
-        rows.sort(cmp);
+        final boolean desc = "desc".equals(intent.getOrderDir());
+        java.util.Arrays.sort(idx, (a, b) -> {
+            double va = toDouble(metas[a].row.get(numericKey));
+            double vb = toDouble(metas[b].row.get(numericKey));
+            return desc ? Double.compare(vb, va) : Double.compare(va, vb);
+        });
         int limit = intent.getLimit() == null ? 3 : intent.getLimit();
-        return rows.size() > limit ? new ArrayList<>(rows.subList(0, limit)) : rows;
+        int take = Math.min(limit, rows.size());
+        List<Map<String, Object>> outRows = new ArrayList<>(take);
+        List<Map<String, Object>> derived = new ArrayList<>(take);
+        for (int i = 0; i < take; i++) {
+            RowMeta m = metas[idx[i]];
+            outRows.add(m.row);
+            derived.add(m.derived);   // 派生度量（如 passRate）按行对齐带出去，供上层极值投影用
+        }
+        if (r != null) {
+            r.setDerived(derived);
+        }
+        return outRows;
+    }
+
+    /** 一行 + 该行投影时算出来的派生度量（行下标对齐） */
+    private static class RowMeta {
+        private final Map<String, Object> row;
+        private final Map<String, Object> derived = new HashMap<>();
+
+        RowMeta(Map<String, Object> row) {
+            this.row = row;
+        }
     }
 
     private double toDouble(Object v) {
+        Double d = toNullableDouble(v);
+        return d == null ? 0d : d;
+    }
+
+    /** 宽松数值解析：Number / 数字字符串（"0.911"）都能取出值；取不到返回 null */
+    private Double toNullableDouble(Object v) {
         if (v instanceof Number) {
             return ((Number) v).doubleValue();
         }
         if (v != null) {
             try {
-                return Double.parseDouble(v.toString());
+                return Double.parseDouble(v.toString().trim());
             } catch (Exception ignore) {
+                // 非数值文本（如 "2026-08-23"）：不是度量，返回 null
             }
         }
-        return 0d;
+        return null;
     }
 
     private Object firstOf(Map<String, Object> full, String... keys) {

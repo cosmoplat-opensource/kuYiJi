@@ -1,3 +1,6 @@
+-- Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+-- Licensed under the Apache License, Version 2.0 (the "License");
+
 -- ============================================================
 -- hyzz_* 三方对接配置表（im-portal 库，thirdplat 后端② db0 数据源专用）
 -- 首次初始化自动建库 + 建表（与 init.sql 一起由 mysql 镜像自动执行）

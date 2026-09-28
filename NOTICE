@@ -4,10 +4,6 @@ Copyright 2026 海尔卡奥斯物联科技有限公司
 This product includes software developed by
 海尔卡奥斯物联科技有限公司
 
-This project is released under the MIT License (see the LICENSE file).
-The third-party components listed below remain under their own respective
-licenses.
-
 ================================================================================
 Third-Party Components
 ================================================================================
@@ -128,12 +124,36 @@ declaration (see the categories above); the former uni_modules plugins
 without license declarations were replaced during the 2026-02 cleanup:
 
 - lime-echart 0.6.5 (gitee.com/liangei/lime-echart) was replaced by the
-  self-developed component src/components/h-echart.vue (MIT) for H5,
+  self-developed component src/components/h-echart.vue (Apache-2.0) for H5,
   and by qiun-data-charts / uCharts (Apache-2.0, vendored under
   src/uni_modules/qiun-data-charts) for the mini-program chart.
 - ksp-cropper 1.1.6 (DCloud plugin market) was replaced by the self-developed
-  component src/components/h-cropper.vue (MIT).
+  component src/components/h-cropper.vue (Apache-2.0).
 - q-previewImage 1.0.6 was removed (no code referenced it).
+
+Modified Third-Party Source (Derived Works)
+-------------------------------------------------------------------------------
+The following modules contain source files that are derivative works of
+third-party Apache-2.0 code. Per Apache License 2.0 section 4(b) and 4(c), each
+such file retains the original copyright notice and carries a prominent notice
+stating that it was changed, together with a reference to the original project.
+
+- cosmo-himm-commom/hhim-common-easypoi/
+    src/main/java/com/cosmo/hhim/easypoi/BaseExportService.java
+    src/main/java/com/cosmo/hhim/easypoi/ExcelExportService.java
+    src/main/java/com/cosmo/hhim/easypoi/ExcelExportUtil.java
+    src/main/java/com/cosmo/hhim/easypoi/ExportCommonService.java
+    src/main/java/com/cosmo/hhim/excel/CellValueService.java
+    src/main/java/com/cosmo/hhim/excel/DownloadTemplate.java
+    src/main/java/com/cosmo/hhim/excel/ExcelFunctionUtil.java
+    src/main/java/com/cosmo/hhim/excel/ExcelImportService.java
+    src/main/java/com/cosmo/hhim/excel/ExcelImportUtil.java
+    src/main/java/com/cosmo/hhim/excel/ExcelUtilService.java
+  Derived from EasyPoi (https://github.com/jueyue/easypoi),
+  Copyright 2013-2015 JueYue (qrb.jueyue@gmail.com), Apache License 2.0.
+  Modifications Copyright (c) 2026 海尔卡奥斯物联科技有限公司: adapted for the
+  Ku易记 project, added @Slf4j logging, replaced e.printStackTrace() with
+  log.error(), and fixed Javadoc.
 
 Deployment images (infrastructure only, not part of this product's code)
 ------------------------------------------------------------------------
@@ -149,22 +169,20 @@ async message needs (third-party interface calls) were re-implemented on Redis
 Streams (a native Redis 5.0+ feature, part of the Redis server, BSD-3-Clause).
 
 ================================================================================
-Internal Modules (this project's own code, not third-party)
+Private/Internal Components
 ================================================================================
 
-The artifacts under groupId com.cosmo.plugins / com.cosmo.hhim.thirdplat /
-com.cosmo.hhim.micro are this project's own modules, not third-party
-components. Their source code is contained in this repository
-(cosmo-himm-commom / hhim-third-platform / hhim-micro-be) and is released
-under the MIT License together with this project.
+The jars under the lib/ directory are build artifacts of this project's own
+modules (groupId: com.cosmo.plugins / com.cosmo.hhim.thirdplat /
+com.cosmo.hhim.micro). Their corresponding source code is contained in this
+repository (cosmo-himm-commom / hhim-third-platform / hhim-micro-be) and is
+released under the Apache License 2.0 together with this project.
 
-They are built from source by the root pom's reactor, so no prebuilt jars and
-no private artifact repository are required:
-
-    mvn clean install -DskipTests      # run from the repository root
-
-Note: hhim-common-swagger and hhim-common-uuc were removed during the
+Note: hhim-common-swagger-4.1.jar and hhim-common-uuc were removed during the
 open-source cleanup (2026-02) because their source code is not in this
 repository and no module referenced them.
+
+These jars are installed into the local Maven repository (~/.m2/repository)
+by running install-lib.bat (Windows) or install-lib.sh (Linux/macOS).
 
 ================================================================================

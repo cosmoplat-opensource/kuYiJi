@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+-->
+
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -19,7 +24,7 @@
 
     <name>cosmo-hhim-open</name>
     <description>三方对接平台 - 基于 Spring Cloud 的工业制造微服务系统</description>
-    <url>https://github.com/your-org/cosmo-hhim-open</url>
+    <url>https://github.com/cosmoplat-opensource/kuYiJi</url>
 
     <organization>
         <name>海尔卡奥斯物联科技有限公司</name>
@@ -28,8 +33,8 @@
 
     <licenses>
         <license>
-            <name>MIT License</name>
-            <url>https://opensource.org/licenses/MIT</url>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -43,9 +48,9 @@
     </developers>
 
     <scm>
-        <url>https://github.com/your-org/cosmo-hhim-open</url>
-        <connection>scm:git:git://github.com/your-org/cosmo-hhim-open.git</connection>
-        <developerConnection>scm:git:ssh://github.com:your-org/cosmo-hhim-open.git</developerConnection>
+        <url>https://github.com/cosmoplat-opensource/kuYiJi</url>
+        <connection>scm:git:git://github.com/cosmoplat-opensource/kuYiJi.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/cosmoplat-opensource/kuYiJi.git</developerConnection>
     </scm>
 
 
@@ -562,12 +567,8 @@
     </build>
 
     <!--
-        内部模块依赖（com.cosmo.plugins / com.cosmo.hhim.thirdplat / com.cosmo.hhim.micro）
-        的源码全部在本仓库内，由本 pom 的 <modules> 聚合，一次 reactor 构建即可全部产出，
-        无需预先安装任何离线 jar，也不走公司 nexus。
-        公网依赖走 Maven Central，由 spring-boot-dependencies 等 BOM 统一管理。
-
-        构建方式：务必在仓库根目录执行（mvn clean install / mvn clean package）。
-        单独构建某个子模块时，兄弟模块尚未安装到 ~/.m2 会导致依赖解析失败。
+        公司私服依赖（com.cosmo.plugins / com.cosmo.hhim.thirdplat / com.cosmo.hhim.micro）
+        通过 lib/ 目录下的 jar 由 install-lib.bat / install-lib.sh 装到本地 ~/.m2/repository，
+        不再走公司 nexus。公网依赖走 Maven Central，由 spring-boot-dependencies 等 BOM 统一管理。
     -->
 </project>

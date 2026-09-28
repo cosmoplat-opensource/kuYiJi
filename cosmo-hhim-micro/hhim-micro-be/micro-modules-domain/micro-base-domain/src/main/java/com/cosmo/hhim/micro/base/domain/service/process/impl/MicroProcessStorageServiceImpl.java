@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.base.domain.service.process.impl;
 
@@ -648,10 +648,8 @@ public class MicroProcessStorageServiceImpl implements IMicroProcessStorageServi
                     MicroProcessStorage preProcessStorageInsert = new MicroProcessStorage();
                     preProcessStorageInsert.setProductSeq(microWorkSubmit.getProductSeq());
                     preProcessStorageInsert.setProcessSeq(preProcessSeqList.get(i));
-                    // 口径：工序间流转的只有良品（不良品通过返修/报废离开本工序的 ng_num，不参与流转），
-                    // 因此前工序的"欠账"只记良品 —— 原来记的是 -(良品+不良)，每流转一次就多扣一个不良，导致在制系统性偏负
                     preProcessStorageInsert.setNgNum(BigDecimal.ZERO);
-                    preProcessStorageInsert.setPassNum(microWorkSubmit.getCheckPassNum().negate());
+                    preProcessStorageInsert.setPassNum(microWorkSubmit.getCheckNgNum().negate().add(microWorkSubmit.getCheckPassNum().negate()));
                     preProcessStorageInsert.setCreatedDate(DateUtils.getNowDate());
                     preProcessStorageInsert.setTenantCode(microWorkSubmit.getTenantCode());
                     preProcessStorageInsert.setCreatedBy(microWorkSubmit.getSubmitUser());
@@ -665,13 +663,11 @@ public class MicroProcessStorageServiceImpl implements IMicroProcessStorageServi
                 } else {
                     MicroProcessStorage preProcessStorageUpdate = new MicroProcessStorage();
                     preProcessStorageUpdate.setId(preProcessStorage.getId());
-                    // 加减相关库存并更新（口径同注释：只对良品加减，不含不良）
+                    // 加减相关库存并更新
                     if (CommonConstants.STORAGE_CHANGE_TYPE_SUBMIT.equals(dealType)) {
-                        // 只扣减良品的数量
-                        preProcessStorageUpdate.setPassNum(preProcessStorage.getPassNum().subtract(microWorkSubmit.getCheckPassNum()));
+                        preProcessStorageUpdate.setPassNum(preProcessStorage.getPassNum().subtract(microWorkSubmit.getCheckPassNum().add(microWorkSubmit.getCheckNgNum())));
                     } else {
-                        // 只加良品的数量
-                        preProcessStorageUpdate.setPassNum(preProcessStorage.getPassNum().add(microWorkSubmit.getCheckPassNum()));
+                        preProcessStorageUpdate.setPassNum(preProcessStorage.getPassNum().add(microWorkSubmit.getCheckPassNum().add(microWorkSubmit.getCheckNgNum())));
                     }
                     preProcessStorageUpdate.setLastUpdDate(DateUtils.getNowDate());
                     preProcessStorageUpdate.setLastUpdBy(microWorkSubmit.getSubmitUser());

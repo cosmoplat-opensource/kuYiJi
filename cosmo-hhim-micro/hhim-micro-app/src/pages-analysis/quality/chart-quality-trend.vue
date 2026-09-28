@@ -1,3 +1,9 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
 <template>
   <view>
     <view class="bg-fff pt-32 mx-16 box rounded-16 mt-16 flex flex-col">
@@ -39,7 +45,12 @@
           <view class="flex align-center mt-24">
             <h-text-display :text="item.operateProcessName" :width="200" class="color-5a6f82 font-28" />
             <view class="flex-1" />
-            <area-date-info :dataItem="{ pass: 1, ng: 2 }" :unit="item.unit" />
+            <!-- 此前这里写死了 { pass: 1, ng: 2 }（占位数据），导致每行徽标都显示"良 1 不良 2" ✗
+                 现接上真实件数：列表接口(/submit/completedProductInformation)返回 checkPassNum/checkNgNum -->
+            <area-date-info
+              :dataItem="{ pass: item.checkPassNum, ng: item.checkNgNum }"
+              :unit="item.unit"
+            />
           </view>
         </view>
         <view class="font-24 color-b6c0c9 py-48 text-center">已到底部</view>

@@ -1,4 +1,10 @@
-﻿/**
+﻿/*
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+ */
+/**
  * decouple-from-ops-platform-cleanup (B.2): 租户选择 picker
  * 基于 uni.showActionSheet API 的工具模块（无 UI）。
  *

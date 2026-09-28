@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.base.domain.service.submit.impl;
 
@@ -1354,7 +1354,7 @@ public class MicroWorkSubmitServiceImpl implements IMicroWorkSubmitService {
         if (microWorkSubmit.getSubmitStatus().equals(SubmitStatusEnum.UN_APPROVE.getCode())) {
             throw new CustomException("该报工记录还未审核，无法撤销");
         }
-        if (microWorkSubmit.getIsComplete().equals(IsCompleteEnum.YES.getCode())) { // add by zyh 完工报告模块需求 20230327 
+        if (microWorkSubmit.getIsComplete().equals(IsCompleteEnum.YES.getCode())) { // add by cosmo-hhim-open Team 完工报告模块需求 20230327 
             throw new CustomException("该报工记录已入库，无法撤销");
         }
         if (microWorkSubmit.getRepairNum().add(microWorkSubmit.getAbandonedNum()).signum() > 0) {
@@ -1920,10 +1920,9 @@ public class MicroWorkSubmitServiceImpl implements IMicroWorkSubmitService {
                     MicroProcessStorage preProcessStorageInsert = new MicroProcessStorage();
                     preProcessStorageInsert.setProductSeq(microWorkSubmit.getProductSeq());
                     preProcessStorageInsert.setProcessSeq(preProcessSeqList.get(i));
-                    // 口径：工序间流转的只有良品（不良通过返修/报废离开本工序的 ng_num），前工序"欠账"只记良品
-                    // 原来记的是 -(已审不良 + 报工良品)，既多扣了不良、又与 MicroProcessStorageServiceImpl 的口径不一致
+                    // 口径沿用 master：前工序"欠账"按 良品+不良 合计扣减/回补
                     preProcessStorageInsert.setNgNum(BigDecimal.ZERO);
-                    preProcessStorageInsert.setPassNum(microWorkSubmit.getCheckPassNum().negate());
+                    preProcessStorageInsert.setPassNum(microWorkSubmit.getCheckNgNum().negate().add(microWorkSubmit.getCheckPassNum().negate()));
                     preProcessStorageInsert.setCreatedDate(DateUtils.getNowDate());
                     preProcessStorageInsert.setTenantCode(microWorkSubmit.getTenantCode());
                     preProcessStorageInsert.setCreatedBy(microWorkSubmit.getSubmitUser());
@@ -1937,13 +1936,11 @@ public class MicroWorkSubmitServiceImpl implements IMicroWorkSubmitService {
                 } else {
                     MicroProcessStorage preProcessStorageUpdate = new MicroProcessStorage();
                     preProcessStorageUpdate.setId(preProcessStorage.getId());
-                    // 加减相关库存并更新（口径同上：只对良品加减，不含不良）
+                    // 加减相关库存并更新（口径沿用 master：按 良品+不良 合计加减）
                     if (CommonConstants.STORAGE_CHANGE_TYPE_SUBMIT.equals(type)) {
-                        // 只扣减良品的数量
-                        preProcessStorageUpdate.setPassNum(preProcessStorage.getPassNum().subtract(microWorkSubmit.getCheckPassNum()));
+                        preProcessStorageUpdate.setPassNum(preProcessStorage.getPassNum().subtract(microWorkSubmit.getCheckPassNum().add(microWorkSubmit.getCheckNgNum())));
                     } else {
-                        // 只加良品的数量
-                        preProcessStorageUpdate.setPassNum(preProcessStorage.getPassNum().add(microWorkSubmit.getCheckPassNum()));
+                        preProcessStorageUpdate.setPassNum(preProcessStorage.getPassNum().add(microWorkSubmit.getCheckPassNum().add(microWorkSubmit.getCheckNgNum())));
                     }
                     preProcessStorageUpdate.setLastUpdDate(DateUtils.getNowDate());
                     preProcessStorageUpdate.setLastUpdBy(microWorkSubmit.getSubmitUser());
@@ -2372,10 +2369,9 @@ public class MicroWorkSubmitServiceImpl implements IMicroWorkSubmitService {
             }
         }
         // 负库存标签
-        // 口径：只有良品在工序间流转，所以判断"会不会扣成负库存"只比良品（原来的 passNum + ngNum 会把不良算进去 → 误报负库存）
         if (!CollectionUtils.isEmpty(preProcessTotalNumList)) {
             for (BigDecimal preProcessTotalNum : preProcessTotalNumList) {
-                if (preProcessTotalNum.subtract(microWorkSubmitDto.getPassNum()).signum() < 0) {
+                if (preProcessTotalNum.subtract(microWorkSubmitDto.getPassNum().add(microWorkSubmitDto.getNgNum())).compareTo(BigDecimal.ZERO) < 0) {
                     microWorkSubmitDto.setNegativeStockFlag(NegativeStockFlagEnum.NEGATIVE_STOCK.getCode());
                     break;
                 } else {

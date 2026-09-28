@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="flex flex-wrap justify-center m-h-100 overflow-auto">
     <view v-for="(item, index) in techData" :key="index" class="box juxta-card relative">
       <h-text-display :text="item.processName" :width="219" />

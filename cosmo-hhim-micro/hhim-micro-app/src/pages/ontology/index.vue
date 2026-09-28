@@ -1,3 +1,9 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
 <template>
   <view class="ontology-page">
     <view class="own-header">
@@ -123,8 +129,8 @@
           </template>
         </view>
       </view>
-      <view v-if="current.fields && current.fields.length" class="chips">
-        <text v-for="f in current.fields" :key="f" class="chip">{{ f }}</text>
+      <view v-if="currentFields.length" class="chips">
+        <text v-for="f in currentFields" :key="f" class="chip">{{ f }}</text>
       </view>
       <view v-if="currentExamples.length" class="examples">
         <text v-for="q in currentExamples" :key="q" class="ex" @tap="tryAsk(q)">问：{{ q }}</text>
@@ -892,6 +898,25 @@ export default {
       return rows
     })
 
+    /** 实体字段：只显示**业务名**（去掉"物理列名="前缀），避免把开发层信息给用户看 */
+    const currentFields = computed(() => {
+      const n = current.value
+      const raw = (n && n.fields) || []
+      if (!raw.length) {
+        return []
+      }
+      const out = []
+      for (let i = 0; i < raw.length; i++) {
+        const s = String(raw[i] == null ? '' : raw[i])
+        const eq = s.indexOf('=')
+        const text = eq >= 0 ? s.substring(eq + 1) : s
+        if (text) {
+          out.push(text)
+        }
+      }
+      return out
+    })
+
     /** 实例节点的关键数字（详情抽屉用） */
     const currentFacts = computed(() => {
       const n = current.value
@@ -952,7 +977,7 @@ export default {
       showCapability, showLineage, animate, lastEvt, diagText, counts, groups, relationRows, currentKind,
       relatedCaps, gnodes, edges, edgeLabels, innerStyle, mode, toggleMode, setMode, currentFacts, currentExamples,
       legendItems, legendNotes, days, setWindow, windowKey, windowLabel, productFlow, statItems, verText,
-      currentOntology, currentEntityCaps, askCap, envNote, edgesAlways, toggleEdges,
+      currentOntology, currentEntityCaps, askCap, envNote, edgesAlways, toggleEdges, currentFields,
       tapNode, onBlankTap, showGraph, zoomIn, zoomOut, fitView, toggleCapability, toggleLineage, playStory, tryAsk,
       goBack, onTouchStart, onTouchMove, onTouchEnd
     }

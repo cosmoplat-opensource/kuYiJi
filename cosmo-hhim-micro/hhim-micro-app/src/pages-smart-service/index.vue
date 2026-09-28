@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="w-full h-full bg-f3f3f5 flex flex-col overflow-hidden">
     <uni-nav-bar />
     <h-status-icon-header title="海云客服" :iconOptions="{ icon: 'icon_robot', iconType: 'png' }" />

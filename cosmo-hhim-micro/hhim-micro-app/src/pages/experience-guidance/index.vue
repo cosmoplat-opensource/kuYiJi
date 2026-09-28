@@ -1,4 +1,10 @@
-﻿<!--体验引导-->
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<!--体验引导-->
 <template>
   <view class="experience-guidance w-full h-full absolute flex flex-col justify-end" v-if="stepIndex">
     <step1 v-if="stepIndex === 1" @stepChange="handleStepChange" />

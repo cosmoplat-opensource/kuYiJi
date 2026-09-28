@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.base.domain.entity.ai;
 
@@ -12,7 +12,7 @@ import java.util.Date;
  * AI 问数消息表 micro_ai_chat_message
  *
  * <p>消息明细：role/content + 答案卡片结构化字段（route/evidence/clarify）+ 埋点字段。
- * 建表脚本见仓库根 hhim-ai-chat-schema.sql。
+ * 建表脚本见仓库根 init.sql。
  *
  * @author cosmo-hhim-open Team
  */

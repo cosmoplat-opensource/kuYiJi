@@ -1,3 +1,9 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
 <template>
 	<view class="h-echart" :style="customStyle">
 		<!-- #ifdef H5 -->
@@ -31,7 +37,7 @@
 
 <script>
 /**
- * h-echart —— echarts 图表容器组件(自研,MIT)
+ * h-echart —— echarts 图表容器组件(自研,Apache-2.0)
  *
  * 兼容原 lime-echart 的调用方式:
  *   <h-echart ref="chart" class="w-100 h-500" @finished="init" />

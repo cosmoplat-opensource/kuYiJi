@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view v-for="(dataItem, index) in dataList" :key="`p-${index}`" class="mb-8 bg-fff">
     <!--通用大列表项-->
     <view

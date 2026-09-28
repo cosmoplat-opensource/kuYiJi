@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="flex align-center rounded-16 pl-32 pr-24" :class="bgClass">
     <image src="/static/images/icon_s_b8.svg" class="icon-24" />
     <input

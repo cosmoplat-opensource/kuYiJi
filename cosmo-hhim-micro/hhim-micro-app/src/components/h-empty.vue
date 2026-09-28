@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="no-data flex flex-col w-100 align-center" :class="className">
     <image src="/static/images/img_tips_noresult.svg" class="img mb-64" />
     <text class="font-24 color-b6c0c9">{{ tipsWord }}</text>

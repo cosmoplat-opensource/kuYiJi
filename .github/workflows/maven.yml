@@ -1,3 +1,6 @@
+# Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+# Licensed under the Apache License, Version 2.0 (the "License");
+
 name: CI
 
 # 触发时机：推送到主要分支 或 对主要分支发起 PR
@@ -35,6 +38,13 @@ jobs:
             </mirrors>
           </settings>
           EOF
+
+      - name: 安装 lib/ 私有 jar 到本地仓库
+        # 仓库根 pom 聚合了三个模块，install-lib.sh 依赖根 pom 解析；Windows 下 clone 的脚本是 CRLF，需转 LF
+        run: |
+          chmod +x install-lib.sh
+          sed -i 's/\r$//' install-lib.sh
+          ./install-lib.sh
 
       - name: 编译 + 打包（跳过测试）
         # 注意：单元测试多为 SpringBootTest，需 MySQL/Redis/RocketMQ 服务，CI 暂不跑；

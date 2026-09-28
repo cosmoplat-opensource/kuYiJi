@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="w-100 relative">
     <view class="flex px-32">
       <h-search class="flex-1" placeholder="输入工序编码/名称" @searchInput="iptChange" bgClass="bg-fff-80" />

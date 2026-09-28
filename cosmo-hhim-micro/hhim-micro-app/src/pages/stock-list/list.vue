@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="flex flex-col h-100 overflow-hidden bg-f3f3f5" @touchstart="touchStart" @touchend="touchEnd">
     <view class="flex flex-col relative">
       <view class="h-80 pl-8 pr-16 box mb-24 mt-16 flex align-center justify-between pr-24 box bg-fff rounded-16 mx-16">

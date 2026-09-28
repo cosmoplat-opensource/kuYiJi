@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.base.domain.service.common.impl;
 
@@ -327,6 +327,15 @@ public class MicroAnalysisServiceImpl implements IMicroAnalysisService {
         }
 
         result.setMomCheckProgress(momCheckProgress);
+        // 环比的"可用性"交给前端呈现（上期 0 时 +100%、上期很小时 +658% 都会被误读为系统出错）：
+        result.setMomBase(temp.getTotalNum());
+        if (temp.getTotalNum().signum() == 0) {
+            result.setMomLevel("no_base");            // 上期无数据 → 前端显示"—/上期无数据"
+        } else if (temp.getTotalNum().compareTo(BigDecimal.TEN) < 0) {
+            result.setMomLevel("small_base");         // 上期 < 10 → 保留数字但标注"样本不足"
+        } else {
+            result.setMomLevel("ok");
+        }
         result.setMomPassRate(momPassRate);
 
         return result;

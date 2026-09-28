@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.base.domain.entity.analysis;
 
@@ -45,6 +45,18 @@ public class AnalysisIndex {
      * 审产进度环比
      */
     private BigDecimal momCheckProgress;
+
+    /**
+     * 环比对比的"上期值"（报产总数）。前端据此决定是否显示百分比：
+     * 上期=0 → 显示"上期无数据"；上期<10 → 标注"样本不足"。
+     * （此前上期为 0 时会显示 +100%、上期很小时显示 +658%，用户会误以为系统出错）
+     */
+    private BigDecimal momBase;
+
+    /**
+     * 环比可用性：ok（正常）/ no_base（上期无数据）/ small_base（上期样本不足，<10）
+     */
+    private String momLevel;
 
     /**
      * 审产的数量

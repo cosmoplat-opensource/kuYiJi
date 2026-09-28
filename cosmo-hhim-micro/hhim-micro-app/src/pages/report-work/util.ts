@@ -1,4 +1,10 @@
-﻿export function checkSubmitRule(prod, pre, now, item, passKey = 'passNum', ngKey = 'ngNum', standard = false) {
+﻿/*
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+ */
+export function checkSubmitRule(prod, pre, now, item, passKey = 'passNum', ngKey = 'ngNum', standard = false) {
   if (item[passKey] && !/^\d+(\.\d{1,4})?$/.test(item[passKey])) {
     uni.showToast({
       title: '良品数量应为非负数且最多保留4位小数',

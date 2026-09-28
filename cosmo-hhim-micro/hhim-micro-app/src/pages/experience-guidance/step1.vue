@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="color-fff font-64 rounded-16-top step1-wrapper">
     <view class="color-000b29 font-48 bold">欢迎来到KU易记</view>
     <view class="color-000b29 font-28 mt-24">选择感兴趣的功能，为你快速视频演示</view>

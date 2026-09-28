@@ -1,4 +1,7 @@
-责任人：张耀晖
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+-->
 
 ## 1.前言
 

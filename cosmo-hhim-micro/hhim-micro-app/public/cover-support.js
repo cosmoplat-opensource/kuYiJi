@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+ */
+
 // ============================================================
 // 移动端 viewport 兼容脚本（由 index.html 内联脚本外链化而来）
 // 外链化原因：CSP 收紧为 script-src 'self' 后，内联 <script>

@@ -1,3 +1,9 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
 <template>
   <!-- 小程序/App：movable-view（H5 端 movable-view 初始 x 超界会锁死横向拖动、边界处截断，改用下方 touch 拖动） -->
   <!-- #ifndef H5 -->

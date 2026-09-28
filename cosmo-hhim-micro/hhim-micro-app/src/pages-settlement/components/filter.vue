@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <!-- animation=false：H5 下 uni-popup 动画（slide-bottom）可能卡住导致弹窗不显示，关闭动画确保稳定弹出 -->
   <uni-popup ref="popup" type="bottom" @maskClick="handleCancel" :safe-area="false" :animation="false">
     <view class="open-filter bg-fff flex flex-col justify-start font-28">

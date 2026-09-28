@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.service.ai;
 
@@ -211,6 +211,11 @@ public class OntologyService {
         for (JSONObject m : metrics.values()) {
             OntologyCapabilityDTO dto = new OntologyCapabilityDTO();
             dto.setCode(m.getString("code"));
+            // 能力类型：metric / analysis（意图映射要据此判断"该用指标还是算子"）
+            String type = m.getString("type");
+            dto.setType(type == null || type.isEmpty() ? "metric" : type);
+            // 算子的能力规格（能算什么/需要什么/不能算什么）→ 进意图提示词，供 LLM 判断去向
+            dto.setRouting(m.getString("routing"));
             dto.setName(m.getString("name"));
             dto.setAliases(toList(m.getJSONArray("aliases")));
             dto.setDims(toList(m.getJSONArray("dims")));

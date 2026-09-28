@@ -1,3 +1,9 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
 <template>
   <view class="w-100 h-full relative box bg-f3f3f5 flex flex-col" style="padding: 0 8px">
     <uni-nav-bar />

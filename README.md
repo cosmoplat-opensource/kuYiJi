@@ -1,311 +1,492 @@
-# cosmo-hhim-open
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+-->
 
-**Powered by 卡奥斯 COSMOPlat** | Licensed under MIT License
+<div align="center">
 
----
+<h1>Ku易记 · cosmo-hhim-open</h1>
 
-## 项目简介
+<h3>让车间里每一件产品、每一次报工、每一笔结算都有据可查</h3>
 
-Ku易记（工程标识 `cosmo-hhim-open` / `cosmo.hhim.*`）是一套面向工业制造现场场景的**微应用管理平台 + 第三方集成平台**，提供与第三方平台（微信、个推、短信等）的集成能力。
+[English](README_en.md) | 简体中文
 
-### 主要功能
+[![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
+[![JDK](https://img.shields.io/badge/JDK-1.8%2B-orange.svg)](https://adoptium.net/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.3.7-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Vue](https://img.shields.io/badge/Vue-3.x-42b883.svg)](https://vuejs.org/)
+[![uni-app](https://img.shields.io/badge/uni--app-H5%20%2B%20MiniProgram-2b9939.svg)](https://uniapp.dcloud.net.cn/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1.svg)](https://www.mysql.com/)
+[![Redis](https://img.shields.io/badge/Redis-6%2B-DC382D.svg)](https://redis.io/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg)](https://docs.docker.com/compose/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-ff69b4.svg)](CONTRIBUTING.md)
 
-- 第三方平台集成（微信、个推、短信、邮件等）
-- 微应用管理（报工、质检、库存等）
-- 多租户支持
-
-### 技术栈
-
-- **框架**：Spring Boot 2.3.7 + Spring Cloud Hoxton
-- **注册中心**：Nacos（可选，当前未使用，微服务间 Feign 直连）
-- **数据库**：MySQL + Druid（db0/db1 双数据源，多租户 Schema）
-- **缓存**：Redis
-- **消息队列**：Redis Streams（三方接口异步调用，替代 RocketMQ）
-- **ORM**：MyBatis Plus
-
-### 系统架构
-
-```
-前端 uni-app / Vue3（H5 + 微信小程序，同一套代码）
-        │
-        ├── /api（nginx 反代）──► 后端① hhim-micro-be :9010（报工/质检/良品率/库存等业务微应用）
-        │
-        └── wx.request（https 合法域名）──► 后端①（小程序端）
-                                            │
-        后端① ──Feign 直连──► 后端② hhim-third-platform :8899（微信/个推/短信/邮件/SQM 等三方集成）
-        后端② ──Redis Streams──► 三方接口异步调用（失败落库，/external/retryTask 补偿重试）
-        中间件：MySQL 双库（db0/db1）/ Redis / MinIO
-```
+</div>
 
 ---
 
-## 许可证
+<div align="center">
 
-本项目采用 **MIT License** 开源。
+<img src="docs/images/KuReadme.png" alt="Ku易记 —— 车间生产，一部手机管到底：角色协作、业务流转与能力落点全景" width="100%">
 
-详细信息请参阅 [LICENSE](./LICENSE) 和 [NOTICE](./NOTICE) 文件。
+<sub>▲ <b>一张图看懂 Ku易记</b>：同一企业内租户隔离，<b>五类角色</b>各司其职（工人记工 → 审产员审核 → 质检员质检 → 车间在制品 → 管理员结算）；<br>
+底下一行是他们共同推进的同一件事：<b>报工 → 审核 → 质检合格 → 完工</b>，每一环都落数据；最下方是这批数据最终的去处 —— <b>经营分析</b>（良品率下钻 / 记工排行 / 库存分析）与 <b>AI 问数</b>（自然语言查经营，答案附数据来源）。</sub>
 
-### 版权声明
-
-Copyright 2026 海尔卡奥斯物联科技有限公司
+</div>
 
 ---
 
-## 快速开始
+**Ku易记** 是一套面向**离散制造车间**的开源精益生产管理平台。它把「工人报工 → 班组长审产 → 质检判定 → 完工入库 → 计件结算」这条现场主线装进**微信小程序和 H5**，再叠加一层**经营分析**与**AI 自然语言问数**，让车间里原本散落在纸质单据、Excel、微信群里的生产数据，第一次真正变成可追溯、可分析、可结算的结构化资产。
 
-> 💡 不想手动装环境？直接跳到 [Docker Compose 部署](#docker-compose-部署)，一条命令拉起全部服务（含中间件）。
+**不是又一个后台管理系统。** 它从工人的手机出发：产品和工序从列表点选，不用背编码、不用记流程，一次报工三步完成；班组长愿意天天用的审核流；老板一眼看得懂的经营看板。
 
-## Maven 配置建议
+<div align="center">
 
-首次构建前，建议配置 Maven 镜像以加快依赖下载（特别是在中国大陆）：
+<img src="docs/images/screens-main.png" alt="Ku易记 四个主界面：记工 / 审产 / 车间库存 / 工作台" width="100%">
 
-**~/.m2/settings.xml**：
-```xml
-<mirrors>
-  <mirror>
-    <id>aliyun-central</id>
-    <name>Aliyun Maven Central</name>
-    <url>https://maven.aliyun.com/repository/central</url>
-    <mirrorOf>central</mirrorOf>
-  </mirror>
-</mirrors>
+<br>
+
+**📱 记工**　产品工序点选，三步完成　　**✅ 审产**　超报 / 低良品率 / 超产能自动标记<br>
+**📦 车间库存**　产品·工序双视图 + 健康度预警　　**📊 工作台**　良品率、产量、审核进度一屏看完
+
+</div>
+
+---
+
+## 🚀 核心特性
+
+### 🏭 生产现场全链路闭环
+> *从工人指尖的一次点击，到财务桌上的一张结算单，全程留痕。*
+
+- **记工 / 报工**：工人按产品 + 工序报工，支持**批量报工**、**补录**（7 天内）、图片凭证、工序级库存联动；单条记录可编辑、可删除、可追溯修改历史。
+- **审产防错**：班组长按待审/驳回/已审三态处理，支持**批量审核**、**撤销审核**、**我关注的**人员过滤；报工提交时后端自动打**三重风险标记**——**超报风险**（按良品流转口径预判是否会扣成负库存）、**良品率偏低**（对比该产品+工序的日均良品率）、**记工数超产能**（对比日产能上限）。异常记录在列表打标，并可跳转「记工风险」页按类型聚合成治理清单，逐条追溯与修正。
+- **质检判定**：待检/已检双 Tab，支持合格/不良数量拆分、不良类型打标、**返修复核**全流程、质检记录时间线。
+- **车间库存（在制品）**：产品库存 + 工序库存双视图，支持**直接调整**与**变动申请**两种模式，任何一次数量变动都落**变动历史**，附健康度预警。
+- **完工入库**：完工报告（按日/按产品统计）→ 完工入库 → 出库，形成与报工数据自动对账的成品账。
+- **计件结算**：按产品/员工双维度结算，支持结算历史明细、编辑态与结算态分离，**数据源自完工报告**（口径唯一）。
+
+### 📊 经营分析：让数字自己开口
+> *良品率掉了 3 个点，到底是哪台机床、哪道工序、哪个人？*
+
+- **良品率分析**：产品 / 工序 / 员工**三个维度**自由下钻，附环比趋势与良品率趋势曲线；
+- **质量趋势**：按日/月聚合的质量走势，与良品率分析合一看板；
+- **记工排行**：员工报工量排行榜（Top-N），支持导出与邮件发送；
+- **在制品查询**：按产品/工序检索在制品分布，点进即看工序级明细；
+- **库存分析**：库存量排名、周转与异常（含"改"标与超报风险标记）；
+- **完工产品统计**：按日/按产品的完工量统计与趋势；
+- **生产日报**：支持**微信订阅消息**推送（订阅模板可在公众平台自助申请）。
+
+### 🤖 AI 问数：对着手机问经营
+> *"这个月良品率最低的产品是什么？" —— 像问同事一样问出口，答案还会告诉你它是从哪来的。*
+
+- **问一句，答一句**：产量、良品率、不良明细、记工排名、库存、延期风险…… **12 类经营问题直接用大白话问**，不用先想"这个数在哪个报表里、该选哪个筛选条件"。
+- **答案带着来历**：每个数字都能展开看**口径 / 来源 / 快照**三级依据——按什么算的、从哪来的、当时取的什么范围，看完再决定信不信，而不是只丢给你一个数。
+- **说人话**：字段名中文化、比率自动转百分比、关键数字高亮、长答案可折叠；答完还给几条"你可能还想问"。
+- **不会答就直说**：问工资、问结算、问能力之外的事，都会得到明确回复（甚至给你替代问法建议），**绝不编一个看起来很像的数字**。
+- **会话能留存**：多会话管理（搜索 / 重命名 / 删除）、失败可在对话内重试、历史随时翻回来。
+- **没配大模型也能用**：默认走规则解析 + 模板答案；配好密钥后自动升级为更强的理解与润色，**且数字会做一致性校验，校验不过自动退回模板**。
+- **顺带能"看见"数据**：配套的 [业务本体图](#-业务本体可视化) 把「谁 / 什么 → 做了什么 → 剩多少 → AI 能答什么」画成一张关系图，点一条能力就能直接开问。
+
+<details>
+<summary><strong>🔧 技术实现（面向开发者 / 二次开发）</strong></summary>
+
+- **Agent 循环编排（Plan-Act-Reflect-Replan）**
+  - **Router 确定性分流**（不调 LLM）：空/超长、含**封禁词**（工资/薪资/薪酬/结算/罚款/报酬/提成）→ 边界话术；闲聊/礼貌语 → 独立应答；其余放行进主循环；
+  - **Plan**（意图解析，LLM 优先 / 规则兜底）→ **代码归一**（时间、实体、组合白名单）→ **Act**（登记实现执行）→ **Reflect**（规则一级审视）→ 决策 **PASS / CLARIFY / REPLAN / STOP**；
+  - **四道死循环闸**：①失败指标跟踪 ②确定性错误不重试 ③全失败无数据即停 ④有数据即输出；
+  - 启动时打印**链路版本号**，排查"改了没生效"时一眼确认跑的是不是最新代码。
+- **三通道能力分流 + 可信分级**（关键设计）：
+  | 通道 | 取数方式 | 可信度 |
+  | :--- | :--- | :--- |
+  | **登记指标 / 算子** | 人写 SQL，可评审、可回归 | **权威口径**（存在即优先） |
+  | **分析算子** | 确定性聚合 + 归因计算（回答"为什么"类问题） | **权威口径** |
+  | **生成 SQL** | LLM 生成 → 过安全闸 → 只读执行 | **探索性**（`exploratory=true`，答案中如实标注） |
+- **LLM 生成 SQL 也安全**：本通道设 **`SqlGuard` 三道闸**（基于 Druid AST 解析，非字符串匹配）——
+  1. **语句类型闸**：解析后必须**恰好一条 SELECT**，任何 DML/DDL（INSERT/UPDATE/DELETE/DROP/TRUNCATE/ALTER/CALL）与多语句拼接**毫秒级直接拒绝**，不调 LLM、不重试；另加危险函数兜底（`sleep` / `benchmark` / `load_file` / `into outfile` / `information_schema` 等）；
+  2. **对象白名单闸**：AST 收集到的表必须 ∈ 白名单，列不得命中敏感列（表级 + 字段级两层）；
+  3. **强制约束（AST 改写）**：每个查询块的每张表都强制 AND 上 `tenant_code = '<当前租户>'`；无 `LIMIT` 或超上限则改写为上限行数（默认 500 行 / 单次最多 3 条语句）；
+  - **全程审计**：每条生成 SQL 的 `SUCCESS` / `REJECTED` / `FAILED`、行数、耗时均落库；执行链路**最多 2 轮**（第 1 轮结果不足才带结果再生成一轮，硬上限防无限取数）。
+- **本体驱动，不是 prompt 驱动**：`ai-ontology/` 下的 `metrics.json`（12 指标）+ `entities.json` + `relations.json` 是**唯一事实来源**，一条 `node ai-ontology/sync.js` 同步到后端与前端。
+- **数字一致性铁律**：问数结果与页面口径强制对齐（统一 `truncate(...,3)` 截断），杜绝"问数 95.7% / 页面 95.6%"这类信任崩塌。
+- **禁止误述**：全 NULL 聚合结果会被显式标注"**未取到数值 ≠ 业务上不存在**"；执行失败与"没有数据"严格区分，润色层被禁止输出"无记录 / 没有报工"这类错误结论。
+- **覆盖自检**：`ExecutionCoverageChecker` 启动比对本体承诺与执行器台账的差集，缺口以 `[AI缺口]` 落日志，可直接聚合成补登记清单。
+
+</details>
+
+### 🕸️ 业务本体可视化
+> *不只看数字，还能看见"这些数字是怎么连起来的"。*
+
+独立「业务本体」页把「谁 / 什么 → 做了什么 → 剩多少成多少 → AI 能用它答什么」画成一张**可交互关系图**：
+
+<div align="center">
+
+<img src="docs/images/screens-ai-ontology.png" alt="AI 问数与业务本体数据视图" width="880">
+
+<br>
+
+<sub><b>左</b>：AI 问数 —— 一句大白话直出答案，答案同时标注**统计范围**与**产品范围**，并可展开口径 / 来源 / 快照三级依据，末尾附一条追问入口<br>
+<b>右</b>：业务本体 —— 真实业务记录连成一张活图（产品蓝 · 工序紫 · 员工绿），它同时告诉 AI"能答什么""数据从哪来"；点节点上的能力即可直接开问</sub>
+
+</div>
+
+- **数据视图（默认）**：以**真实业务记录**为节点，分四层同心环——主数据外环 / 现场动作中环 / 结果内环 / 能力最外环，节点大小按报工量分档；
+- **结构视图**：本体类型关系（实体 / 关系 / 能力规模）；
+- **能力层与血缘线开关**：打开血缘自动联动能力层（避免端点不可见的"开关失效"错觉）；
+- **点能力直接问数**：每个实体节点展示"属于哪个本体实体 + 相关能力"，点一条能力即用其登记示例问法**直接发起问数**；
+- **工序流转**：展示该产品按实际报工先后形成的工序链路。
+
+### 📱 一套代码，双端交付
+> *老板要免安装的网页版，工人要免下载的小程序 —— 一份代码，两边都有。*
+
+- **H5 + 微信小程序**同一套 `uni-app + Vue 3` 源码，按平台条件编译（`#ifdef H5` / `#ifndef H5`）自动适配拖拽、弹窗、视频、手势等平台差异；
+- **H5 端微信能力优雅降级**（代码已适配，无需额外配置）：一键登录 → **验证码登录**、邀请海报 → **本地生成可下载**、分享 → **复制链接**、订阅消息/购买跳转 → **引导提示**；
+- **小程序主包守线**：视频（61.6 MB）与图片**不进小程序包**，随 H5 构建产物部署、由 `VITE_MP_VIDEO_BASE` 远程加载，主包稳定控制在 2MB 限制内。
+
+### 🏢 多租户 + 精细角色权限
+- **多租户隔离**：数据级租户隔离（`tenant_code`），同一套部署服务多个车间/班组/分厂；支持**邀请码加入**与**租户切换**；
+- **五种角色**：`10` 企业管理员 / `20` 审产员 / `25` 质检员 / `30` 员工 / `40` 试用，界面与能力按角色动态收敛（工人看不到管理菜单，管理者看不到工人入口）；
+- **试用体验模式**：`40` 角色走**新手引导旅程**（记工 → 审核 → 库存 → 分析四步），配**指导视频**与**体验旅程完成提示**，新人不用先读手册就能上手。
+
+### 🎯 演示数据一键切换
+> *给客户演示时不想要空看板，也不想污染真实数据。*
+
+工作台悬浮按钮一键在**演示数据 / 实际数据**之间切换，演示态为**内置真实感数据**（`.json` 随镜像发布，Redis 懒加载），后端无感知、数据库零写入。
+
+### 🔌 开箱即用的三方集成
+- **微信生态**：小程序一键登录、邀请二维码 / 小程序码生成、订阅消息（生产日报）、微信公众号；
+- **消息触达**：个推（uni-push）、短信（可对接任意网关）、邮件（支持附件上传）；
+- **协作通知**：飞书机器人 webhook（生产环境 / 测试环境 / 意见收集三通道）；
+- **对象存储**：MinIO（替代商业 CDN，图片/附件自托管，桶自动创建）；
+- **异步可靠性**：三方接口走 **Redis Streams** 异步队列，失败落库 + `/external/retryTask` 补偿重试。
+
+### ⚡ 一条命令拉起全栈
+```bash
+cp .env.example .env && docker compose up -d --build
 ```
+后端①②、H5（nginx）、MySQL（自动建表）、Redis、MinIO 全部就绪 —— 见 [快速开始](#-快速开始)。
 
-> 如果已有 Maven 配置，使用默认的 Maven Central 也可以，只是下载速度可能较慢。
+---
 
-### 运行环境
+## 📣 最新动态
 
-- JDK 1.8
-- Maven 3.6+
-- MySQL 8.0+（im_micro + im-portal 两个库）
-- Redis
-- MinIO（对象存储，替代 ioss CDN）
-- Nacos（可选，用于服务发现和配置管理）
+<details open>
+<summary><strong>🔥 AI 问数（问一问）· 本体驱动的经营问答</strong></summary>
 
-### 第一步：配置数据库
+- **12 类指标**覆盖经营概览、三维良品率、记工排名、不良明细、库存、订单延期预警、实体清单、变化归因、集中度分析、两期对比；
+- **Agent 循环编排**：Router 确定性分流（封禁词/闲聊/超长）→ Plan-Act-Reflect-Replan，四道死循环闸兜底；
+- **三通道能力分流 + 可信分级**：登记指标/算子为**权威口径**，LLM 生成 SQL 为**探索性**并如实标注；
+- **生成 SQL 的安全闸**：`SqlGuard` 三道闸（恰好一条 SELECT / 表白名单与敏感列排除 / AST 改写强制租户隔离与行数上限）+ 全程审计；
+- **分级血缘证据**：口径 / 来源 / 快照三级可核对，消灭"AI 黑箱数字"；
+- **本体单一来源**：`ai-ontology/` → `sync.js` 一键投影到后端 resources + 前端能力清单；
+- **业务本体可视化**：独立页面以关系图呈现「谁/什么 → 做了什么 → 剩多少 → AI 能答什么」，点能力直接问数；
+- **启动自检 + 缺口台账**：`ExecutionCoverageChecker` 自动发现"本体承诺了但执行器没实现"的组合，杜绝假能力；
+- **零 LLM 可用**：未配置密钥时走规则解析 + 模板答案，配置后自动升级（数字一致性校验，失败回退）；
+- **会话能力**：多会话管理（搜索/重命名/删除）、追问建议（本体投影）、失败气泡可重试、H5 输入法避让。
 
-1. 创建两个 MySQL 数据库（MySQL 8.0+）：
-   ```sql
-   CREATE DATABASE im_micro DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-   CREATE DATABASE `im-portal` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;  -- 后端②三方对接库
-   ```
-2. 导入项目根目录的初始化脚本：
-   ```bash
-   # micro_* 业务表（60 张，含初始数据）
-   mysql -h 127.0.0.1 -u root -p im_micro < init.sql
-   # hyzz_* 三方对接表（20 张，im-portal 库，后端② db0 数据源用）
-   mysql -h 127.0.0.1 -u root -p im-portal < hyzz-schema.sql
-   ```
-   或使用 Navicat / DBeaver 等工具直接导入。
+</details>
 
-   > **微信小程序配置（必配）**：`hyzz_micro_miniapp_config` 表（im-portal 库）只建表、不带数据，
-   > 部署后必须把微信小程序的 AppId/AppSecret 插入该表（模板见 `hyzz-schema.sql` 末尾的 INSERT，
-   > 将占位符替换为你的真实值即可），否则后端②无法解析小程序身份，**微信一键登录、邀请二维码/小程序码生成
-   > 等微信功能会失败（接口返回 500）**。
-   > 注意：`application_sign` 填 `micro_process`、`platform_type` 填 `wechatMiniApp`（勿填注释里的 `wechat`）、
-   > `app_id` 必须与前端 `src/manifest.json` 中 `mp-weixin.appid` 一致。
+<details>
+<summary><strong>📦 生产现场主线 · 全链路闭环完成</strong></summary>
 
-3. 修改 `cosmo-hhim-micro/hhim-micro-be/micro-interface/src/main/resources/application-local.yml` 中
-   `db0/db1` 的 `url / username / password` 指向你的数据库。
-4. 修改 `hhim-third-platform/thirdplat-web/src/main/resources/application-local.yml` 中
-   `db0` 指向 `im-portal` 库、`db1` 指向 `im_micro` 库（用 `cp application-local.yml.example application-local.yml` 复制后填写）。
+- **完工会话报告 → 完工入库 → 出库**：成品账与报工数据自动对账；
+- **计件结算**：产品/员工双维度、结算历史明细、口径统一源自完工报告；
+- **不良品返修全流程**：返修复核、不良类型打标、质检记录时间线；
+- **车间库存双模式**：直接调整 + 变动申请，每次变动落历史并附健康度预警；
+- **审产防错增强**：三重风险标记（超报 / 低良品率 / 超产能）、批量审核、审核撤销、我关注的过滤。
 
-**初始数据**（init.sql 提供，本地快速体验用）：
-- 初始租户：`A9K3Q7`
-- 初始管理员：手机号 `13800000000`，昵称"演示管理员"（登录验证码在后端控制台日志中打印）
-- 角色：10 企业管理员 / 20 审产员 / 25 质检员 / 30 员工 / 40 试用
-- 默认工序：下料 / 车削 / 攻丝
+</details>
 
-### 第二步：编译项目
+<details>
+<summary><strong>📱 双端体验与开源适配</strong></summary>
 
-> 内部模块（`com.cosmo.plugins` / `com.cosmo.hhim.thirdplat` / `com.cosmo.hhim.micro`）的源码都在本仓库内。
-> 请在**仓库根目录**构建：一次 reactor 会按依赖顺序把它们全部产出，无需安装任何离线 jar。
-> 单独构建某个子模块会因为兄弟模块尚未安装到 `~/.m2` 而依赖解析失败。
+- **H5 全平台适配**：拖拽浮标、自定义弹窗、原生 video、`visualViewport` 输入法避让、hash 路由 + 上次访问页恢复；
+- **小程序合规适配**：主包体积守线（< 2MB）、大文件远程加载、订阅消息模板自助申请；
+- **一键 Docker 部署**：全栈 compose 编排，含中间件与自动建表；
+- **开源清理**：私有 jar 离线化随仓库发布、全部敏感配置改环境变量占位符、Apache-2.0 许可与三方声明完备。
+
+</details>
+
+---
+
+## 🚀 快速开始
+
+### 步骤 1：只想先看看效果？
+
+三种零门槛方式，任选其一：
+
+| 方式 | 适合谁 | 怎么做 |
+| :--- | :--- | :--- |
+| **🐳 Docker 一键起** | 想最快看到完整系统 | 见下方[步骤 2](#步骤-2docker-一键部署推荐)，一条命令拉起全栈 |
+| **🎭 演示数据模式** | 想给客户演示 | 起好后点工作台悬浮按钮，一键切到**内置演示数据**，无需录入任何数据 |
+| **💻 本地开发模式** | 想改代码 / 二次开发 | 见下方[步骤 3](#步骤-3本地开发调试) |
+
+> 💡 **首次体验建议**：Docker 起好后用初始管理员账号登录 → 点悬浮按钮切演示数据 → 逛一遍工作台/分析/基础数据三个 Tab，30 秒建立整体印象。
+
+### 步骤 2：Docker 一键部署（推荐）
+
+**前置要求**：Docker 20.10+ 与 Docker Compose v2（`docker compose` 命令可用），建议 4 核 8G 以上。
 
 ```bash
-mvn clean install -DskipTests
+# 1. 复制环境变量模板（必填项只有两个：数据库密码 + JWT 密钥，其余留空即可启动核心功能）
+cp .env.example .env
+#    编辑 .env，至少修改：
+#      MYSQL_ROOT_PASSWORD=你的数据库密码
+#      JWT_SECRET=至少32位的随机字符串（可用 openssl rand -hex 32 生成）
+
+# 2. 构建镜像并启动全部服务（首次需下载 Maven / npm 依赖，约 10-20 分钟）
+docker compose up -d --build
+
+# 3. 等待 MySQL 初始化（首次自动建 62 + 21 张表，最长数分钟，等状态变 healthy）
+docker compose ps
+
+# 4. 观察后端日志，出现"微应用服务启动成功"即就绪
+docker compose logs -f hhim-micro-be
 ```
 
-### 第三步：启动后端
+**启动后访问**：
+
+| 入口 | 地址 | 说明 |
+| :--- | :--- | :--- |
+| 🖥️ **H5 前端** | http://localhost | `.env` 里 `H5_PORT=8080` 时改为 http://localhost:8080 |
+| 🔧 后端①（业务） | http://localhost:9010 | 报工 / 质检 / 良品率 / 库存等 |
+| 🔧 后端②（三方集成） | http://localhost:8899 | 微信 / 个推 / 短信 / 邮件 |
+| 📦 MinIO 控制台 | http://localhost:9001 | 默认 `minioadmin` / `minioadmin` |
+
+**默认演示账号**：
+
+| 项 | 值 |
+| :--- | :--- |
+| 初始租户 | `A9K3Q7` |
+| 初始管理员 | 手机号 `13800000000`，昵称「演示管理员」（登录验证码打印在后端控制台日志） |
+| 角色 | `10` 企业管理员 / `20` 审产员 / `25` 质检员 / `30` 员工 / `40` 试用 |
+| 默认工序 | 下料 / 车削 / 攻丝 |
+
+> ⚠️ **生产环境请删除演示账号**并自行创建管理员，勿使用默认手机号。
+
+### 步骤 3：本地开发调试
+
+**运行环境**：JDK 1.8 · Maven 3.6+ · Node 16/18 · MySQL 8.0+ · Redis · MinIO
+
+#### 3.1 后端
 
 ```bash
-# 启动微应用后端①（默认端口 9010）
-cd cosmo-hhim-micro/hhim-micro-be/micro-interface
-mvn spring-boot:run
+# ① 安装私有 jar 到本地 Maven 仓库（仅首次需要，仓库不带私服）
+./install-lib.sh          # Linux / macOS / Git Bash
+install-lib.bat           # Windows
 
-# 另开终端：启动第三方对接后端②（默认端口 8899）
-cd hhim-third-platform/thirdplat-web
-mvn spring-boot:run
+# ② 建库并导入初始化脚本
+mysql -h 127.0.0.1 -u root -p -e "
+  CREATE DATABASE im_micro DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+  CREATE DATABASE \`im-portal\` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;"
+mysql -h 127.0.0.1 -u root -p im_micro   < init.sql        # micro_* 业务表（62 张，含演示数据）
+mysql -h 127.0.0.1 -u root -p im-portal  < hyzz-schema.sql # hyzz_* 三方对接表（21 张）
+
+# ③ 复制配置模板并填写真实值
+cp cosmo-hhim-micro/hhim-micro-be/micro-interface/src/main/resources/application-local.yml.example \
+   cosmo-hhim-micro/hhim-micro-be/micro-interface/src/main/resources/application-local.yml
+cp hhim-third-platform/thirdplat-web/src/main/resources/application-local.yml.example \
+   hhim-third-platform/thirdplat-web/src/main/resources/application-local.yml
+#    把所有 please_set_xxx 替换为真实值
+
+# ④ 编译并启动
+mvn clean compile -DskipTests
+cd cosmo-hhim-micro/hhim-micro-be/micro-interface && mvn spring-boot:run   # 后端① :9010
+cd hhim-third-platform/thirdplat-web && mvn spring-boot:run                # 后端② :8899（另开终端）
 ```
 
-> 或使用 IDEA 打开 `cosmo-hhim-micro/hhim-micro-be` 启动 `LittleGiantsApplication`、打开 `hhim-third-platform/thirdplat-web` 启动 `ThirdpartWebApplication`。
-> 启动前请确保已配置两个后端的 `application-local.yml`（数据库 / Redis / 短信）——详见"第一步：配置数据库"。
+> 💡 **首次构建加速**：建议配置阿里云 Maven 镜像（见 [Maven 配置建议](#maven-配置建议)）。
+> 💡 **IDEA 用户**：打开 `cosmo-hhim-micro/hhim-micro-be` 启动 `LittleGiantsApplication`，打开 `hhim-third-platform/thirdplat-web` 启动 `ThirdpartWebApplication`。
 
-### 第四步：前端（H5 + 微信小程序）
-
-前端为 uni-app + Vue 3 项目（支持 **H5** 与 **微信小程序**双端）：
+#### 3.2 前端
 
 ```bash
 cd cosmo-hhim-micro/hhim-micro-app
 npm install --legacy-peer-deps
-```
 
-**H5 运行**：
-```bash
+# H5（本机 http://localhost:8082；手机同局域网访问 http://<本机IP>:8082）
 npm run dev:h5
-```
-- 本机访问 http://localhost:8082
-- 手机（与电脑同局域网）访问 `http://<本机IP>:8082`
 
-**微信小程序运行**：
-```bash
+# 微信小程序（用微信开发者工具导入 dist/dev/mp-weixin 目录）
 npm run dev:mp-weixin
 ```
-用微信开发者工具导入 `dist/dev/mp-weixin` 目录。
 
-**配置说明**：
-- 后端地址：H5 端通过环境变量 `VITE_API_BASE` 配置（默认 `/api`，由 vite dev proxy / nginx 反代到后端 9010）；小程序/App 端通过独立环境变量 `VITE_MP_API_BASE` 配置（默认 `http://localhost:9010`，仅限微信开发者工具本地调试）。**真机预览/体验版必须将 `VITE_MP_API_BASE` 改为实际后端地址**（小程序端在 `src/utils/common.ts` 的 `server` 读取该变量），且微信公众平台需配置 request 合法域名（https）。注意：小程序端不能复用 H5 的 `VITE_API_BASE`（其值 `/api` 是相对路径，`wx.request` 不支持）
-- 微信小程序 AppID 在 `src/manifest.json` 中修改 `mp-weixin.appid`（仓库默认占位 `touristappid`：微信开发者工具以游客模式运行，**注意：游客模式不支持 canvas 2d 同层渲染，echarts/uCharts 图表会显示空白**——本地调试图表时请在 `manifest.json` 填入你自己的 AppID 后重新编译，测完改回占位符再提交；真机预览/体验版/上传同样需要你的 AppID）
+#### 3.3 微信小程序两项必配（否则微信功能会失败）
 
-**前端环境变量**（构建时注入，详见 `.env.example`）：
+**① 小程序 AppID**
+
+改 `cosmo-hhim-micro/hhim-micro-app/src/manifest.json` 的 `mp-weixin.appid`：
+
+- 仓库默认占位 `touristappid`（游客模式，**不支持 canvas 2d 同层渲染，图表会显示空白**）；
+- 本地调试图表时填你自己的 AppID，**测完改回占位符再提交**；
+- 真机预览 / 体验版 / 上传发布同样需要你的真实 AppID。
+
+**② 小程序凭据入库（容易被漏！）**
+
+`hyzz_micro_miniapp_config` 表（`im-portal` 库）**只建表不带数据**，部署后必须插入：
+
+```sql
+-- 模板见 hyzz-schema.sql 末尾的 INSERT，替换占位符为你的真实值
+-- ⚠️ application_sign 必须填 'micro_process'（勿填注释里的 wechat）
+-- ⚠️ platform_type 必须填 'wechatMiniApp'
+-- ⚠️ app_id 必须与前端 manifest.json 的 mp-weixin.appid 一致
+```
+
+**不配这项的后果**：后端②无法解析小程序身份 → **微信一键登录、邀请二维码/小程序码生成等微信功能接口直接返回 500**。
+
+#### 3.4 小程序端静态资源（视频 / 图片）
+
+小程序主包限制 2MB，视频（61.6 MB）和图片**不打包进小程序**，而是随 H5 产物部署后远程加载：
+
+1. **先完成 H5 部署**；
+2. 把 `.env.production` 的 `VITE_MP_VIDEO_BASE` 改为你的 H5 域名（如 `https://your-domain.com/static/micro_app`），**重新构建小程序**；
+3. **微信公众平台配置合法域名**（真机/体验版/正式版必须，均需 **https + ICP 备案**）：
+   - `request` 合法域名 → 后端地址
+   - `downloadFile` 合法域名 → H5 静态资源地址（开发调试可先用开发者工具「真机调试」跳过校验）；
+4. **主包体积守线**：当前约 1.8MB。新增 `src/static/` 图片或大依赖后，请用开发者工具检查主包体积。
+
+#### 3.5 前端环境变量
 
 | 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `VITE_API_BASE` | `/api`（H5 dev 为 `http://localhost:9010`） | 后端接口地址前缀 |
+| :--- | :--- | :--- |
+| `VITE_API_BASE` | `/api` | **H5** 后端地址前缀（vite dev proxy / nginx 反代到 9010） |
+| `VITE_MP_API_BASE` | `http://localhost:9010` | **小程序/App** 后端地址。**真机预览/体验版必须改为公网可达 https 域名**；不可复用 `VITE_API_BASE`（相对路径 `wx.request` 不支持） |
+| `VITE_MP_VIDEO_BASE` | `.env.example` 留空 / `.env.production` 为 `https://your-domain.com/static/micro_app` | 小程序端静态资源地址（视频+图片），指向你部署的 H5 静态目录。**留空时回退包内路径**（仅部分资源可用，真机不保证） |
 | `VITE_EXPERIENCE_USERNAME` | `15888888888` | 体验登录固定账号 |
 | `VITE_EXPERIENCE_PASSWORD` | `cosmoplat` | 体验登录固定密码 |
-| `VITE_CDN_BASE` | `/static/micro_app` | 静态图片 CDN 前缀（默认已本地化；如使用自有对象存储可覆盖，如 `https://cdn.example.com`） |
-| `VITE_MP_VIDEO_BASE` | `https://your-domain.com/static/micro_app`（占位） | **小程序端静态资源地址（视频 + 图片）**：指向你部署的 H5 静态目录，见下方"小程序端静态资源"说明 |
-| `VITE_MP_API_BASE` | `http://localhost:9010` | 小程序/App 端后端地址（微信开发者工具本地调试；真机预览/体验版需改为公网可达 https 域名并在微信公众平台配置 request 合法域名） |
-| `VITE_MP_TARGET_APPID` | `wx0000000000000000`（占位） | 小程序跳转目标 AppID（本地开发可在 `.env.development.local` 配置真实值，该文件已 gitignore） |
-
-**H5 端微信专属能力差异**（代码已做多端适配，无需额外配置）：
-- 微信一键登录 / 体验登录 → H5 使用**验证码登录**
-- 邀请海报 → H5 **直接生成海报**（弹窗显示/下载）
-- 分享 → 降级为**复制链接**
-- 订阅消息 / 购买跳转 → 属微信专属能力，H5 提示引导
-
-**微信订阅消息模板**：订阅消息模板绑定具体小程序，需在微信公众平台（订阅消息 → 公共模板库）申请"生产日报"类模板，将 `template_id` 更新到数据库 `micro_wechat_msg_template_config`（`WHERE template_type='20' AND service_sign='micro_process'`）。代码逻辑通用，无需修改。
-
-**小程序端静态资源（视频/图片）**：
-- 视频（约 62MB）和图片**不会打包进小程序**（小程序主包限制 2MB），而是随 **H5 构建产物**部署（`dist/build/h5/static/micro_app/`），小程序端通过 `VITE_MP_VIDEO_BASE` 从你的 H5 域名加载；
-- **依赖关系**：请先完成 H5 部署，再将 `.env.production` 的 `VITE_MP_VIDEO_BASE` 改为你的 H5 域名（如 `https://your-domain.com/static/micro_app`），重新构建小程序；
-- **微信合法域名**（真机预览/体验/正式版必须）：在微信公众平台 → 开发设置 → 服务器域名中配置——`request` 合法域名填后端地址、`downloadFile` 合法域名填 H5 静态资源地址（均需 **https + ICP 备案**）；开发调试可先使用开发者工具的"真机调试"（不校验域名）；
-- **主包体积**：当前主包约 1.8MB（< 2MB 限制）。后续如新增图片到 `src/static/` 或引入大依赖，请用微信开发者工具检查主包体积，避免超出限制导致无法上传发布。
+| `VITE_CDN_BASE` | `/static/micro_app` | 静态图片 CDN 前缀（默认已本地化，可覆盖为自有对象存储） |
+| `VITE_MP_TARGET_APPID` | `wx0000000000000000`（占位） | 小程序跳转目标 AppID（真实值放 `.env.development.local`，已 gitignore） |
 
 ---
 
-## 项目结构
+## 🧩 功能全景
 
-```
-cosmo-hhim-open/
-├── hhim-third-platform/          # 第三方对接平台（后端②）
-│   ├── thirdplat-api/            # API 模块
-│   ├── thirdplat-common/         # 公共模块
-│   ├── thirdplat-core/           # 核心模块
-│   ├── thirdplat-modules/        # 功能模块
-│   └── thirdplat-web/            # Web 层
-├── cosmo-himm-commom/            # 通用组件（后端①）
-│   └── hhim-common-*             # 各种通用模块
-├── cosmo-hhim-micro/             # 微应用
-│   ├── hhim-micro-app/           # 微信小程序前端（uni-app）
-│   └── hhim-micro-be/            # 微应用后端①
-│       ├── micro-application/    # 应用层
-│       ├── micro-infrastructure/ # 基础设施
-│       └── micro-modules-domain/ # 领域模块
-├── .github/                      # CI 工作流
-├── docker-compose.yml            # Docker Compose 编排（开源版，一条命令拉起全部服务）
-├── .env.example                  # 环境变量模板（复制为 .env 后填写）
-├── init.sql                      # micro_* 业务表初始化脚本（60 张表）
-├── hyzz-schema.sql               # hyzz_* 三方对接表（im-portal 库，20 张表）
-├── LICENSE / NOTICE              # MIT 许可证与第三方组件声明
-└── CONTRIBUTING.md               # 贡献指南
-```
+<details open>
+<summary><strong>📋 点开查看完整功能矩阵</strong></summary>
+
+| 模块 | 能力 | 面向角色 |
+| :--- | :--- | :--- |
+| **记工 / 报工** | 单个报工、批量报工、补录（近 7 天）、图片凭证、编辑/删除、天维度汇总 | 员工 `30` |
+| **审产** | 待审/驳回/已审、批量审核、撤销审核、我关注的过滤、三重风险标记（超报 / 低良品率 / 超产能） | 审产员 `20` |
+| **质检** | 待检/已检、合格/不良拆分、不良类型打标、返修复核、质检时间线 | 质检员 `25` |
+| **车间库存** | 产品/工序双视图、直接调整、变动申请、变动历史、健康度预警 | 管理员 `10` |
+| **完工管理** | 完工报告（日/产品）、完工入库、出库 | 管理员 `10` |
+| **计件结算** | 产品/员工双维度、结算历史、结算态与编辑态分离 | 管理员 `10` |
+| **不良品管理** | 不良清单、不良处理全流程、返修、报废类型标记 | 质检员 `25` |
+| **分析报表** | 良品率（产品/工序/员工）、质量趋势、记工排行、在制品查询、库存分析、完工产品统计 | 管理员 `10` / 审产员 `20` |
+| **生产日报** | 微信订阅消息推送（订阅入口在工作台，需在公众平台申请「生产日报」类模板） | 管理员 `10` |
+| **AI 问数** | 12 类指标自然语言问数、Agent 循环编排、三通道可信分级、分级血缘证据、追问建议、多会话管理 | 管理员 `10` / 审产员 `20` |
+| **业务本体** | 可交互关系图（数据视图 / 结构视图）、能力层与血缘线、点能力直接问数、工序流转链路 | 管理员 `10` / 审产员 `20` |
+| **数据治理** | 数据健康度看板、记工风险治理（超报/低良品率/超产能）、在制品库存治理、工序异常治理（无首序尾序/多尾序指定） | 管理员 `10` |
+| **主数据维护** | 产品管理（含**工艺路线编辑**：并列/顺序排列、相似产品智能推荐）、工序管理、员工管理 | 管理员 `10` |
+| **智能客服** | 海云客服对话、常见问题、历史会话 | 全部角色 |
+| **我的中心** | 个人信息、消息订单、短信订阅、意见反馈、邀请同事、切换/加入租户、解散企业 | 全部角色 |
+| **帮助中心** | 25 个指导视频、新手引导旅程、帮助入口 | 全部角色 |
+| **演示数据** | 一键切换演示/实际数据 | 演示场景 |
+
+</details>
 
 ---
 
-## 配置说明
+## 🏗️ 系统架构
 
-### 配置文件
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  前端：uni-app + Vue 3（一套代码，双端交付）                            │
+│    ├── H5  → nginx 反代 /api → 后端①                                  │
+│    └── 微信小程序 → wx.request（https 合法域名）→ 后端①                 │
+└──────────────────────────────────────────────────────────────────────┘
+                                 │
+        ┌────────────────────────┴────────────────────────┐
+        ▼                                                  ▼
+┌───────────────────┐   Feign 直连   ┌──────────────────────────────┐
+│ 后端①              │ ─────────────► │ 后端②                         │
+│ hhim-micro-be      │                │ hhim-third-platform          │
+│ :9010              │                │ :8899                        │
+│ 报工/审产/质检      │                │ 微信/个推/短信/邮件/SQM        │
+│ 良品率/库存/结算    │                │                              │
+│ AI 问数            │                │                              │
+└───────────────────┘                └──────────────────────────────┘
+        │                                          │
+        │                                          ▼
+        │                             Redis Streams 异步队列
+        │                             （失败落库 + /external/retryTask 补偿）
+        ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│  中间件                                                               │
+│   MySQL 8.0（db0 = im_micro 业务库 / db1 = im-portal 三方库，双数据源）  │
+│   Redis（缓存 + Streams 队列）· MinIO（对象存储，替代商业 CDN）          │
+└──────────────────────────────────────────────────────────────────────┘
+```
 
-主要配置文件位于各模块的 `src/main/resources/` 目录下：
+**技术选型**：
 
-- `application.yml` - 通用配置
-- `application-local.yml` - 本地开发配置
+| 层 | 技术 |
+| :--- | :--- |
+| 后端 | Spring Boot 2.3.7.RELEASE · Spring Cloud Hoxton.SR9 · Spring Cloud Alibaba 2.2.5 · MyBatis-Plus 3.4.0 · Druid 1.2.6 · Fastjson 1.2.83 · JWT |
+| 前端 | uni-app 3.0（alpha）· Vue 3.2 · Vuex 4 · ECharts 5 / uCharts · dayjs 1.11 · BigNumber.js |
+| 存储 | MySQL 8.0（双数据源 + 多租户）· Redis（缓存 + Redis Streams 队列）· MinIO |
+| 服务发现 | Nacos（**可选**，当前默认关闭，微服务间 Feign 直连） |
+| 部署 | Docker Compose（全栈编排，含中间件自动初始化） |
 
-### 敏感信息
+---
 
-**重要**：配置文件中的敏感信息（如数据库密码、第三方密钥等）需要替换为实际值或使用环境变量：
+## 📦 部署详解
+
+### 包含的服务
+
+| 服务 | 说明 | 端口 |
+| :--- | :--- | :--- |
+| `hhim-micro-be` | 微应用后端①（业务） | 9010 |
+| `hhim-third-platform` | 三方对接后端② | 8899 |
+| `hhim-h5` | H5 前端（nginx） | `${H5_PORT:-80}` |
+| `mysql` | 数据库（自动执行 `init.sql` 建 62 张 micro_* 表 + `hyzz-schema.sql` 建 21 张 hyzz_* 表） | 3306 |
+| `redis` | 缓存 + Redis Streams 队列 | 6379 |
+| `minio` | 对象存储 | 9000 / 9001 |
+| `minio-init` | 一次性任务：自动创建 `hhim` / `hhim-micro` / `hyzz-site-test` 三个桶 | — |
+
+> Nacos 默认未启用（当前未使用服务发现/配置中心），如需启用取消 `docker-compose.yml` 中对应注释即可。
+
+### 配置要点
+
+- **全部配置项**在 `.env.example` 中有逐条注释；`.env` 不要提交到 git；
+- **MinIO 图片回显**：`MINIO_URL` 默认 `http://minio:9000`（容器内互访）。但浏览器解析不了容器名 `minio` —— 如需图片回显，改为 `http://<宿主机IP>:9000`（compose 已映射 9000 到宿主机，容器与浏览器都可访问）；
+- **后端②专用库**：`THIRDPLAT_DB_*` 默认指向 compose 内 mysql 的 `im-portal` 库，一般不用改；
+- **接入已有中间件**：若已有自建 MySQL/Redis/MinIO，只需改 `.env` 的 `DB_HOST`、`REDIS_HOST`、`MINIO_URL` 指向你的服务，无需改 compose；
+- **镜像构建参数**：`VITE_API_BASE`、`VITE_EXPERIENCE_USERNAME` / `VITE_EXPERIENCE_PASSWORD` 可在 `.env` 中覆盖。
+
+### 可选功能（留空 = 该功能不可用，不影响其他功能与启动）
+
+| 功能 | 环境变量 |
+| :--- | :--- |
+| 短信 | `COSMO_SMS_ACCESS_KEY` · `COSMO_SMS_URL` · `COSMO_SMS_TEMPLATE` · `SMS_LOGIN_CODE` · `SMS_WEEK_REPORT` · `SMS_LOGIN_TEMPLATE` · `SMS_WEEK_TEMPLATE` |
+| 个推推送 | `UNIPUSH_APP_ID` · `UNIPUSH_APP_KEY` · `UNIPUSH_APP_SECRET` · `UNIPUSH_MASTER_SECRET` · `UNIPUSH_APP_PACKAGE` · `UNIPUSH_BASE_URL` |
+| 微信公众号 | `WXMP_APP_ID` · `WXMP_APP_SECRET` · `WXMP_SERVER_TOKEN` · `WXNO_SERVER_AES_KEY` |
+| 待办推送 | `TODOPUSH_APP_ID` · `TODOPUSH_APP_SECRET` · `TODOPUSH_GATEWAY_URL` · `TODOPUSH_PARENT_ID` |
+| 飞书通知 | `FEISHU_PROD_WEBHOOK` · `FEISHU_TEST_WEBHOOK` · `FEISHU_SUGGEST_BOT_URL` |
+| 邮件 | `MAIL_ACCESS_KEY` · `MAIL_UPLOAD_URL` · `MAIL_SEND_URL` |
+| AI 问数 | `AI_BASE_URL`（OpenAI 兼容网关）· `AI_API_KEY` · `AI_CHAT_MODEL` · `AI_ENABLED` · `AI_TIMEOUT_MS` · `AI_MONTHLY_BUDGET` · `AI_REFINE_ENABLED` |
+
+### AI 问数配置
 
 ```yaml
-spring:
-  datasource:
-    password: ${MYSQL_PASSWORD:your-password}
-  redis:
-    password: ${REDIS_PASSWORD:your-password}
+# micro-interface/src/main/resources/application-local.yml（本文件已被 .gitignore 忽略）
+ai:
+  base-url: ${AI_BASE_URL:please_set_ai_base_url}     # OpenAI 兼容网关（DeepSeek / 通义 / OpenAI 等）
+  api-key: ${AI_API_KEY:please_set_ai_api_key}        # 真实密钥只存在于本地，勿提交
+  chat-model: ${AI_CHAT_MODEL:please_set_ai_chat_model}
 ```
 
-### 第三方服务配置
-
-使用第三方服务（微信、个推、短信等）需要：
-
-1. 注册相应的开发者账号
-2. 获取 AppID、AppSecret 等凭据
-3. 在配置文件中填写或通过环境变量注入
+- **未配置密钥功能依然可用**（规则意图解析 + 模板答案）；配置后自动升级为 LLM 意图解析与答案润色（含数字一致性校验，失败回退模板）；
+- 会话上限 200 条/会话（约 100 轮），持久化于 `micro_ai_chat_session` / `micro_ai_chat_message`；
+- 本体资产调整后运行 `node ai-ontology/sync.js` 同步到后端与前端。
 
 ---
 
----
+## 🔐 密钥与安全
 
-## 贡献代码
+### 设计原则：仓库零明文
 
-欢迎提交 Issue 和 Pull Request！
-
-详见 [CONTRIBUTING.md](./CONTRIBUTING.md)
-
----
-
-## 联系我们
-
-- GitHub Issues: [提交 Issue](https://github.com/your-org/cosmo-hhim-open/issues)
-
----
-
-## 关于内部模块依赖
-
-本项目内部有 32 个 Maven 模块（groupId 分为 `com.cosmo.plugins`、`com.cosmo.hhim.thirdplat`、`com.cosmo.hhim.micro`），它们**不在 Maven Central**，但**源码全部在本仓库内**，由根 `pom.xml` 的 `<modules>` 聚合：
-
-| groupId | 模块 | 源码目录 |
-| --- | --- | --- |
-| `com.cosmo.plugins` | `hhim-common-*`（11 个，version 4.1） | `cosmo-himm-commom/` |
-| `com.cosmo.hhim.thirdplat` | `thirdplat-*` / `im-api-operation`（12 个，version 1.0） | `hhim-third-platform/` |
-| `com.cosmo.hhim.micro` | `micro-*`（9 个，version 1.0） | `cosmo-hhim-micro/hhim-micro-be/` |
-
-因此**不需要任何离线 jar，也不依赖公司私服**：在仓库根目录执行一次 reactor 构建，Maven 会按依赖顺序把这 32 个模块连同两个应用入口一起编译并安装到本地仓库（`~/.m2/repository`）：
-
-```bash
-mvn clean install -DskipTests
-```
-
-> 注意：请始终从**仓库根目录**构建。直接进入某个子模块执行 `mvn` 时，它的兄弟模块可能尚未安装到 `~/.m2`，会报依赖解析失败。
-
-`pom.xml` 通过 `<dependencyManagement>` 统一声明这些模块的 version，公网依赖走 Maven Central。
-
----
-
-## 公网依赖
-
-Spring Boot / Spring Cloud / MyBatis / Fastjson 等公网包由 `pom.xml` 的 `<dependencyManagement>` 统一管理版本号，**首次构建时 Maven 会自动从 Maven Central 下载**，不需要任何额外配置。
-
----
-
-## 配置敏感信息
-
-本项目**不包含**任何明文密码、密钥或内部 IP 地址。所有敏感配置通过 **环境变量占位符**注入。
-
-### 占位符规则
-
-`application-local.yml` 使用 `${ENV_VAR:default}` 格式：
+本项目**不包含**任何明文密码、密钥或内部 IP。所有敏感配置一律通过 `${ENV_VAR:default}` 占位符注入：
 
 ```yaml
 spring:
@@ -313,20 +494,22 @@ spring:
     password: ${DB_PASSWORD:please_set_db_password}
 ```
 
-含义：
-- `${DB_PASSWORD}` → 读取环境变量 `DB_PASSWORD`
-- `:please_set_db_password` → 如果环境变量未设置，使用默认值（带 `please_set_` 前缀）
+```java
+@Value("${mail.access-key:please_set_mail_access_key}")
+private String mailAccessKey;
+```
 
-### 部署方式
+- 未设置环境变量时使用 `please_set_*` 默认值 → 数据库/Redis 连接会**失败并明确提示**，不会静默使用弱默认值；
+- 涉及的 Java 文件：`MailService` · `SendIhaierMsg` · `TenantWebInterceptorConfig` · `OpenFeishuEventListener` · `CosmoConfig` · `CustomerSuggestionFacadeService` · `MicroFAQFacadeServiceImpl`。
 
-#### 方式一：通过环境变量注入（推荐）
+### 注入方式
+
+**方式一：环境变量（推荐）**
 
 ```bash
 # Linux / macOS
 export DB_PASSWORD=your_real_password
 export REDIS_PASSWORD=your_redis_password
-export NACOS_USERNAME=your_nacos_username
-export NACOS_PASSWORD=your_nacos_password
 export JWT_SECRET=$(openssl rand -hex 32)
 mvn spring-boot:run
 ```
@@ -338,216 +521,190 @@ $env:JWT_SECRET=[guid]::NewGuid().ToString().Replace("-","")
 mvn spring-boot:run
 ```
 
-#### 方式二：复制示例文件并修改
+**方式二：复制示例文件填写**
 
 ```bash
-# thirdplat-web
-cp hhim-third-platform/thirdplat-web/src/main/resources/application-local.yml.example \
-   hhim-third-platform/thirdplat-web/src/main/resources/application-local.yml
-
-# micro-interface
-cp cosmo-hhim-micro/hhim-micro-be/micro-interface/src/main/resources/application-local.yml.example \
-   cosmo-hhim-micro/hhim-micro-be/micro-interface/src/main/resources/application-local.yml
+cp <module>/src/main/resources/application-local.yml.example \
+   <module>/src/main/resources/application-local.yml
+# 然后编辑，把所有 please_set_xxx 替换为真实值（该文件已被 .gitignore 忽略）
 ```
 
-然后编辑 `application-local.yml`，把所有 `please_set_xxx` 替换为真实值。
+### 上线前安全检查清单
 
-### 必填环境变量清单
-
-完整列表请见 `application-local.yml.example` 文件末尾的注释。常用变量：
-
-| 变量名 | 用途 |
-|--------|------|
-| `DB_PASSWORD` | 数据库密码 |
-| `REDIS_PASSWORD` | Redis 密码 |
-| `NACOS_USERNAME` / `NACOS_PASSWORD` | Nacos 凭证 |
-| `NACOS_NAMESPACE` | Nacos 命名空间（默认 `NS04001`） |
-| `JWT_SECRET` | JWT 签名密钥（至少 32 字符） |
-| `MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY` | MinIO 凭证 |
-| `UNIPUSH_APP_KEY` / `UNIPUSH_APP_SECRET` | 个推推送凭证 |
-| `WXMP_APP_ID` / `WXMP_APP_SECRET` | 微信公众号凭证 |
-| `SQM_CLIENT_ID` / `SQM_CLIENT_SECRET` | SQM 凭证 |
-| `MAIL_ACCESS_KEY` | 邮件服务凭证（卡奥斯网关 access-key） |
-| `MAIL_UPLOAD_URL` | 邮件附件上传地址 |
-| `MAIL_SEND_URL` | 邮件发送地址 |
-| `COSMO_SMS_ACCESS_KEY` | 卡奥斯短信网关 AccessKey |
-| `COSMO_SMS_URL` | 卡奥斯短信网关 URL |
-| `COSMO_SMS_TEMPLATE` | 卡奥斯短信网关模板 ID |
-| `SMS_LOGIN_CODE` | 登录验证码短信模板 ID |
-| `SMS_WEEK_REPORT` | 周报短信模板 ID |
-| `FEEDBACK_DETAIL_URL` | 意见反馈详情页链接（飞书机器人消息附带） |
-| `FEISHU_PROD_WEBHOOK` | 飞书生产环境机器人 webhook |
-| `FEISHU_TEST_WEBHOOK` | 飞书测试环境机器人 webhook |
-| `FEISHU_SUGGEST_BOT_URL` | 飞书意见收集机器人 webhook |
-
-**Docker 部署时在 `.env` 中配置的变量**（`cp .env.example .env` 后有注释说明）：
-
-| 变量名 | 用途 |
-|--------|------|
-| `MYSQL_ROOT_PASSWORD` / `DB_PASSWORD` / `DB1_PASSWORD` | MySQL root / 应用连接密码（必填） |
-| `JWT_SECRET` | JWT 签名密钥，至少 32 位（必填） |
-| `THIRDPLAT_DB_HOST` / `THIRDPLAT_DB_PORT` / `THIRDPLAT_DB_NAME` / `THIRDPLAT_DB_USERNAME` / `THIRDPLAT_DB_PASSWORD` | 后端②专用库（默认 compose 内 mysql 的 `im-portal` 库，一般不用改） |
-| `SMS_LOGIN_TEMPLATE` / `SMS_WEEK_TEMPLATE` | 后端①短信模板 ID（应与 `SMS_LOGIN_CODE` / `SMS_WEEK_REPORT` 一致） |
-| `TODOPUSH_APP_ID` / `TODOPUSH_APP_SECRET` / `TODOPUSH_GATEWAY_URL` / `TODOPUSH_PARENT_ID` | 待办推送（可选） |
-| `SYS_URL` / `ORIGINAL_CUSTOMER_CODE` / `APPLICATION_PRODUCT_ID` / `IMPORTEXPORT_IMPORT_LINK` | 系统平台 / 业务默认值（可选） |
-| `H5_PORT` | H5 宿主机映射端口（默认 80；服务器要求 8080 时改这里） |
-
-### 代码中的密钥处理
-
-项目使用 Spring `@Value` 占位符注入，不在代码中硬编码真实值：
-
-```java
-// 占位符格式：${ENV_VAR:please_set_xxx}
-@Value("${mail.access-key:please_set_mail_access_key}")
-private String mailAccessKey;
-
-@Value("${notify.feishu.prod-webhook:please_set_feishu_prod_webhook}")
-private String prodWebhook;
-```
-
-**涉及的 Java 文件**：
-- `MailService.java` — 邮件服务凭证和 URL
-- `SendIhaierMsg.java` / `TenantWebInterceptorConfig.java` — 飞书 webhook
-- `OpenFeishuEventListener.java` — 飞书意见收集 webhook
-- `CosmoConfig.java` — 卡奥斯短信网关 URL
-- `CustomerSuggestionFacadeService.java` / `MicroFAQFacadeServiceImpl.java` — 意见反馈详情页链接（`feedback.detail-url`）
-
-**用户可覆盖**：通过环境变量（如 `MAIL_ACCESS_KEY=your_key`）或 `application-local.yml` 注入真实值。
-
-### 启动校验
-
-未设置环境变量直接启动时，应用会使用默认值（如 `please_set_db_password`）。  
-如果数据库/Redis 连接时仍使用默认值，会**连接失败**，提示用户必须配置真实值。
+- [ ] 修改 `MYSQL_ROOT_PASSWORD`（勿留空）
+- [ ] 设置 `JWT_SECRET`（**至少 32 位随机串**）
+- [ ] 删除或禁用演示账号（`13800000000`）
+- [ ] `.env` / `application-local.yml` **不要提交到 git**
+- [ ] 生产环境建议修改中间件默认端口映射，或删除不需要对外暴露的 `ports:`
+- [ ] 飞书 webhook / 短信 AccessKey 等按需在后台 rotate
 
 ---
 
-## Docker Compose 部署
+## ❓ 常见问题
 
-项目提供完整的 `docker-compose.yml`，一条命令拉起全部服务（含中间件）。
+<details>
+<summary><strong>首次构建很慢 / 卡住</strong></summary>
 
-### 包含的服务
+首次 `docker compose up -d --build` 需下载 Maven / npm 依赖，约 **10-20 分钟**属正常。两个 Dockerfile 已配置阿里云 Maven 镜像，前端固定 `node:16-alpine`。
+</details>
 
-| 服务 | 说明 | 端口 |
-|------|------|------|
-| `hhim-micro-be` | 微应用后端① | 9010 |
-| `hhim-third-platform` | 第三方对接后端② | 8899 |
-| `hhim-h5` | H5 前端（nginx） | `${H5_PORT:-80}`（默认 80，.env 可改） |
-| `mysql` | 数据库（首次启动自动执行 `init.sql` 建 micro_* 60 张表 + `hyzz-schema.sql` 建 im-portal 库 hyzz_* 20 张表） | 3306 |
-| `redis` | 缓存 | 6379 |
-| `minio` | 对象存储（替代 ioss CDN） | 9000 / 9001 |
+<details>
+<summary><strong>MySQL 容器长时间 unhealthy</strong></summary>
 
-> Nacos 未启用（当前项目未使用服务发现/配置中心），如需启用取消 `docker-compose.yml` 中注释即可。
+首次启动自动建 83 张表，耗时可能达数分钟。healthcheck 的 `start_period` 已放宽到 600s，耐心等待变 `healthy` 即可。
+</details>
 
-### 部署步骤
+<details>
+<summary><strong>前端端口 80 被占用</strong></summary>
 
-```bash
-# 1. 复制环境变量模板并修改
-#    必填：MYSQL_ROOT_PASSWORD（数据库密码）、JWT_SECRET（JWT 签名密钥，至少 32 位）
-#    其余留空即可启动核心功能（短信/推送/微信等留空 = 对应功能不可用，不阻塞启动）
-cp .env.example .env
+`.env` 中改 `H5_PORT=8080`，然后 `docker compose up -d`。
+</details>
 
-# 2. 构建镜像并启动全部服务（首次构建需下载 Maven/Node 依赖，约 10-20 分钟）
-docker compose up -d --build
+<details>
+<summary><strong>中间件端口冲突（本机已装 MySQL/Redis/MinIO）</strong></summary>
 
-# 3. 等待 MySQL 初始化完成（首次自动建 80 张表，最长数分钟，容器状态 healthy 后继续）
-docker compose ps
+compose 把中间件端口（3306/6379/9000/9001）也映射到了宿主机。解决方式：停掉本机同名服务，或改 compose 中对应 `ports:`（如 `"3307:3306"`）；若中间件只需容器内互访，**直接删除该服务的 `ports:` 段**。
+</details>
 
-# 4. 查看后端启动日志，出现"微应用服务启动成功"即就绪
-docker compose logs -f hhim-micro-be
+<details>
+<summary><strong>图表显示空白（微信开发者工具）</strong></summary>
+
+`manifest.json` 的 `mp-weixin.appid` 是占位 `touristappid`，**游客模式不支持 canvas 2d 同层渲染**。填入你自己的 AppID 后重新编译即可（测完改回占位符再提交）。
+</details>
+
+<details>
+<summary><strong>微信一键登录 / 邀请二维码报 500</strong></summary>
+
+`hyzz_micro_miniapp_config` 表（`im-portal` 库）**只建表不带数据**，必须插入你的 AppId/AppSecret。注意 `application_sign` 填 `micro_process`、`platform_type` 填 `wechatMiniApp`、`app_id` 与前端 `manifest.json` 一致。详见上方「3.3 微信小程序两项必配」。
+</details>
+
+<details>
+<summary><strong>小程序真机预览请求失败</strong></summary>
+
+两个原因：① `VITE_MP_API_BASE` 仍是 `http://localhost:9010`（手机访问不到电脑的 localhost）——改为公网可达的 https 域名；② 微信公众平台未配置 `request` / `downloadFile` 合法域名（需 **https + ICP 备案**）。
+</details>
+
+<details>
+<summary><strong>AI 问数怎么新增一个指标？</strong></summary>
+
+改 `ai-ontology/metrics.json`（加指标定义 + questionTemplates）→ 在 `MicroAiDailyMapper.xml` 登记固定 SQL（人写，必带 `tenant_code` 隔离、口径注释、`nullif` 防除零、`limit`）→ 运行 `node ai-ontology/sync.js` 生效。
+
+**注意**：不要改 prompt 来实现新指标 —— 本体是唯一事实来源。登记指标属于**权威口径**通道；本体没覆盖到的问法会由**探索性**的生成 SQL 通道兜底（结果会如实标注可信度），详见上方「核心特性 → AI 问数」。
+</details>
+
+<details>
+<summary><strong>为什么问数的百分比和页面差 0.1%？</strong></summary>
+
+全站既有口径是 `BigDecimal.divide(..., 3, RoundingMode.DOWN)`（**截断** 3 位）。登记 SQL 必须用 `truncate(...,3)`，**不要用 `round(...,4)`**；`AnswerComposer.rate()` 也先截断 3 位再 ×100。这是数字一致性铁律。
+</details>
+
+### Maven 配置建议
+
+首次构建前建议配置镜像加速（尤其是中国大陆网络）：
+
+```xml
+<!-- ~/.m2/settings.xml -->
+<mirrors>
+  <mirror>
+    <id>aliyun-central</id>
+    <name>Aliyun Maven Central</name>
+    <url>https://maven.aliyun.com/repository/central</url>
+    <mirrorOf>central</mirrorOf>
+  </mirror>
+</mirrors>
 ```
 
-启动后访问：
-- H5：http://localhost（`.env` 中 `H5_PORT` 改为 8080 时，访问 http://localhost:8080）
-- 后端①：http://localhost:9010
-- 后端②：http://localhost:8899
-- MinIO 控制台：http://localhost:9001（默认 minioadmin / minioadmin）
-
-### 配置说明
-
-- **全部配置项**在 `.env.example` 中有注释说明；`.env` 不要提交到 git
-- **MinIO 图片回显**：`.env` 的 `MINIO_URL` 默认 `http://minio:9000`（容器内互访，后端上传/下载正常）。但浏览器回显图片时解析不了容器名 `minio`——如需图片回显，改为 `http://<宿主机IP>:9000`（compose 已把 9000 映射到宿主机，容器与浏览器都能访问）。桶（hhim / hhim-micro / hyzz-site-test）由 `minio-init` 服务首次启动自动创建
-- **后端②专用库**：`THIRDPLAT_DB_*` 默认指向 compose 内 mysql 的 `im-portal` 库（hyzz_* 三方对接表，由 `hyzz-schema.sql` 首次启动自动创建），一般不用改
-- **自定义中间件**：若已有自建 MySQL/Redis/MinIO，只需修改 `.env` 中的 `DB_HOST`、`REDIS_HOST`、`MINIO_URL` 等指向你自己的服务即可，无需改动 compose
-- **可选功能**（留空 = 功能不可用，不影响其他功能）：
-  - 短信：`COSMO_SMS_ACCESS_KEY` / `COSMO_SMS_URL` / `COSMO_SMS_TEMPLATE` / `SMS_LOGIN_CODE` / `SMS_WEEK_REPORT` / `SMS_LOGIN_TEMPLATE` / `SMS_WEEK_TEMPLATE`
-  - 个推推送：`UNIPUSH_APP_ID` / `UNIPUSH_APP_KEY` / `UNIPUSH_APP_SECRET` / `UNIPUSH_MASTER_SECRET` / `UNIPUSH_APP_PACKAGE` / `UNIPUSH_BASE_URL`
-  - 微信公众号：`WXMP_APP_ID` / `WXMP_APP_SECRET` / `WXMP_SERVER_TOKEN` / `WXNO_SERVER_AES_KEY`
-  - 海尔 SQM 开放平台：`SQM_CLIENT_ID` / `SQM_CLIENT_SECRET`
-  - 待办推送：`TODOPUSH_APP_ID` / `TODOPUSH_APP_SECRET` / `TODOPUSH_GATEWAY_URL` / `TODOPUSH_PARENT_ID`
-- **镜像构建参数**：`VITE_API_BASE`（H5 API 前缀）、`VITE_EXPERIENCE_USERNAME` / `VITE_EXPERIENCE_PASSWORD`（体验登录账号）可在 `.env` 中覆盖
-
-### 常见问题
-
-- **首次构建慢**：首次 `up -d --build` 需下载 Maven / npm 依赖（后端 Dockerfile 已配置阿里云 Maven 镜像、Node 固定 16），约 10-20 分钟，属正常现象
-- **MySQL 初始化慢**：首次启动自动建 80 张表（init.sql + hyzz-schema.sql），容器状态 `unhealthy` 期间属正常（healthcheck `start_period` 已放宽到 600s），耐心等待变 `healthy`
-- **构建失败（Node 版本）**：uni-app 要求 Node 16/18，Dockerfile 已固定 `node:16-alpine`，不受本机 Node 版本影响
-- **`.env` 未创建**：compose 会用默认值启动，但 `MYSQL_ROOT_PASSWORD` / `JWT_SECRET` 为空会导致连接失败，务必先 `cp .env.example .env` 并修改
-- **前端端口冲突**：80 被占用时，`.env` 中改 `H5_PORT=8080` 后 `docker compose up -d` 即可
-- **中间件端口冲突**：compose 把中间件端口（3306/6379/9000/9001）也映射到宿主机，本机已装 MySQL/Redis/MinIO 会冲突。解决：停掉本机同名服务，或修改 compose 中对应 `ports:` 映射（如 `"3307:3306"`）；若中间件只需容器内互访、不对外，直接删除该服务的 `ports:` 段即可
+> 已有 Maven 配置时使用默认 Central 也可，仅下载较慢。
 
 ---
 
-## 默认账号与测试数据
+## 📂 项目结构
 
-`init.sql` 初始化脚本提供**演示用初始数据**（仅用于本地快速体验，详见"第一步：配置数据库"）：
+```
+cosmo-hhim-open/
+├── cosmo-hhim-micro/                 # 微应用（业务主体）
+│   ├── hhim-micro-app/               # 前端 uni-app（H5 + 微信小程序）
+│   └── hhim-micro-be/                # 后端① hhim-micro-be :9010
+│       ├── micro-interface/          # 应用入口（Spring Boot fat jar）
+│       ├── micro-application/        # 应用层
+│       ├── micro-infrastructure/     # 基础设施层
+│       └── micro-*-domain/           # 领域模块（base/storage/planning/submit/complete/ng…）
+├── hhim-third-platform/              # 后端② 三方集成 :8899
+│   ├── thirdplat-api/                # API 定义（微信/个推/短信/邮件…）
+│   ├── thirdplat-common/             # 公共模块
+│   ├── thirdplat-core/               # 核心模块
+│   ├── thirdplat-modules/            # 功能模块
+│   └── thirdplat-web/                # Web 层入口
+├── cosmo-himm-commom/                # 通用组件库（安全/缓存/日志/数据源/Excel…）
+├── ai-ontology/                      # 🤖 AI 问数本体资产（唯一事实来源）
+│   ├── metrics.json                  #   指标层（12 指标）
+│   ├── entities.json                 #   实体层
+│   ├── relations.json                #   关系层
+│   └── sync.js / validate.js / capability.js / export-frontend.js / add-metric-tables.js / add-operator-routing.js
+├── docker-compose.yml                # 全栈编排（一条命令拉起所有服务）
+├── .env.example                      # 环境变量模板（cp 为 .env 后填写）
+├── init.sql                          # micro_* 业务表（62 张，含 AI 会话表与演示数据）
+├── hyzz-schema.sql                   # hyzz_* 三方对接表（21 张）
+├── install-lib.sh / install-lib.bat  # 私有 jar 安装脚本
+├── lib/                              # 32 个私有依赖 jar（离线包）
+├── .github/workflows/                # CI（后端 Maven 编译 + 前端 H5 构建）
+├── LICENSE / NOTICE                  # Apache-2.0 许可证与三方组件声明
+└── CONTRIBUTING.md                   # 贡献指南
+```
 
-- **初始管理员**：手机号 `13800000000`，昵称"演示管理员"（角色：10 企业管理员）
-- **初始租户**：`A9K3Q7`
-- **角色**：10 企业管理员 / 20 审产员 / 25 质检员 / 30 员工 / 40 试用
-- **默认工序**：下料 / 车削 / 攻丝
+### 关于 `lib/` 私有依赖
 
-> ⚠️ 生产环境请**删除演示账号**并自行创建管理员，勿使用默认手机号。
+项目依赖 32 个内部发布的 jar（groupId 为 `com.cosmo.plugins` / `com.cosmo.hhim.thirdplat` / `com.cosmo.hhim.micro`），**不在 Maven Central**。为避免依赖任何私服，这些 jar 已作为**离线包随仓库发布**：
+
+- `pom.xml` 通过 `<dependencyManagement>` 声明了它们的 groupId / artifactId / version，但**不走任何私服**；
+- Maven 解析时直接从本地仓库（`~/.m2/repository`）查找，所以**首次构建前必须先执行** `install-lib.sh` / `install-lib.bat`；
+- `lib/` 另附 `hhim-common-ioss-4.1.pom`（含依赖信息，安装脚本自动附带）。
+
+> 注：`hhim-common-swagger-4.1.jar` 与 `hhim-common-uuc` 已在开源清理时移除（源码不在仓库且无模块引用，见 [NOTICE](NOTICE)）。
+
+### 公网依赖
+
+Spring Boot / Spring Cloud / MyBatis / Fastjson 等公网包由 `pom.xml` 的 `<dependencyManagement>` 统一管理版本，**首次构建时 Maven 自动从 Central 下载**，无需额外配置。
 
 ---
 
-## AI 问数（问一问）
+## ✨ 保持关注
 
-微信小程序/H5 端新增"问一问"入口（工作台悬浮 AI 按钮），面向管理员/审产员提供**自然语言经营问数**：产量、良品率、不良明细、记工排名、库存、实体清单等，答案附**分级血缘证据**（口径/来源/快照）与图表跳转。
+如果 Ku易记 对你有帮助 —— 或者你所在的车间正需要这样一套东西 ——
 
-### 快速配置（必读）
+⭐ **给个 Star，让更多做制造业数字化的人看到它** ⭐
 
-```yaml
-# micro-interface/src/main/resources/application-local.yml（本文件已被 .gitignore 忽略）
-ai:
-  base-url: ${AI_BASE_URL:please_set_ai_base_url}     # LLM 网关（OpenAI 兼容，如 DeepSeek / 通义 / OpenAI 等）
-  api-key: ${AI_API_KEY:please_set_ai_api_key}        # 真实密钥只存在于本地，勿提交
-  chat-model: ${AI_CHAT_MODEL:please_set_ai_chat_model}
-```
+---
 
-- 未配置密钥时功能可用（规则意图解析 + 模板答案）；配置后自动升级 LLM 意图解析与答案润色（数字一致性校验，失败回退模板）；
-- 会话上限 200 条/会话（约 100 轮），会话持久化于 `micro_ai_chat_session` / `micro_ai_chat_message`（建表脚本见仓库根 `hhim-ai-chat-schema.sql`）。
+## 🤝 贡献与社区
 
-### 本体资产（单一来源，CI 可挂）
+欢迎任何形式的参与：提 Issue、提 PR、写文档、报 Bug、分享使用场景。
 
-- `ai-ontology/metrics.json`（指标层·9 指标）+ `entities.json`（实体层）+ `relations.json`（关系层）；
-- 工具链：`validate.js`（校验）/ `capability.js`（能力清单投影）/ `export-frontend.js`（前端导出）/ `sync.js`（**一键同步**：本体 → 后端 resources + 前端 `src/utils/ai-capability.ts`）；前端投影固定放**主包** `utils/`——主包组件与分包页面都要引用它，微信小程序禁止主包 require 分包模块；
-- **新增指标/组合 = 改本体文件 + 登记 SQL（人写）**，运行 `node ai-ontology/sync.js` 生效，而非改 prompt。
+- **贡献指南**：[CONTRIBUTING.md](CONTRIBUTING.md)
+- **问题反馈**：[提交 Issue](https://github.com/cosmoplat-opensource/kuYiJi/issues)
+- **安全漏洞**：请勿公开提 Issue，通过私下渠道联系维护者
 
-### 接口
+**适合上手的贡献方向**：
+- 🐛 修 Bug / 补测试
+- 📖 完善文档与部署教程
+- 🌐 多语言 README（英/日/韩…）
+- 🎨 前端 UI 细节与无障碍
+- 🔌 接入更多三方渠道（钉钉/企业微信/更多短信网关）
 
-`POST /ai/ask`（问数）· `POST /ai/chat/session` 等会话 5 接口 · `GET /ai/capability`（能力清单）——详见《问一问接口契约》。
+---
 
-### 覆盖不到怎么办（组合登记与自检）
+## 📄 许可证
 
-登记制（人写固定 SQL）的固有风险是"本体承诺"与"执行器实现"漂移。问数不覆盖时**不允许静默失败**：
+本项目采用 [**Apache License 2.0**](LICENSE) 开源。
 
-| 情形 | 处理 | 用户看到 |
-| --- | --- | --- |
-| 问题超出能力清单（创作/归因/闲聊/未登记指标） | LLM 语义边界 | 原因 + 「你可以试试…」 |
-| 粒度在本体 `dims` 内、执行器未登记该组合 | `IntentExecutor` 入口收口 → 确定性错误（UNSUPPORTED）→ STOP | 「这个问法我还没学会。『X』目前不支持按 Y 看（可用粒度：按 Z）；你可以先问「…」」 |
-| 登记实现/配置缺陷等确定性错误 | 中性话术，技术原因只进日志（`[Agent/Reflect]`） | 「这个查询我没跑通（已记录）。换个范围或问法再试试」 |
+第三方组件声明详见 [NOTICE](NOTICE)。
 
-- **组合台账**：`IntentExecutor` 里 `CONSUMED_GROUP_BY`（已消费粒度）/ `TOLERATED_GROUP_BY`（不消费但返回行天然含该维度，近似可接受，仅告警）/ `ENTITY_NARROWED_OK`（已被单个实体约束的冗余分组，如"法兰盘产量"+product）。
-- **比率取舍必须与页面一致（数字一致性铁律）**：全站既有口径是 `BigDecimal.divide(..., 3, RoundingMode.DOWN)`（**截断** 3 位），所以登记 SQL 一律用 `truncate(...,3)`（**不要用 `round(...,4)`**），`AnswerComposer.rate()` 也先截断 3 位再 ×100。否则会出现"问数 95.7% / 页面 95.6%"（88/92 的场景）。
-- **零 SQL 优先**：同一批登记 SQL 换个排序键/比率键就是新组合——`SUMMARY×{product|employee|process}` 产量排行复用良品率 SQL（按已审记工总数=`checkPassNum+checkNgNum`），`良品率×day` 复用按日聚合 SQL 现算比率。
-- **启动自检**：`ExecutionCoverageChecker` 打印本体 `dims` 与执行器台账的差集——`[AI覆盖]`（一致）/ 未登记组合 / 未登记指标 / 死代码；缺口同时以 `[AI缺口] type=...` 出现在运行日志，可直接聚合成"该登记清单"。
-- **缺口的三种补法**（先分诊再动手）：① 已有 SQL × 已有维度 → 只补组合/投影（零 SQL）；② 确实缺数据形状 → 在 `MicroAiDailyMapper.xml` 登记一条固定 SQL（必带 `tenant_code` 隔离、口径注释、`nullif` 防除零、`limit`）；③ 本体承诺了但短期不实现 → 从该指标 `questionTemplates` 中移除，别让模板承诺假能力。
-- 红线不变：**LLM 只输出语义键，绝不产 SQL/列名/数字**；新 SQL 一律人写、可评审、可回归。
+**Copyright 2026 海尔卡奥斯物联科技有限公司**
 
-### 前端交互（问一问页面）
+---
 
-- **答案卡片**：关键数字高亮、长答案折叠（>150 字）、复制、**统计范围回显**（登记实现参数回显，用户可确认"问的是不是这段"）、依据展开（指标口径 / 数据来源 / 结果快照，键名中文化、比率转百分比）、查看图表跳转、歧义澄清选项；
-- **继续问**：按命中意图取 `FOLLOW_UPS`（本体 `questionTemplates` 投影）生成追问建议，仅最新一条答案展示，避免刷屏；空态为 `QUICK_QUESTIONS` 快捷提问（同为本体投影）；
-- **失败可重试**：问数失败在对话内留失败态气泡（本地态，不落库），点"重试"用同一问题重发，不重复上屏问题；
-- **会话**：会话记录弹层（搜索 / 重命名 / 删除 / 当前标记）、切换会话有加载态与竞态保护（快速连点丢弃过期响应）、超过 5 个会话出现搜索框；
-- **滚动与键盘**：用户上翻查看历史时新答案不强行拽到底（浮出"回到最新"）；H5 端按 `visualViewport` 上移输入栏，避免被输入法遮挡（小程序端由 `textarea` 原生 `adjust-position` 处理）。
+<div align="center">
+
+**Ku易记** · 让车间数据第一次真正被用起来
+
+</div>

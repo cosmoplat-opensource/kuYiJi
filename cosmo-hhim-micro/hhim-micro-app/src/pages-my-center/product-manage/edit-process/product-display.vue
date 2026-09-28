@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="p-16 flex align-center">
     <h-text-display :text="productName" :width="424" class="color-5a6f82 font-28" />
     <view class="flex-1" />

@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="flex box pl-32 pr-32 pt-48 pb-40" @click="edit">
     <image :src="userInfo.avatar || '/static/images/img_default.svg'" class="avatar rounded-50 icon-128 mr-32" />
     <view class="color-333 flex-1 flex flex-col">

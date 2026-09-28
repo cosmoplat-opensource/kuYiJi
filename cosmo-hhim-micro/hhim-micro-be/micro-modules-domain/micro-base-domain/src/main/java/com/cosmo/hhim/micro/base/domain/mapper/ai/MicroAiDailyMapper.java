@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.base.domain.mapper.ai;
 
@@ -118,8 +118,10 @@ public interface MicroAiDailyMapper {
      */
     int insertSqlAudit(com.cosmo.hhim.micro.base.domain.entity.ai.MicroAiSqlAudit audit);
 
-    /** 工序在制品（车间在制余额）按产品汇总：与车间库存页面同源 */
-    java.util.List<java.util.Map<String, Object>> selectProcessStockByProduct(@org.apache.ibatis.annotations.Param("tenantCode") String tenantCode);
+    /** 工序在制品（车间在制余额）按产品汇总：与车间库存页面同源；productNameOrCode 可选下推（null=不过滤，排行用） */
+    java.util.List<java.util.Map<String, Object>> selectProcessStockByProduct(
+            @org.apache.ibatis.annotations.Param("tenantCode") String tenantCode,
+            @org.apache.ibatis.annotations.Param("productNameOrCode") String productNameOrCode);
 
     /* ---------- 业务数据图（实例级：真实业务记录 + 真实发生的关系） ---------- */
 
@@ -150,8 +152,9 @@ public interface MicroAiDailyMapper {
     /** 最近一次报工日（空数据引导用）：返回 submitDay 字符串 or null */
     String selectLatestSubmitDay(@Param("tenantCode") String tenantCode);
 
-    /** 成品库存（租户隔离）：finishedNum 总数量 / productCnt 涉及产品数 */
-    Map<String, Object> selectFinishedStock(@Param("tenantCode") String tenantCode);
+    /** 成品库存（租户隔离）：finishedNum 总数量 / productCnt 涉及产品数；productNameOrCode 可选下推（null=全厂合计） */
+    Map<String, Object> selectFinishedStock(@Param("tenantCode") String tenantCode,
+                                            @Param("productNameOrCode") String productNameOrCode);
 
     /** 产品维度成品库存排行（租户隔离、同 selectFinishedStock 口径 num>0）：productName/productSeq/finishedNum */
     List<Map<String, Object>> selectFinishedStockByProduct(@Param("tenantCode") String tenantCode);

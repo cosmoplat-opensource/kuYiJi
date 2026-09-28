@@ -8,7 +8,10 @@
     "build:app": "uni build -p app",
     "build:custom": "uni build -p",
     "build:h5": "uni build",
-    "build:mp-weixin": "uni build -p mp-weixin"
+    "build:mp-weixin": "uni build -p mp-weixin",
+    "lint": "eslint src --ext .vue,.ts,.js",
+    "lint:fix": "eslint src --ext .vue,.ts,.js --fix",
+    "format": "prettier --write \"src/**/*.{vue,ts,js,scss}\""
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-alpha-3060420220922001",

@@ -1,3 +1,8 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+-->
+
 ##功能简介
 权限拦截器 feign拦截器
 ## 内置功能
@@ -7,7 +12,7 @@
 - 数据脱敏
 
 
-## 功能一：访问权限拦截器（责任人：张耀晖）
+## 功能一：访问权限拦截器
 使用参考项目：在制品库存-微应用
 
 ### 第一步：pom引入common-security依赖
@@ -52,7 +57,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @author zyh
+ * @author cosmo-hhim-open Team
  * @createTime 2022-11-07
  */
 @Slf4j
@@ -147,7 +152,7 @@ public class MicroAccessAuthFilterCondition implements CustomizedAccessAuthFilte
 注意：allowAccessRoles属性设置为可以访问此接口的角色编码
 
 
-## 功能二：数据脱敏（责任人：张耀晖）
+## 功能二：数据脱敏
 - 支持请求指定自定义字段信息脱敏
 - 支持导出Excel的指定字段脱敏
 - 可根据用户权限自动判断需不需要针对自定义脱敏字段进行脱敏处理

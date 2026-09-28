@@ -1,3 +1,6 @@
+# Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+# Licensed under the Apache License, Version 2.0 (the "License");
+
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.cosmo.hhim.thirdplat.api.wechatmp.factory.RemoteWxMenuFallbackFactory, \
   com.cosmo.hhim.thirdplat.api.wechatmp.factory.RemoteWxBaseFallbackFactory, \

@@ -1,3 +1,9 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
 <template>
   <!-- 问一问 AI 答案卡片：答案文本（关键数字高亮 + 长答案折叠）+ 统计范围 + 复制/查看图表/依据 + 继续问 + 澄清选项 -->
   <view class="h-ask-answer">
@@ -219,6 +225,8 @@ const KEY_LABELS: Record<string, string> = {
   productName: '产品',
   processName: '工序',
   nickName: '员工',
+  productCode: '产品编码',
+  processCode: '工序编码',
   deliveryDate: '交期',
   predictDate: '预计完成',
   submitDay: '日期',

@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="list-item rounded-16 pl-32 pr-32 box" @tap="handleTapItem">
     <view class="flex align-start border-bottom-f5f5f5 pt-30 pb-24">
       <view class="flex flex-col flex-1 pt-2 bold">

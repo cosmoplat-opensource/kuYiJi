@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+/*
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+ */
+
 /**
  * Ku易记 · 本体文件同步脚本（零依赖）
  * 用法：node ai-ontology/sync.js

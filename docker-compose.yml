@@ -1,3 +1,6 @@
+# Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+# Licensed under the Apache License, Version 2.0 (the "License");
+
 # ============================================================
 # cosmo-hhim 项目 Docker Compose 编排
 # 用法：
@@ -26,13 +29,13 @@ services:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
-      # 首次启动自动执行建表脚本（60 张表 micro_* 表）；本文件需和 init.sql 同目录
+      # 首次启动自动执行建表脚本（62 张表 micro_* 表，含 AI 会话表）；本文件需和 init.sql 同目录
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-      # hyzz_* 三方对接表（im-portal 库，thirdplat 后端② db0 专用）；本文件需和 hyzz-schema.sql 同目录
+      # hyzz_* 三方对接表（21 张，im-portal 库，thirdplat 后端② db0 专用）；本文件需和 hyzz-schema.sql 同目录
       - ./hyzz-schema.sql:/docker-entrypoint-initdb.d/hyzz-schema.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set}"]
-      # 首次初始化（跑 init.sql + hyzz-schema.sql 共 80 张表）可能耗时数分钟，start_period 给足容错
+      # 首次初始化（跑 init.sql + hyzz-schema.sql 共 83 张表）可能耗时数分钟，start_period 给足容错
       interval: 15s
       timeout: 10s
       retries: 30
@@ -163,6 +166,10 @@ services:
       ORIGINAL_CUSTOMER_CODE: ${ORIGINAL_CUSTOMER_CODE:-}
       APPLICATION_PRODUCT_ID: ${APPLICATION_PRODUCT_ID:-}
       IMPORTEXPORT_IMPORT_LINK: ${IMPORTEXPORT_IMPORT_LINK:-}
+      # 手动触发日报/周报推送接口开关（GET /notice/send）
+      # 该接口无登录态校验、推送无幂等，对外暴露会被反复调用刷消息/刷短信费，故默认 false。
+      # 需用外部定时任务触发推送时，在 .env 设 NOTIFY_MANUAL_TRIGGER_ENABLED=true
+      NOTIFY_MANUAL_TRIGGER_ENABLED: ${NOTIFY_MANUAL_TRIGGER_ENABLED:-false}
     ports:
       - "9010:9010"
 

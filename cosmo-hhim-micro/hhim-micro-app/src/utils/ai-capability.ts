@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+ */
 // ============================================================
 // 本文件由 ai-ontology/export-frontend.js 自动生成，请勿手改
 // 数据源：ai-ontology/metrics.json（本体·指标层 v1.0）

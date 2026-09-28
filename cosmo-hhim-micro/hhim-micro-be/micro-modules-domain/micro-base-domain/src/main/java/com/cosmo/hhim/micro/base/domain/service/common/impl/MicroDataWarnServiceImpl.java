@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.base.domain.service.common.impl;
 
@@ -742,10 +742,9 @@ public class MicroDataWarnServiceImpl implements IMicroDataWarnService {
             }
         }
         // 负库存标签
-        // 口径：只有良品在工序间流转，判断"会不会扣成负库存"只比良品（原来把不良也算进去 → 误报）
         if (!CollectionUtils.isEmpty(preProcessTotalNumList)) {
             for (BigDecimal preProcessTotalNum : preProcessTotalNumList) {
-                if (preProcessTotalNum.subtract(microWorkSubmitDto.getPassNum()).signum() < 0) {
+                if (preProcessTotalNum.subtract(microWorkSubmitDto.getPassNum().add(microWorkSubmitDto.getNgNum())).compareTo(BigDecimal.ZERO) < 0) {
                     microWorkSubmitDto.setNegativeStockFlag(NegativeStockFlagEnum.NEGATIVE_STOCK.getCode());
                     break;
                 } else {

@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="w-100 box h-96 flex align-center border-bottom-f5f5f5">
     <view class="w-176 color-5a6f82">员工</view>
     <input

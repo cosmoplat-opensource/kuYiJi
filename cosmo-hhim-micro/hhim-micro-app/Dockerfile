@@ -1,3 +1,6 @@
+# Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+# Licensed under the Apache License, Version 2.0 (the "License");
+
 # ============================================================
 # hhim-h5（前端 H5）镜像
 # 构建上下文：cosmo-hhim-micro/hhim-micro-app 目录

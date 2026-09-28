@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <uni-popup ref="popup" background-color="#00000000" :is-mask-click="false" class="rounded-16">
     <view class="popup-content relative">
       <image v-if="checkStep1" :src="formatImage('img_pop_jg')" class="popup-e-record__jg" />

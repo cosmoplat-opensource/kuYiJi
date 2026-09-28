@@ -1,3 +1,9 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
 <template>
   <view class="h-ask-loading">
     <!-- 3x3 像素网格：波峰扫过；Orbit 变体中心格常暗 -->

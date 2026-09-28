@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.dto.ai;
 
@@ -24,6 +24,51 @@ public class AskIntentResult {
 
     /** 意图编码（本体 metrics.code；NOT_SUPPORTED=超范围） */
     private String intent;
+
+    /**
+     * 这一项**想要什么**（人话，如「今天报工总数与良品率」）——来自 needs[] 的 want。
+     *
+     * <p>用途：合并骨架时写段头、依据里说明"这段数据是为什么查的"。
+     * 旧格式（intents[]）没有该字段，为空即可（执行层不得依赖它做分支）。
+     */
+    private String want;
+
+    /**
+     * 取数方式（needs[] 的 how）：operator / registered / self / compute。
+     *
+     * <p>与 {@link #route} 的关系：how 是新契约（四态），route 是旧契约（registered/self/both）。
+     * 解析时把 route 映射成 how（self→self，其余→registered）；执行层统一只认 how。
+     */
+    private String how;
+
+    /**
+     * 路由决策（框架 v2 · 判断驱动）：
+     * registered=用登记能力（权威口径）/ self=自己生成 SQL / both=两者都用。
+     * 由 LLM 对照能力的「★能力规格」按六条判据判断"这份已登记的 SQL 是否满足回答需求"。
+     */
+    private String route;
+
+    /** 路由理由（尤其"放弃登记能力自己生成"时必须写明哪条判据不满足，供审计与依据展示） */
+    private String routeReason;
+
+    /** 限定条件（"某个产品/某道工序/某个员工"），与 entities 分开，便于执行层直接落到 SQL 的 WHERE */
+    private java.util.Map<String, String> filter = new java.util.HashMap<>();
+
+    /** 依赖的前置诉求下标（如"他的良品率"依赖第 0 个诉求定出的实体） */
+    private java.util.List<Integer> dependsOn = new java.util.ArrayList<>();
+
+    /**
+     * 一句多诉求时，"主诉求"之外的其余诉求（能力 code，最多 2 个）。
+     * <p>语义判断允许一句话包含多个诉求（如"最低的产品是什么？为什么？"= 数值 + 原因），
+     * 主诉求驱动主流程，其余用于补答或提示 —— 不静默丢弃。
+     */
+    private java.util.List<String> extraIntents = new java.util.ArrayList<>();
+
+    /**
+     * 其余诉求的**完整槽位**（复用本类承载每个诉求：intent/groupBy/entities/time/order/statScope）。
+     * <p>上层据此逐个执行（每个诉求走同一条闸门+通道），最后把数据拼成**一段输出**。
+     */
+    private java.util.List<AskIntentResult> extraSlots = new java.util.ArrayList<>();
 
     /** 分组粒度（组合式能力）：null / day / product / process / employee / ngType（须在指标 dims 白名单内） */
     private String groupBy;

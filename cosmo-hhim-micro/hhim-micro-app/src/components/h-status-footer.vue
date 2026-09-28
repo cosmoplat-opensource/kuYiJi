@@ -1,4 +1,10 @@
-﻿<!--页面底部安全区域-->
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<!--页面底部安全区域-->
 <template>
   <view class="h-status-footer" :style="formatStyle" />
 </template>

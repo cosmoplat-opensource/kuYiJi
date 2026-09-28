@@ -1,3 +1,9 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
 <template>
   <scroll-view v-if="sortType === '顺序'" enable-flex scroll-y class="h-100 flex flex-col px-16 box overflow-hidden">
     <view

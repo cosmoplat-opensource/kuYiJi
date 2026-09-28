@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.planning.domain.service.manufacture.impl;
 
@@ -243,7 +243,7 @@ public class MicroManufactureOrderServiceImpl implements IMicroManufactureOrderS
         flag = microManufactureOrderMapper.updateMicroManufactureOrder(manufactureOrder);
         MicroManufactureWorkOrder param = new MicroManufactureWorkOrder();
         param.setOrderNo(manufactureOrder.getOrderNo());
-        param.setIsComplete(IsCompleteEnum.NO.getCode()); // add by zyh 2023/04/26 重启只能重启未完工入库的工单 
+        param.setIsComplete(IsCompleteEnum.NO.getCode()); // add by cosmo-hhim-open Team 2023/04/26 重启只能重启未完工入库的工单 
         List<MicroManufactureWorkOrder> workOrderList = microManufactureWorkOrderMapper.selectMicroManufactureWorkOrderList(param);
         if (!CollectionUtils.isEmpty(workOrderList)){
             //2.重启订单下的工单

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.base.domain.service.common.impl;
 
@@ -265,7 +265,7 @@ public class MicroProductServiceImpl implements IMicroProductService {
             bomMapper.updateBomByProductSeq(bom);
             updateProductHotData(microProduct);
 
-            // 发送产品名称变更的事件 add by zyh 20230426
+            // 发送产品名称变更的事件 add by cosmo-hhim-open Team 20230426
             if (StringUtils.hasText(microProduct.getProductName())) {
                 Map<String, String> map = Maps.newHashMap();
                 map.put("productSeq", microProduct.getProductSeq());

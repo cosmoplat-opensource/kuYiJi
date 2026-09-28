@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+-->
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cosmo.hhim.micro.base.domain.mapper.ai.MicroAiDailyMapper">
 
@@ -164,11 +169,17 @@
           and submit_day &lt;= curdate()
     </select>
 
-    <!-- 成品库存（租户隔离登记 SQL；替代既有 obtainedTotalStock 的跨租户/在制品口径问题） -->
+    <!-- 成品库存（租户隔离登记 SQL；替代既有 obtainedTotalStock 的跨租户/在制品口径问题）
+         productNameOrCode 可选下推：问「冰箱有成品吗」只统计该产品；
+         无记录 → 0 件如实回答，避免拿全厂合计冒充该产品库存（双向 LIKE 与实体查证同法） -->
     <select id="selectFinishedStock" resultType="java.util.Map">
         select ifnull(sum(num), 0) as finishedNum, count(*) as productCnt
         from micro_finished_product_storage
         where tenant_code = #{tenantCode} and num > 0
+        <if test="productNameOrCode != null and productNameOrCode != ''">
+          and (product_name like concat('%', #{productNameOrCode}, '%')
+               or #{productNameOrCode} like concat('%', product_name, '%'))
+        </if>
     </select>
 
     <!-- 产品维度成品库存排行（同 selectFinishedStock 口径：租户隔离 + num>0；"哪个产品库存最多"）
@@ -316,7 +327,8 @@
         group by groupName, groupKey
         order by ngNum desc
     </select>
-    <!-- 工序在制品（车间在制余额）：按产品汇总，与车间库存页面同源（micro_process_storage.pass_num） -->
+    <!-- 工序在制品（车间在制余额）：按产品汇总，与车间库存页面同源（micro_process_storage.pass_num）
+         productNameOrCode 可选下推：问「冰箱有在制吗」只汇总该产品，无记录 → 0 如实回答 -->
     <select id="selectProcessStockByProduct" resultType="java.util.Map">
         select mp.product_name as productName,
                mp.product_code as productCode,
@@ -325,6 +337,11 @@
         left join micro_product mp on mp.tenant_code = mps.tenant_code and mp.product_seq = mps.product_seq
         where mps.tenant_code = #{tenantCode}
           and mps.pass_num &gt; 0
+        <if test="productNameOrCode != null and productNameOrCode != ''">
+          and (mp.product_name like concat('%', #{productNameOrCode}, '%')
+               or mp.product_code = #{productNameOrCode}
+               or #{productNameOrCode} like concat('%', mp.product_name, '%'))
+        </if>
         group by mps.product_seq, mp.product_name, mp.product_code
         order by wipNum desc
         limit 10

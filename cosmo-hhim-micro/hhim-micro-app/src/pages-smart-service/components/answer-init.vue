@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <date-time :date-time="dayjs().format('YYYY-MM-DD HH:mm:ss')" />
   <default-answer showIcon text="您好，海云客服为您服务！" />
   <default-answer :text="adList[randomIndex]" />

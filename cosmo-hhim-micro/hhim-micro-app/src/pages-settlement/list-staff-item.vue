@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="bg-fff flex flex-col pt-32 box mb-8" v-for="(item, index) in dataList" :key="index">
     <!--头部人物信息区域-->
     <view class="flex align-center pr-32 box overflow-hidden" :class="[item.listShow ? '' : 'pb-32']">

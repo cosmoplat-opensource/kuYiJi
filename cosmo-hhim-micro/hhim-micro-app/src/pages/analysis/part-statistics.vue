@@ -1,5 +1,15 @@
-﻿<template>
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="bg-fff rounded-16 flex flex-col">
+    <!-- 统计周期说明：此前卡片只有 4 个数字、不写周期，用户会误读（"今日"被当成"本月"） -->
+    <view class="flex align-center justify-center pt-16">
+      <text class="font-22 color-999">统计周期：{{ startDate }} ~ {{ endDate }}</text>
+    </view>
     <view class="flex h-136 align-center border-bottom-f5f5f5">
       <view class="flex-1 flex flex-col align-center" @tap="toReport">
         <text class="font-32 bold">{{ indexData.submitUserNum }}<text class="font-20 color-999 ml-8">人</text></text
@@ -11,17 +21,21 @@
       </view>
       <view class="flex-1 flex flex-col align-center" @tap="toProduct">
         <text class="font-32 bold">{{ indexData.totalNum || 0 }}</text>
-        <text class="font-24 mt-8">报产总数</text>
+        <text class="font-24 mt-8">报产总数<text class="font-20 color-999">(含待审)</text></text>
       </view>
       <view class="flex-1 flex flex-col align-center">
-        <view class="relative">
+        <view class="relative" v-if="indexData.momLevel !== 'no_base'">
           <image
             :src="`/static/images/icon_trendarr_${indexData.momCheckProgress > 0 ? 'up' : 'down'}.svg`"
             class="icon-16 ml-8 mr-4 position-icon"
           />
           <text class="font-32 bold">{{ indexData.momCheckProgressShow }}%</text>
         </view>
+        <!-- 上期无数据时不显示百分比（0 → +100% 在数学上未定义，显示出来会被误认为系统出错） -->
+        <text v-else class="font-28 bold color-999">—</text>
         <text class="font-24 mt-8">环比</text>
+        <text v-if="indexData.momLevel === 'no_base'" class="font-20 color-999">上期无数据</text>
+        <text v-else-if="indexData.momLevel === 'small_base'" class="font-20 color-999">样本不足</text>
       </view>
     </view>
     <template v-if="Role_Admin || Role_Review">

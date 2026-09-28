@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+ */
 /**
  * SHA-256 实现（FIPS 180-4 标准），无外部依赖，兼容微信小程序 / H5。
  * 用于前后端约定的事件编码（替代 MD5），与后端 Sha256Utils.sha256Hex 输出一致（hex 小写）。

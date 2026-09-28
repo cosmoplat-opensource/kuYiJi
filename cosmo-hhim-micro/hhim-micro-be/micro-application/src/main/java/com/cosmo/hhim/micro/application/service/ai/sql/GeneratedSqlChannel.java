@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.service.ai.sql;
 
@@ -149,7 +149,8 @@ public class GeneratedSqlChannel {
                     audit(question, tenantCode, sessionId, intentCode, gen, i, sql, "SUCCESS", null, count, cost);
                 } catch (Exception e) {
                     // 表不存在/超时等确定性错误：不重试，如实告知（与 Agent 循环的"确定性错误不重试"一致）
-                    String msg = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
+                    String msg = (e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage())
+                            + " @" + where(e);   // 附上首个业务栈帧，避免只看到"NullPointerException"无法定位
                     firstError = msg;
                     roundFailed++;
                     Map<String, Object> item = new LinkedHashMap<>();
@@ -157,9 +158,17 @@ public class GeneratedSqlChannel {
                     item.put("sqlIndex", totalSql + i + 1);
                     item.put("error", msg);
                     outcome.results.add(item);
-                    brief.append("查询").append(totalSql + i + 1).append("执行失败：").append(msg)
-                            .append("（**这是查询失败，不是“没有数据”**：请如实说明未能取到结果，"
+                    brief.append("查询").append(totalSql + i + 1).append("执行失败：本条指标未取到")
+                            // 措辞三要点（实测踩过）：①这是**这次**查询的取数故障，不是业务上没数据；
+                            // ②其它查询若已取到结果，必须照常用那些数作答（否则模型会写成"查询失败、无数据"，把已有数字丢掉）；
+                            // ③只有**本条**指标确实没取到时才说明未取到 —— 禁止输出"无记录/无数据/没有报工"这类业务结论
+                            // ★**技术细节（异常原文/表名/字段名/SQL）一律不进 brief**：brief 会进提示词、
+                            //   极端情况下还会被当骨架直接展示给用户（实测泄漏过 SQL 与文件路径）。
+                            //   技术细节只进日志与审计表，用户可见文案只说"哪条指标没取到"。
+                            .append("（属系统侧取数故障，**不代表业务上没有数据**；"
+                                    + "其它查询已取到的结果照常使用，并说明**本条指标未取到**即可；"
                                     + "禁止输出“无记录/无数据/没有报工”这类业务结论）\n");
+                    log.warn("[AI-SQL] 查询{}执行失败：{}", totalSql + i + 1, msg);
                     audit(question, tenantCode, sessionId, intentCode, gen, i, sql, "FAILED", msg, 0,
                             System.currentTimeMillis() - t1);
                 }
@@ -289,15 +298,38 @@ public class GeneratedSqlChannel {
         return true;
     }
 
-    private String renderRows(List<Map<String, Object>> rows) {        if (rows == null || rows.isEmpty()) {
+    /** 异常定位：取首个业务栈帧（形如 Class.method:行号），让"NullPointerException"这种无信息异常可定位 */
+    private String where(Throwable e) {
+        if (e == null || e.getStackTrace() == null) {
+            return "";
+        }
+        for (StackTraceElement s : e.getStackTrace()) {
+            String cn = s.getClassName();
+            if (cn != null && cn.startsWith("com.cosmo")) {
+                return cn.substring(cn.lastIndexOf('.') + 1) + "." + s.getMethodName() + ":" + s.getLineNumber();
+            }
+        }
+        return e.getStackTrace().length > 0 ? String.valueOf(e.getStackTrace()[0]) : "";
+    }
+
+    private String renderRows(List<Map<String, Object>> rows) {
+        if (rows == null || rows.isEmpty()) {
             return "（无数据）\n";
         }
         int limit = Math.min(rows.size(), 10);
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < limit; i++) {
             Map<String, Object> row = rows.get(i);
+            // 防御：行本身可能为 null（驱动/映射的极端形态）→ 不能让它把"取到 1 行"误判成"查询失败"
+            if (row == null || row.isEmpty()) {
+                sb.append("- （该行为空值）\n");
+                continue;
+            }
             List<String> parts = new ArrayList<>();
             for (Map.Entry<String, Object> e : row.entrySet()) {
+                if (e == null) {
+                    continue;
+                }
                 parts.add(label(e.getKey()) + " " + value(e.getKey(), e.getValue()));
             }
             sb.append("- ").append(String.join("，", parts)).append("\n");
@@ -318,16 +350,21 @@ public class GeneratedSqlChannel {
         if (v == null) {
             return "—";
         }
-        if (v instanceof Number && RATE_KEYS.contains(key == null ? "" : key.toLowerCase())) {
-            // 比率：统一按百分比展示（截断 1 位，与页面观感一致）
-            java.math.BigDecimal rate = new java.math.BigDecimal(v.toString());
-            return rate.multiply(java.math.BigDecimal.valueOf(100))
-                    .setScale(1, java.math.RoundingMode.DOWN).stripTrailingZeros().toPlainString() + "%";
+        try {
+            if (v instanceof Number && RATE_KEYS.contains(key == null ? "" : key.toLowerCase())) {
+                // 比率：统一按百分比展示（截断 1 位，与页面观感一致）
+                java.math.BigDecimal rate = new java.math.BigDecimal(v.toString());
+                return rate.multiply(java.math.BigDecimal.valueOf(100))
+                        .setScale(1, java.math.RoundingMode.DOWN).stripTrailingZeros().toPlainString() + "%";
+            }
+            if (v instanceof java.math.BigDecimal) {
+                return ((java.math.BigDecimal) v).stripTrailingZeros().toPlainString();
+            }
+            return v.toString();
+        } catch (Exception e) {
+            // 数值格式化异常不该让整条查询"变成失败"：原样返回即可
+            return String.valueOf(v);
         }
-        if (v instanceof java.math.BigDecimal) {
-            return ((java.math.BigDecimal) v).stripTrailingZeros().toPlainString();
-        }
-        return v.toString();
     }
 
     /** purpose 可能是字符串，也可能是数组（模型有时给多条）——统一成一句话 */

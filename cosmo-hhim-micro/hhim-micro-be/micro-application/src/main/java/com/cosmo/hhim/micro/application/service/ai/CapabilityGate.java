@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.service.ai;
 
@@ -104,18 +104,34 @@ public class CapabilityGate {
             d.setReason("能力 " + capability + " 不在本体清单内");
             return d;
         }
-        // ① 指标词一致：问题说的指标必须在被选能力里有对应，否则就是"选错了槽位"
+        // ① 指标词一致：**只告警、不否决**（2026-09 调整，职责重新划分）
+        //
+        // 理由：「这个能力能不能回答这个问题」属于**语义判断** → 由 LLM 在意图映射阶段决定；
+        // 闸门的职责只是"**用法是否合法**"（能力是否已登记 / 参数与维度是否合法 / 实体是否存在）。
+        // 曾经的硬否决会把 LLM 正确选出的能力误杀：
+        //   例「上个月哪天良品率低？为什么？」→ LLM 正确选 ATTRIBUTION（归因算子）
+        //   但词抽取得到噪声「月哪天良品率」→ 判"未被 ATTRIBUTION 覆盖" → 否决 → 转生成 SQL → 失败
         String uncovered = uncoveredMetricTerm(question, metric);
         if (uncovered != null) {
-            d.setMode(Mode.GENERATED);
-            d.setReason("问题里的指标词「" + uncovered + "」未被能力 " + capability + " 覆盖");
-            return d;
+            log.warn("[AI闸门] 提示（**不否决**）：问题里的指标词「{}」未出现在能力 {}（{}）的名称/别名中；"
+                            + "若最终答案不贴合，请检查意图映射的提示词与能力别名登记",
+                    uncovered, capability, metric.getString("name"));
         }
         // ② 维度：问题要求的分组维度，必须是该能力声明过的维度；否则交给生成 SQL（它能按任意维度聚合）
         String unsupportedDim = unsupportedDimPhrase(question, metric);
         if (unsupportedDim != null) {
             d.setMode(Mode.GENERATED);
             d.setReason("问题要求" + unsupportedDim + "分组，但能力 " + capability + " 未声明该维度");
+            return d;
+        }
+        // ②.5 **整体量 vs 明细清单**（实测踩到，2026-09-22）：
+        //     问「这个月的返修率和报废率」「本月总不良数是多少」这类**只要一个整体数值**的问题，
+        //     却被路由到"明细清单"型能力（如 NG_DETAIL 不良明细：一行一个产品/工序/不良类型）
+        //     → 答案里出现"法兰盘DN20 不良数为 1"这种**某个分组的一行** ✗ 而用户要的是全厂合计 ✗。
+        //     判据：问题没提任何分组/排名维度（哪/每/按/各/谁/最高/最低/排名），且该能力是明细型 → 交生成 SQL 做整体聚合。
+        if (isDetailCapability(capability) && !asksForBreakdown(question)) {
+            d.setMode(Mode.GENERATED);
+            d.setReason("问题要的是整体数值，而能力 " + capability + " 只给明细清单（一行一个对象）→ 交生成 SQL 做整体聚合");
             return d;
         }
         // ③ 维度词冲突：问题明确提到某个业务维度（产品/工序/员工/不良类型），
@@ -128,6 +144,21 @@ public class CapabilityGate {
             d.setReason("问题涉及「" + conflicted + "」维度，但能力 " + capability + " 与本维度不匹配（疑似选错槽位）");
             return d;
         }
+        // ② 排序方向纠偏（**参数用法**层面，不是"能不能回答"）：
+        //    问题里的方向词是硬事实（"最少/最低/最差/倒数" vs "最多/最高/第一"），
+        //    而 LLM 可能被指标名带偏（例：「谁记工最少」→ 能力叫"记工排名"，它给了 desc ✗ →
+        //    执行器按 desc 取第一名 = 最多 → 答案把"最多"说成"最少" ✗ 事实性错误）。
+        //    这里以**问题为准**强制校准方向；LLM 没说方向时也照样补上。
+        String wantedDir = directionFromQuestion(question);
+        if (wantedDir != null && !wantedDir.equalsIgnoreCase(String.valueOf(intent.getOrderDir()))) {
+            log.warn("[AI闸门] 排序方向纠偏：问题要「{}」→ 采用 dir={}（LLM 原值={}，能力={}）",
+                    wantedDir.equals("asc") ? "最小/最低" : "最大/最高", wantedDir,
+                    intent.getOrderDir(), capability);
+            intent.setOrderDir(wantedDir);
+            if (intent.getLimit() == null) {
+                intent.setLimit(1);   // 问"最少/最高"通常只要那一个
+            }
+        }
         d.setCapability(capability);
         boolean analysis = "analysis".equalsIgnoreCase(metric.getString("type"))
                 || IntentExecutor.isAnalysisOperator(capability);
@@ -137,6 +168,43 @@ public class CapabilityGate {
     }
 
     // ------------------------------------------------------------------ 内部
+
+    /** 明细清单型能力：返回的是"一行一个对象"的清单，而不是整体数值 */
+    private boolean isDetailCapability(String capability) {
+        return "NG_DETAIL".equals(capability) || "ENTITY_LIST".equals(capability);   // 不良明细 / 实体清单
+    }
+
+    /**
+     * 问题是否要求"按某个维度拆开看"。
+     *
+     * <p>**判据必须"认维度词"，不能用「分别/各/多少种」这类口语词**：
+     * 「本月的返修率和不良数**分别**是多少」里的"分别"指的是"两个指标各自的值"，不是"按维度拆开"
+     * —— 用口语词判定会把这个整体量问题误判成"要拆开"（实测把闸门兜底整条挡掉了 ✗）。
+     */
+    private boolean asksForBreakdown(String question) {
+        if (!StringUtils.hasText(question)) {
+            return false;
+        }
+        // 具体维度词：出现即"要拆开"（这些词在 CapabilityGate 的 DIM_WORDS / DIM_GROUP_PHRASES 里已有登记）
+        for (String[] pair : DIM_WORDS) {
+            if (question.contains(pair[0])) {
+                return true;
+            }
+        }
+        for (String[] pair : DIM_GROUP_PHRASES) {
+            if (question.contains(pair[0])) {
+                return true;
+            }
+        }
+        // 排名/极值/趋势：问答的是"哪一个"，同样属于"要拆开"
+        String[] rank = {"排名", "排行", "第一", "倒数", "最高", "最低", "最多", "最少", "最差", "最好", "哪天", "哪一天"};
+        for (String w : rank) {
+            if (question.contains(w)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /** 返回"问题里有、但该能力没覆盖"的指标词（null = 全部覆盖） */
     private String uncoveredMetricTerm(String question, JSONObject metric) {
@@ -205,6 +273,26 @@ public class CapabilityGate {
         for (String[] pair : DIM_GROUP_PHRASES) {
             if (question.contains(pair[0]) && !declared.contains(pair[1])) {
                 return "按「" + pair[0].replace("按", "") + "」";
+            }
+        }
+        return null;
+    }
+
+    /** 从问题里读"排序方向"：最少/最低/最差/倒数/最后 → asc；最多/最高/最好/第一 → desc；没提返回 null */
+    private String directionFromQuestion(String question) {
+        if (question == null || question.isEmpty()) {
+            return null;
+        }
+        String[] ascWords = {"最少", "最低", "最差", "最小", "倒数", "最后", "垫底", "排最后"};
+        String[] descWords = {"最多", "最高", "最好", "最大", "第一", "排第一", "最多的是谁"};
+        for (String w : ascWords) {
+            if (question.contains(w)) {
+                return "asc";
+            }
+        }
+        for (String w : descWords) {
+            if (question.contains(w)) {
+                return "desc";
             }
         }
         return null;

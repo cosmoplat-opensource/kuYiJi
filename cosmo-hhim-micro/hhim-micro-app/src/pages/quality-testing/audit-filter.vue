@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <uni-popup ref="popup" type="bottom" @maskClick="handleCancel" :safe-area="true">
     <view class="open-filter bg-fff px-32 box flex flex-col justify-start font-28">
       <view class="title w-100 flex align-center">

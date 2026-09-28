@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <!-- 时间选择 -->
   <view class="flex font-24 color-fff justify-between align-center box">
     <!-- <view class="mark-ebf0f5">完工日期</view> -->

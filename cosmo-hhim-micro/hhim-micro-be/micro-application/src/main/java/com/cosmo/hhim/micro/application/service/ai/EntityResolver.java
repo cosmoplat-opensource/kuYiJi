@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.service.ai;
 
@@ -111,8 +111,29 @@ public class EntityResolver {
         if (!StringUtils.hasText(raw)) {
             return r;
         }
+        return resolve(intent, r.field, raw);
+    }
+
+    /**
+     * **按指定槽位**做字典查证（调用方逐个槽位查，便于把结果同步回 entities 与 filter 两处）。
+     *
+     * <p>与 {@link #resolveEntity} 的差别：那个只查"第一个已填槽位"，而 LLM 有时会把实体
+     * 只填进 `filter`（或同时填多个槽位），逐个查才不会漏。
+     *
+     * @param field 槽位键（productNameOrCode / processNameOrCode / employeeName）
+     * @param raw   用户原话里的实体值
+     */
+    public Resolved resolve(AskIntentResult intent, String field, String raw) {
+        if (intent != null) {
+            normalizeKeys(intent);
+        }
+        Resolved r = new Resolved();
+        r.field = field;
+        if (!StringUtils.hasText(raw) || field == null) {
+            return r;
+        }
         List<Map<String, Object>> rows;
-        switch (r.field) {
+        switch (field) {
             case "productNameOrCode":
                 rows = dictMapper.selectProductByName(raw);
                 break;
@@ -133,7 +154,7 @@ public class EntityResolver {
             r.status = Status.AMBIGUOUS;
             r.ambiguousQuestion = "「" + raw + "」有多个匹配，请确认：";
             for (Map<String, Object> row : rows) {
-                String name = String.valueOf(row.get(fieldNameKey(r.field)));
+                String name = String.valueOf(row.get(fieldNameKey(field)));
                 if (!"null".equals(name)) {
                     r.candidates.add(name);
                 }
@@ -141,7 +162,7 @@ public class EntityResolver {
             return r;
         }
         r.status = Status.OK;
-        r.value = String.valueOf(rows.get(0).get(fieldNameKey(r.field)));
+        r.value = String.valueOf(rows.get(0).get(fieldNameKey(field)));
         return r;
     }
 

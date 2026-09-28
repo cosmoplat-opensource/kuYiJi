@@ -1,3 +1,9 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
 <template>
   <view v-if="isShareShow" class="shareTimeLine">
     <image :src="formatImage('0825ba69-14cd-4a36-aff6-3656a41be853')" class="share-image" />

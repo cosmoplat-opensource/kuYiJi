@@ -1,4 +1,10 @@
-﻿/**
+﻿/*
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+ */
+/**
  * decouple-from-ops-platform-cleanup (C.9): 严格契约守卫
  *
  * 用于确保"需要租户上下文"的 API 调用在用户登录 + 选完租户后才执行。

@@ -1,3 +1,6 @@
+# Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+# Licensed under the Apache License, Version 2.0 (the "License");
+
 # ==============================================================
 # application-local.yml.example — 配置示例
 # ==============================================================
@@ -147,6 +150,11 @@ sys:
 notify:
   feishu:
     suggest-bot-url: ${FEISHU_SUGGEST_BOT_URL:please_set_feishu_suggest_bot_url}
+  # 手动触发推送接口开关（GET /notice/send）。
+  # 该接口按 micro_notice_config 配置逐条向已配置用户推送日报/周报（微信 + 短信），
+  # 且**不经登录态校验**，对外暴露存在被反复调用刷消息/刷短信费的风险，故默认关闭。
+  # 需要用外部定时任务触发日报/周报推送时，在 .env 设置 NOTIFY_MANUAL_TRIGGER_ENABLED=true 开启。
+  manual-trigger-enabled: ${NOTIFY_MANUAL_TRIGGER_ENABLED:false}
 
 sms:
   url: ${SMS_URL:https://your-sms-gateway/v1/sms/sendsms}
@@ -260,6 +268,7 @@ newAddProductAndProcess:
 # APPLICATION_PRODUCT_ID 应用产品 ID
 # IMPORTEXPORT_IMPORT_LINK 导入导出链接
 # FEISHU_SUGGEST_BOT_URL 飞书意见收集 webhook（建议在飞书后台 rotate）
+# NOTIFY_MANUAL_TRIGGER_ENABLED  手动触发日报/周报推送接口开关（默认 false；该接口无登录态校验，对外暴露有刷消息/刷短信费风险）
 # ORIGINAL_CUSTOMER_CODE  原始客户代码
 # FEEDBACK_DETAIL_URL     意见反馈详情页链接（飞书机器人消息附带）
 

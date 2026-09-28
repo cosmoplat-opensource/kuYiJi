@@ -1,6 +1,11 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+-->
+
 # log包使用说明
 
-## 1.功能一：操作日志异步DB记录（责任人：张耀晖）
+## 1.功能一：操作日志异步DB记录
 使用参考项目：在制品库存-微应用
 
 ### 第一步：pom引入common-log包

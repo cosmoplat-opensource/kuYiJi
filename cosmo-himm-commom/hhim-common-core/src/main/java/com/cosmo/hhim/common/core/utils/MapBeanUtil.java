@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.common.core.utils;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 
 /**
- * Created by zyh on 2021/1/9.
+ * Created by cosmo-hhim-open Team on 2021/1/9.
  * (枚举单例常用工具类)Map与Java对象互转(包含处理和不处理驼峰)
  */
 @Slf4j

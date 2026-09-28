@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.service.agent;
 
@@ -87,8 +87,10 @@ public class ExecutionCoverageChecker {
                 log.warn("[AI覆盖] 本体已发布但执行器未登记（问到会走\"还没学会\"话术，需登记执行器）: {}", unregistered);
             }
             if (!missingCombos.isEmpty()) {
-                log.warn("[AI覆盖] 本体 dims 承诺但执行器未实现（问到会给\"还没学会\"话术；"
-                        + "需登记组合/登记 SQL，或从本体问题模板中移除）: {}", missingCombos);
+                // 框架 v2（判断驱动）后，这些组合**不再是缺陷** ✗：
+                // LLM 会判定"登记能力不满足"并**自行生成 SQL 回答** ✓ → 由 warn 降为 info（仅作登记建议）
+                log.info("[AI覆盖] 以下「能力×维度」组合尚无登记实现（问到时由 LLM 自行生成 SQL 回答 ✓，"
+                        + "要走权威口径再登记对应组合/登记 SQL）: {}", missingCombos);
             }
             if (!orphan.isEmpty()) {
                 log.warn("[AI覆盖] 执行器已登记但本体无对应指标（死代码，建议清理）: {}", orphan);

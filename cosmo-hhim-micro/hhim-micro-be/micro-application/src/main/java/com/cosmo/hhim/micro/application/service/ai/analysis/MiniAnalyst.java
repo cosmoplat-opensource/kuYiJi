@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.service.ai.analysis;
 
@@ -30,11 +30,11 @@ import java.util.Map;
  */
 public final class MiniAnalyst {
 
-    /** 主因判定：贡献绝对值占比 ≥ 60% */
-    private static final BigDecimal MAJOR_SHARE = new BigDecimal("0.6");
-    /** 主因判定：样本量（明细行数）下限，低于此值只给"可能" */
-    private static final long MAJOR_MIN_ROWS = 20L;
-    /** 可忽略阈值：|贡献| < 0.5 个百分点 的分组不单独列为主因 */
+    /**
+     * 主因判定（2026-09 调整）：**贡献绝对值最大的一项即主因** ✓
+     * （门槛已取消：占比 ≥60% ✗ / 样本量 ≥20 条 ✗ —— 样本大小改为在结论里如实标注 ✓）
+     */
+    /** 可忽略阈值：最大贡献 |贡献| < 0.5 个百分点 → 变化太小，视为无可辨认主因 */
     private static final BigDecimal NEGLIGIBLE_PP = new BigDecimal("0.5");
     /** 内部计算精度（不做展示截断，展示才截断） */
     private static final MathContext MC = new MathContext(16, RoundingMode.HALF_UP);
@@ -170,14 +170,18 @@ public final class MiniAnalyst {
         }
         r.items.sort(Comparator.comparing((Contribution c) -> c.contributionPp.abs()).reversed());
 
-        // 主因判定（业务判据，不做统计检验）：贡献占比 ≥60% 且样本量 ≥20
+        // 主因判定（业务判据，2026-09 调整）：**贡献最大的一项即主因** ✓
+        //   · 取消"贡献占比 ≥60%"门槛 ✗（真实数据里各分组贡献常互相抵消，占比会 >100%，
+        //     于是永远给不出主因 → 业务上等于没用）
+        //   · 取消"样本量 ≥20 条"门槛 ✗（样本大小改为**如实标注**在结论里，由业务人员判断可信度 ✓，
+        //     而不是替业务拒绝回答）
+        //   · 仅保留"可忽略阈值"：最大贡献绝对值 < 0.5 个百分点时视为无可辨认主因（变化太小 ✓）
         if (!r.items.isEmpty() && r.deltaPp.signum() != 0) {
             Contribution first = r.items.get(0);
             BigDecimal share = first.contributionPp.abs()
                     .divide(r.deltaPp.abs(), 4, RoundingMode.HALF_UP);
             r.mainShare = share;
-            long rows = Math.max(first.rowsA, first.rowsB);
-            if (share.compareTo(MAJOR_SHARE) >= 0 && rows >= MAJOR_MIN_ROWS) {
+            if (first.contributionPp.abs().compareTo(NEGLIGIBLE_PP) >= 0) {
                 r.mainGroup = first.group;
             }
         }
@@ -247,14 +251,17 @@ public final class MiniAnalyst {
             if (c.rateA != null && c.rateB != null) {
                 sb.append("（该组 ").append(pct(c.rateA)).append(" → ").append(pct(c.rateB)).append("）");
             } else if (c.newGroup) {
-                sb.append("（本期新出现）");
+                sb.append("（本期新出现：上期无数据 → 变化**全部由它带来**，回答时应说明它是新增来源）");
             } else if (c.goneGroup) {
-                sb.append("（本期无数据）");
+                sb.append("（本期无数据：本期没有它的记录 → **不构成本期变化的原因**，回答时应明确说明"
+                        + "「本期无数据、不是原因」✗ 不要笼统说「不明确」）");
             }
             sb.append("，样本 ").append(c.rowsA).append(" → ").append(c.rowsB).append(" 条\n");
         }
         if (r.mainGroup != null) {
             Contribution main = top(r, 1).get(0);
+            // 主因 = 贡献绝对值最大的一项（2026-09 起取消 60% 占比与样本量门槛 ✓）
+            // 样本量**如实附在后面** ✓：由业务人员据此判断可信度，而不是替业务拒绝回答
             sb.append("主因：").append(r.mainGroup).append("（贡献 ").append(pp(main.contributionPp));
             // 占比只在"主因贡献不超过总变化太多"时报；否则报占比会出现 251% 这种让人以为算错的数字
             // （含义是：主因的绝对贡献大于总变化，说明其它分组同期反向变动抵消了部分变化）
@@ -263,12 +270,30 @@ public final class MiniAnalyst {
             } else {
                 sb.append("，其绝对贡献大于总变化——其余分组同期反向变动，抵消了部分变化");
             }
-            sb.append("）\n");
+            sb.append("；该组样本 ").append(main.rowsA).append(" → ").append(main.rowsB).append(" 条")
+                    // 注意措辞：**不要出现任何"请结合业务判断/样本不足"这类可被润色误读为"不明确"的话** ✗
+                    // （历史 bug：写了"样本较小，结论请结合业务判断"✗ → 润色输出"主因不明确"✗）
+                    .append(main.rowsB < 20 ? "（样本量仅供参考，**不影响主因结论**）" : "")
+                    .append("）\n");
+            // 明确指令：**主因已确定**，回答时必须写出它 ✗ 不许把"样本较小"对冲成"主因不明确"
+            sb.append("★本清单已给出确定主因：回答时**必须写明主因是「").append(r.mainGroup)
+                    .append("」** ✗ 不得改写成「主因不明确」✗；样本量只作为附注说明，"
+                            + "不得用它否定主因结论 ✗。"
+                            + "**除非本清单明确写了「无可辨认的主因」，否则回答中禁止出现「主因不明确」字样** ✗\n");
         } else {
-            sb.append("主因：不明确（各分组贡献接近或样本量不足），结论只能作为\"可能原因\"\n");
+            sb.append("主因：变化幅度过小（最大贡献不足 0.5 个百分点），无可辨认的主因；")
+                    .append("各分组贡献见上，结论只能作为\"可能原因\"\n");
         }
         sb.append("口径：已审报工（submit_status=0）；比率按页面口径截断 3 位；贡献度合计等于总变化 "
                 ).append(pp(r.sumContributionPp)).append("。");
+        // 口径说明（防"下降最多 / 贡献最大"混用）：两者是不同口径，回答时必须讲清按哪个
+        sb.append("\n口径提示：**贡献度**=该分组对【总变化】的影响（谁拖累最大看它 ✓）；"
+                + "**自身降幅**=该分组自己的比率降了几个百分点（上面每行的 X% → Y% 即为其自身变化 ✓）。"
+                + "两者含义不同，回答时必须写明按哪个口径 ✗ 不得混用。");
+        // 防润色省略关键解释：贡献绝对值大于总变化时，必须把"反向抵消"这句一并说出来
+        sb.append("\n★回答要求：若主因的绝对贡献大于总变化（如贡献 73.7 而总变化仅 4.2），"
+                + "**必须保留「其绝对贡献大于总变化——其余分组同期反向变动，抵消了部分变化」这句解释** ✗ "
+                + "不得省略，否则读者会以为数字算错 ✗");
         return sb.toString();
     }
 

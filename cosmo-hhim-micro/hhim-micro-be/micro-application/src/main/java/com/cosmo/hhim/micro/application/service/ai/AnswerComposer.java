@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.service.ai;
 
@@ -48,8 +48,24 @@ public class AnswerComposer {
         vo.setAnswer(render(intent.getIntent(), intent, exec));
         vo.setRoute(exec == null || exec.getRows() == null || exec.getRows().isEmpty()
                 ? null : buildRoute(intent.getIntent(), intent));
-        vo.setEvidence(buildEvidence(intent.getIntent(), exec));
+        // 依据优先用执行器回填的（同一处产出，答案与依据必然同源）；
+        // 执行器没给（异常/未登记通道）才在这里兜底组装，避免卡片空着
+        boolean fromExecutor = exec != null && exec.getEvidence() != null;
+        vo.setEvidence(fromExecutor ? exec.getEvidence() : buildEvidence(intent.getIntent(), exec));
+        // 诊断：依据到底取自「执行器回填」还是「合成层兜底」——排查"卡片里出现旧口径文案"时一眼可见
+        log.info("[AI依据] intent={} 来源={} 快照={} 项", intent.getIntent(),
+                fromExecutor ? "执行器回填" : "合成层兜底", snapshotSize(vo.getEvidence()));
         return vo;
+    }
+
+    /** 依据里 snapshot 的条目数（诊断用：0 表示该段没带依据） */
+    @SuppressWarnings("unchecked")
+    private int snapshotSize(Map<String, Object> evidence) {
+        if (evidence == null) {
+            return 0;
+        }
+        Object snap = evidence.get("snapshot");
+        return (snap instanceof List) ? ((List<Object>) snap).size() : 0;
     }
 
     /* ---------------- 模板答案 ---------------- */
@@ -375,7 +391,7 @@ public class AnswerComposer {
         Map<String, Object> source = new LinkedHashMap<>();
         source.put("api", exec.getApi());
         source.put("params", exec.getParams());
-        source.put("note", "与本页统计同源（登记于 micro_ai_metric_api）");
+        source.put("note", "与本页统计同源（已审核口径）");
         evidence.put("source", source);
 
         List<Map<String, Object>> snapshot = new ArrayList<>();

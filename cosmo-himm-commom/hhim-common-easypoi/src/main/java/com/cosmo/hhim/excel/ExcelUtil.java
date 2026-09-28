@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.excel;
 
@@ -996,7 +996,7 @@ public class ExcelUtil<T> {
             }
         }
 
-        // 数据脱敏 add by zyh
+        // 数据脱敏 add by cosmo-hhim-open Team
         cellValueMask(attr, cell);
 
     }
@@ -1192,7 +1192,7 @@ public class ExcelUtil<T> {
                 }
                 addStatisticsData(column, Convert.toStr(value), attr);
 
-                // 数据脱敏 add by zyh
+                // 数据脱敏 add by cosmo-hhim-open Team
                 cellValueMask(attr, cell);
             }
         } catch (Exception e) {

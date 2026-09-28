@@ -1,3 +1,8 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+-->
+
 # 贡献指南
 
 感谢您对本项目的兴趣！欢迎提交 Issue 和 Pull Request。
@@ -12,7 +17,7 @@
 
 ## 提 Bug
 
-在 [GitHub Issues](https://github.com/your-org/cosmo-hhim-open/issues) 中提交 Bug，附上：
+在 [GitHub Issues](https://github.com/cosmoplat-opensource/kuYiJi/issues) 中提交 Bug，附上：
 
 - **环境信息**：JDK 版本、操作系统、数据库版本
 - **复现步骤**：清晰的步骤说明
@@ -30,7 +35,7 @@
 ### 2. 克隆代码
 
 ```bash
-git clone https://github.com/your-username/cosmo-hhim-open.git
+git clone https://github.com/cosmoplat-opensource/kuYiJi.git
 cd cosmo-hhim-open
 ```
 
@@ -95,8 +100,12 @@ type 类型：
 ### 本地运行
 
 ```bash
-# 编译 + 安装全部内部模块（务必在仓库根目录执行，一次 reactor 构建产出全部内部依赖）
-mvn clean install -DskipTests
+# 安装本地依赖（仓库根目录执行）
+install-lib.bat   # Windows
+./install-lib.sh  # Linux / macOS / Git Bash
+
+# 编译项目
+mvn clean compile
 
 # 运行测试
 mvn test
@@ -163,11 +172,11 @@ npm run dev:mp-weixin            # 小程序开发（微信开发者工具导入
 
 ## 许可证
 
-提交代码即表示您同意您的代码以 [MIT License](./LICENSE) 许可证开源。
+提交代码即表示您同意您的代码以 [Apache License 2.0](./LICENSE) 许可证开源。
 
 ---
 
 ## 联系方式
 
-- GitHub Issues: [提交 Issue](https://github.com/your-org/cosmo-hhim-open/issues)
+- GitHub Issues: [提交 Issue](https://github.com/cosmoplat-opensource/kuYiJi/issues)
 - 邮箱: your-email@example.com

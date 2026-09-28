@@ -1,3 +1,6 @@
+# Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+# Licensed under the Apache License, Version 2.0 (the "License");
+
 # ============================================
 # Cosmo HHIM Open - .gitignore
 # ============================================
@@ -128,9 +131,6 @@ $RECYCLE.BIN/
 # ---------- 内部资料（不开源） ----------
 doc/
 
-# ---------- 内部模块构建产物（根 reactor 从源码构建，不入库） ----------
-lib/
-
 # ---------- 内部工具缓存（团队约定） ----------
 .codegraph/
 openspec/
@@ -145,3 +145,7 @@ thirdplat-latest.jar
 docker-compose.run.yml
 # 临时调试产物
 diff_*.txt
+# 本地诊断产物（可能含内网地址 / 真实业务数据，务必勿提交）
+.tmp-diag/
+.tmp-*/
+*.diag.txt

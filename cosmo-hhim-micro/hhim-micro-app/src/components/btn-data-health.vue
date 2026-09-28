@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view class="flex-center btn-data-health px-32" @tap.stop="handleClick">
     <image src="/static/images/icon_health.svg" class="icon-32" />
     <text class="ml-8 font-24 color-fff" v-if="checkAudit">记工风险监控</text>

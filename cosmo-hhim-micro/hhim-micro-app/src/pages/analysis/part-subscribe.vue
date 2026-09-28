@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <view
     class="pr-24 box bg-fff rounded-16 flex align-center border-bottom-f5f5f5"
     :class="analysis ? 'pl-24 py-16' : 'pl-32 py-32'"

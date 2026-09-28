@@ -1,5 +1,8 @@
+-- Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+-- Licensed under the Apache License, Version 2.0 (the "License");
+
 -- ============================================================
--- cosmo-hhim micro_* 业务表初始化脚本（共 60 张表）
+-- cosmo-hhim micro_* 业务表初始化脚本（共 62 张表，含 AI 会话表）
 -- Docker 部署：由 mysql 镜像 /docker-entrypoint-initdb.d/ 自动执行；
 -- 手工导入（Navicat 等）：脚本自带建库语句，无需手动创建数据库
 -- ============================================================
@@ -1345,7 +1348,7 @@ VALUES
 ('A9K3Q7', 'GX000003', 'GX000003', '攻丝', 'SYSTEM', NOW(), 'SYSTEM', NOW());
 
 -- =====================================================
--- AI 问数 · 会话存储表（原独立脚本 hhim-ai-chat-schema.sql，已并入本文件）
+-- AI 问数 · 会话存储表（随本文件一并初始化，无需单独执行建表脚本）
 -- -----------------------------------------------------
 -- 会话表
 CREATE TABLE IF NOT EXISTS `micro_ai_chat_session` (

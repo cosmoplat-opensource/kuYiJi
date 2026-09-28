@@ -1,6 +1,11 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+-->
+
 # Redis包使用说明
 
-## 功能一：Redis多DB切换使用方式（责任人：张耀晖）
+## 功能一：Redis多DB切换使用方式
 ### 第一步：引入common-redis包
 
 ### 第二步：启动类上加注解@EnableRedisMultiDB

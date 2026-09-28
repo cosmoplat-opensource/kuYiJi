@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.service.ai;
 
@@ -203,21 +203,9 @@ public class OntologyGraphService {
     /** 表名 → 实体列表（血缘推导用：实体的物理表命中指标登记的表即视为血缘） */
     private final Map<String, java.util.List<JSONObject>> entityTableIndex = new LinkedHashMap<>();
 
-    private static final Map<String, String[]> METRIC_SOURCES = new LinkedHashMap<>();
-
-    static {
-        METRIC_SOURCES.put("SUMMARY", new String[]{"submit"});
-        METRIC_SOURCES.put("PRODUCT_PASS_RATE", new String[]{"submit", "product"});
-        METRIC_SOURCES.put("PROCESS_PASS_RATE", new String[]{"submit", "process"});
-        METRIC_SOURCES.put("EMPLOYEE_PASS_RATE", new String[]{"submit", "employee"});
-        METRIC_SOURCES.put("SUBMIT_RANK", new String[]{"submit", "employee"});
-        METRIC_SOURCES.put("NG_DETAIL", new String[]{"qualityControl", "ngType"});
-        METRIC_SOURCES.put("STOCK", new String[]{"stock_finished", "stock_wip"});
-        METRIC_SOURCES.put("ENTITY_LIST", new String[]{"product", "process", "employee"});
-        METRIC_SOURCES.put("ATTRIBUTION", new String[]{"submit", "process", "product", "employee"});
-        METRIC_SOURCES.put("CONCENTRATE", new String[]{"qualityControl", "ngType", "process", "product"});
-        METRIC_SOURCES.put("COMPARE", new String[]{"submit", "product", "process", "employee"});
-    }
+    // 注：口径血缘原先由这里的静态映射 METRIC_SOURCES 手工维护，已在 2026-09 改为
+    // **由本体推导**（实体 source.table ∈ 指标 dataSource.tables），故该映射已删除。
+    // 好处：本体登记一次即可，改数据源/新增指标不需要改 Java 代码。
 
     /** 分层：主数据 / 现场动作 / 结果 / 指标 */
     private static final Map<String, String> ENTITY_LEVEL = new LinkedHashMap<>();

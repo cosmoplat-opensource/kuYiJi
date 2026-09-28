@@ -1,4 +1,10 @@
-﻿<template>
+﻿<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
+<template>
   <!-- 时间选择 -->
   <!-- #ifdef H5 -->
   <!-- H5：date-select-root 配合 style 块禁止纵向 flex-grow（根因修复，见下方样式注释）；

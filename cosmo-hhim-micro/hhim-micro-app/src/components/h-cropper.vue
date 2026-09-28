@@ -1,3 +1,9 @@
+<!--
+ * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * @author cosmo-hhim-open Team
+-->
 <template>
 	<view v-if="url" class="h-cropper">
 		<!-- #ifdef MP-WEIXIN -->
@@ -45,7 +51,7 @@
 
 <script>
 /**
- * h-cropper —— 图片裁剪组件(自研,MIT)
+ * h-cropper —— 图片裁剪组件(自研,Apache-2.0)
  *
  * 兼容原 ksp-cropper 的 props 与事件:
  *   mode: fixed | ratio | free(默认 free,不限制宽高比)

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.service.ai;
 
@@ -27,7 +27,7 @@ import java.util.UUID;
  * AI 问数 · 会话存储服务
  *
  * <p>会话 CRUD（创建/列表/消息/重命名/删除）+ 消息写入（上限 20 条校验、状态维护）。
- * 表结构见仓库根 hhim-ai-chat-schema.sql；租户/用户取自 ThreadContext（与项目其它服务一致）。
+ * 表结构见仓库根 init.sql；租户/用户取自 ThreadContext（与项目其它服务一致）。
  *
  * @author cosmo-hhim-open Team
  */

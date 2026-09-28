@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2026 海尔卡奥斯物联科技有限公司
- * Licensed under the MIT License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
  */
 package com.cosmo.hhim.micro.application.dto.ai;
 
@@ -21,6 +21,12 @@ public class OntologyCapabilityDTO {
 
     /** 指标编码（如 PRODUCT_PASS_RATE） */
     private String code;
+
+    /** 能力类型：metric（指标）/ analysis（分析算子）。意图映射提示词据此判断"该用哪个能力" */
+    private String type;
+
+    /** 算子的能力规格（能算什么/需要什么/不能算什么）：让 LLM 判断"去了之后算得出、且算得符合问题" */
+    private String routing;
 
     /** 指标名称 */
     private String name;
